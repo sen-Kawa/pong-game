@@ -1,0 +1,61 @@
+version: '3.9'
+
+networks:
+  transcendence:
+
+services:
+  backend:
+    restart: always
+    image: backend
+    container_name: backend
+    build:
+      dockerfile: ./docker/backend/Dockerfile
+    networks:
+      - transcendence
+    volumes:
+      - $PWD/backend/:/app
+    ports:
+      - "3000:3000"
+  frontend:
+    restart: always
+    image: frontend
+    container_name: frontend
+    build:
+      dockerfile: ./docker/frontend/Dockerfile
+    networks:
+      - transcendence
+    volumes:
+      - $PWD/frontend/:/app
+    ports:
+      - "8080:8080"
+    environment:
+      - VUE_APP_BACKEND_SERVER_URI=${VUE_APP_BACKEND_SERVER_URI}
+
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+    networks:
+      - transcendence
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 5050:8080
+    networks:
+      - transcendence
+    depends_on:
+      - db
+
+volumes:
+  db:
+    driver: local
