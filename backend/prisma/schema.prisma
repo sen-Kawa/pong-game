@@ -1,0 +1,29 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int     @id @default(autoincrement())
+  name             String? @unique @default("")
+  user42Name       String?
+  email            String? @default("")
+  password         String
+  gamesAsPlayerOne Game[]  @relation("playerOne")
+  gamesAsPlayerTwo Game[]  @relation("playerTwo")
+  User_A           User[]  @relation("friends")
+  User_B           User[]  @relation("friends")
+}
+
+model Game {
+  id            Int    @id @default(autoincrement())
+  playerOneName String
+  playerTwoName String
+  playerOne     User   @relation("playerOne", fields: [playerOneName], references: [name])
+  playerTwo     User   @relation("playerTwo", fields: [playerTwoName], references: [name])
+}
