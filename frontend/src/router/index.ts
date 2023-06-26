@@ -20,11 +20,6 @@ const router = createRouter({
 			component: () => import('../views/Leader.vue')
 		},
 		{
-			path: '/user/:user',
-			name: 'user',
-			component: () => import('../views/User.vue')
-		},
-		{
 			path: '/user/Preference',
 			name: 'preference',
 			component: () => import('../components/user/Preference.vue')
