@@ -12,8 +12,10 @@ export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
   async login(name: string, password: string): Promise<AuthEntity> {
     // Step 1: Fetch a user with the given email
+    console.log('username %s', name);
+    console.log('password %s', password);
     const user = await this.prisma.user.findUnique({ where: { name: name } });
-
+    
     // If no user is found, throw an error
     if (!user) {
       throw new NotFoundException(`No user found for email: ${name}`);
