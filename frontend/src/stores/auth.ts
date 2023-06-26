@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
+import axios from 'axios';
 
-const baseUrl = `${import.meta.env.VUE_APP_BACKEND_SERVER_URI}/auth/login`;
+// const baseUrl = `${import.meta.env.VUE_APP_BACKEND_SERVER_URI}/auth/login`;
 
 export const useAuthStore = defineStore( 'user', {
     state: () => ({
@@ -10,18 +11,19 @@ export const useAuthStore = defineStore( 'user', {
 
 	actions: {
 		async login(username: string, password: string) {
-			const body = JSON.stringify({ "name": username, "password": password });
-			fetch(baseUrl, 
-			{
-				method: 'POST',
+			const body = { "name": username, "password": password };
+			axios.post('http://localhost:3000/auth/login', body,  {
 				headers: {
 				  'Content-Type': 'application/json'
-				},
-				body: body
+				}
 			  }
 				
-			).then(res => res.json())
-			.then(res => console.log(res))
+			).then(function(response) {
+				console.log(response.data);
+			})
+			.catch(function(error) {
+				console.log(error)
+			})
 
 		},
 		logout() {
