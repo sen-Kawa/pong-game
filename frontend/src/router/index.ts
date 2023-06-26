@@ -1,6 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router";
 
-const router = new createRouter({
+const router = createRouter({
 	history: createWebHistory(),
 	routes: [
 		{ path: '/', redirect: { name: 'home' } },

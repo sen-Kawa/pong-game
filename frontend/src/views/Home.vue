@@ -1,36 +1,29 @@
 <template>
     <div class="text-center">
       this is the home
+      <button @click="increment">Count is: {{ count }}</button>
     </div>
 </template>
 
-<script>
-import { server } from "../helper";
-import axios from "axios";
-
+<script lang="ts">
 export default {
+  // reactive state
   data() {
     return {
-      users: []
-    };
-  },
-  created() {
-    this.fetchCustomers();
-  },
-  methods: {
-    fetchCustomers() {
-      axios
-        .get(`${server.baseURL}/users/users`)
-        .then(data => (this.users = data.data));
-    },
-    deleteCustomer(id) {
-      axios
-        .delete(`${server.baseURL}/customer/delete?customerID=${id}`)
-        .then(data => {
-          console.log(data);
-          window.location.reload();
-        });
+      count: 0
     }
+  },
+
+  // functions that mutate state and trigger updates
+  methods: {
+    increment() {
+      this.count++
+    }
+  },
+
+  // lifecycle hooks
+  mounted() {
+    console.log(`The initial count is ${this.count}.`)
   }
-};
+}
 </script>

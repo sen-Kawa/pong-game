@@ -5,9 +5,9 @@ WORKDIR /app
 
 COPY ./frontend/package*.json .
 
-RUN npm ci
-
+RUN npm install
+# RUN npm run lint
 
 EXPOSE 3030
 
-CMD npm run watch
+CMD npm run dev

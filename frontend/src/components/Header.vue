@@ -7,14 +7,10 @@
     </nav>
 </template>
 
-<script>
-import User from '../components/user/User'
-export default {
-  name: 'navbar',
-  components: {
-    User
-  },
-}
+<script setup lang="ts">
+import User from '../components/user/User.vue'
+
+
 </script>
 <style>
 nav {
