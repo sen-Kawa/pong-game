@@ -12,9 +12,8 @@ export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
   async login(name: string, password: string): Promise<AuthEntity> {
     // Step 1: Fetch a user with the given email
-    console.log('username %s', name);
-    console.log('password %s', password);
-    const user = await this.prisma.user.findUnique({ where: { name: name } });
+
+    const user = await this.prisma.user.findUnique({ where: { user42Name: name } });
     
     // If no user is found, throw an error
     if (!user) {
@@ -31,7 +30,9 @@ export class AuthService {
 
     // Step 3: Generate a JWT containing the user's ID and return it
     return {
-      accessToken: this.jwtService.sign({ userId: user.id }),
+      userId: user.id,
+      user: user.user42Name,
+      accessToken: this.jwtService.sign({ userId: user.id })
     };
   }
 }
