@@ -24,7 +24,8 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   
   app.enableCors({
-    origin: '*',
+    credentials: true,
+    origin: ['http://localhost:8080'],
     methods: 'GET, PUT, POST, DELETE',
     allowedHeaders: 'Content-Type, Authorization',
   });

@@ -1,13 +1,5 @@
 <template>
-    <div class="text-center">
-      this is the home
-      <button @click="increment">Count is: {{ count }}</button>
-    </div>
-    <div>
-        <div class="alert alert-info">
-            Username: test<br />
-            Password: test
-        </div>
+    <div v-if="!authStore.isLoggedIn">
         <h2>Login</h2>
         <Form @submit="onSubmit" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
             <div class="form-group">
@@ -26,33 +18,11 @@
                     Login
                 </button>
             </div>
-            <div v-if="errors.apiError" class="alert alert-danger mt-3 mb-0">{{errors.apiError}}</div>
+            <div v-if="errors.apiError">{{errors.apiError}}</div>
         </Form>
     </div>
 </template>
 
-<script lang="ts">
-export default {
-  // reactive state
-  data() {
-    return {
-      count: 0
-    }
-  },
-
-  // functions that mutate state and trigger updates
-  methods: {
-    increment() {
-      this.count++
-    }
-  },
-
-  // lifecycle hooks
-  mounted() {
-    console.log(`The initial count is ${this.count}.`)
-  }
-}
-</script>
 
 <script setup lang="ts">
 
@@ -60,16 +30,17 @@ import { Form, Field } from 'vee-validate';
 import * as Yup from 'yup';
 import { useAuthStore } from '../stores/auth';
 
+const authStore = useAuthStore();
+
 const schema = Yup.object().shape({
     username: Yup.string().required('Username is required'),
     password: Yup.string().required('Password is required')
 });
 
-function onSubmit(values: any, { setErrors } : any) {
-    const authStore = useAuthStore();
+async function onSubmit(values: any, { setErrors } : any) {
     const { username, password } = values;
-    return authStore.login(username, password)
-        .catch(error => setErrors({ apiError: error }));
+    const stuff = await authStore.login(username, password);
+    setErrors({apiError: stuff})
 }
 
 </script>

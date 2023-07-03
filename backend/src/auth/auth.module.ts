@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
+import { LocalStrategy } from './local.strategy';
 
 //TODO remove secret from files ;)
 export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
@@ -21,6 +22,6 @@ export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
     UsersModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy]
+  providers: [AuthService, JwtStrategy, LocalStrategy]
 })
 export class AuthModule {}

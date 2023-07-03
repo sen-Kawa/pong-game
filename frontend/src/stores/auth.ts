@@ -1,56 +1,85 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { useStorage } from '@vueuse/core'
 
-
+//TODO env import on vue
 const baseUrl = `${import.meta.env.VUE_APP_BACKEND_SERVER_URI}/auth/login`;
 
 export const useAuthStore = defineStore('auth', {
 
-		state: () =>({
-        user : localStorage.getItem('user'),
-		accessToken : localStorage.getItem('token'),
-		userId : localStorage.getItem('userId')
-		}),
-		getters: {
-			isLoggedIn: (state) => {
-				if(state.accessToken === null)
+	state: () => ({ 
+			loginStatus : useStorage("loginStatus",false),
+			userProfile: {
+					id: 0,
+					userName:"",
+					user42Name: "",
+					email: "",
+				}
+			}),
+	getters: {
+		isLoggedIn() {
+				if(this.loginStatus === false)
 					return false;
 				return true;
+			},
+		
+		getUserName(state): string{
+			return state.userProfile.userName
+		} 
+	},
+	actions: {	
+		setUserProfile(date: any){
+			// const userProfile = {
+			// 	id: date.id,
+			// 	name: date.name,
+			// 	user42Name: date.user42Name,
+			// 	email: date.email,
+			// }
+			this.loginStatus = true;
+			this.userProfile.id = date.id;
+			this.userProfile.userName = date.userName;
+			this.userProfile.user42Name = date.user42Name;
+			this.userProfile.email = date.email;
+		},
+		
+		async login(username: string, password: string) {
+				const body = { "username": username, "password": password };
+				try {
+					const response = await axios.post("http://localhost:3000/auth/login", body,  {
+						headers: {
+				  		'Content-Type': 'application/json'
+						},
+						withCredentials: true
+			  		});
+					this.loginStatus = true;
+					console.log(response.data);
+					return "Succes";
+					}
+				catch(error: any) {
+				//TODO improve error handling
+				console.log(error);
+				return error.response.data.message;		
 			}
 		},
-		actions: {
-			
 
-			async login(username: string, password: string) {
-			const self=this;
-			const body = { "name": username, "password": password };
-			axios.post('http://localhost:3000/auth/login', body,  {
-				headers: {
-				  'Content-Type': 'application/json'
-				}
-			  }
-				
-			).then(function(response) {
-				self.user = response.data.user;
-				self.accessToken = response.data.accessToken;
-				self.userId = response.data.userId;
-				localStorage.setItem('token', response.data.accessToken);
-				localStorage.setItem('user', response.data.user);
-				localStorage.setItem('userId', response.data.userId);
-				console.log(response.data);
-			})
-			.catch(function(error) {
-				console.log(error)
-			})
-
+		async userProfile(){
+			const response = await axios
+			.get("http://localhost:3000/user-profile", {
+				withCredentials: true
+			  })
+			  .catch((err) => {
+				console.log(err);
+			  });
+		
+			if (response && response.data) {
+			  this.setUserProfile(response.data);
+			}
 		},
+
+
+		
 		logout() {
-			this.user = null;
-			this.accessToken = null;
-			this.userId = null;
-			localStorage.removeItem('token');
-			localStorage.removeItem('user');
-			localStorage.removeItem('userId');
+			this.loginStatus = false
 		}
 		}
 

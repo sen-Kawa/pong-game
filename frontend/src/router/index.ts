@@ -1,4 +1,5 @@
 import { createWebHistory, createRouter } from "vue-router";
+import { useAuthStore } from '../stores/auth';
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -22,6 +23,7 @@ const router = createRouter({
 		{
 			path: '/user/Preference',
 			name: 'preference',
+			meta: { requiredAuth: true },
 			component: () => import('../components/user/Preference.vue')
 		},
 		{
@@ -37,4 +39,12 @@ const router = createRouter({
 	]
   })
 
+  router.beforeEach(async (to, from, next) => {
+	if (to.meta.requiredAuth)
+	{
+		useAuthStore().userProfile();
+		
+	}
+	next();
+  })
 export default router
