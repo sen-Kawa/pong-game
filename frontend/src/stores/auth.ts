@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', {
 			// 	email: date.email,
 			// }
 			this.loginStatus = true;
-			this.userProfile.id = date.id;
+			this.userProfile.id = date.userId;
 			this.userProfile.userName = date.userName;
 			this.userProfile.user42Name = date.user42Name;
 			this.userProfile.email = date.email;
@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', {
 
 		async userProfile(){
 			const response = await axios
-			.get("http://localhost:3000/user-profile", {
+			.get("http://localhost:3000/auth/user-profile", {
 				withCredentials: true
 			  })
 			  .catch((err) => {

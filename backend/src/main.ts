@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+var cookieParser = require('cookie-parser')
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,6 +30,7 @@ async function bootstrap() {
     methods: 'GET, PUT, POST, DELETE',
     allowedHeaders: 'Content-Type, Authorization',
   });
+  app.use(cookieParser())
   await app.listen(3000);
 }
 bootstrap();

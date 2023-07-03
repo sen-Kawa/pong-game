@@ -12,8 +12,7 @@ import { UserResponseModel } from 'src/auth/model/user.response.model';
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
   async validateUser(name: string, password: string): Promise<AuthEntity> {
-    console.log(name);
-    console.log(password);
+
     const user = await this.prisma.user.findUnique({ where: { user42Name: name } });
 
     if (!user) {
@@ -31,7 +30,7 @@ export class AuthService {
       email: user.email
     };
   }
-  async getToken(user: AuthEntity) {
+  getToken(user: AuthEntity) {
     return this.jwtService.sign(user);
   }
 

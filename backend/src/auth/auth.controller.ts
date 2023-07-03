@@ -1,21 +1,25 @@
-import { Controller, Post, Get, Req, Res, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Req, Res, Body, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entities/auth.entity';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {Response} from 'express'
-
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/users/users.service';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(		
+    private userService: UsersService,
+		private jwtService: JwtService,
+		private authService: AuthService) {}
 
   @Post('login')
   @ApiOkResponse({ type: AuthEntity })
   @UseGuards(AuthGuard('local'))
   async login(@Req() req,@Res({passthrough:true}) res:Response) {
-    const jwtToken = await this.authService.getToken(req.user);
+    const jwtToken = this.authService.getToken(req.user);
     const secretData = {
       accessToken: jwtToken,
     }
@@ -30,7 +34,6 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   userProfile(@Req() req){
-    console.log(req.cookies);
     return req.user;
   }
 
