@@ -36,5 +36,11 @@ export class AuthController {
   userProfile(@Req() req){
     return req.user;
   }
+  @Get('logout')
+  @ApiBearerAuth()
+  async logout(@Res({passthrough:true}) res:Response){
+    res.clearCookie('auth-cookie');
+    return {msg:"success"};
+  }
 
 }

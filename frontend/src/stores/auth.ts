@@ -78,8 +78,16 @@ export const useAuthStore = defineStore('auth', {
 
 
 		
-		logout() {
-			this.loginStatus = false
+		async logout() {
+			//TODO delete cookie and redirect
+			const response = await axios.get("http://localhost:3000/auth/logout", {
+				withCredentials: true
+			}).catch((error) => {
+				console.log(error);
+			});
+			if (response && response.data) {
+				this.loginStatus = false;
+			}
 		}
 		}
 

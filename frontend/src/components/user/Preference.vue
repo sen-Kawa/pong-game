@@ -10,6 +10,6 @@ import User from '../../components/user/User.vue'
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
-//authStore.userProfile();
+authStore.userProfile();
 
 </script>
