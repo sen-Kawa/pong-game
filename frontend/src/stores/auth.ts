@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useStorage } from '@vueuse/core'
+import router from '../router'
+import { truncate } from 'fs';
 
 //TODO env import on vue
 const baseUrl = `${import.meta.env.VUE_APP_BACKEND_SERVER_URI}/auth/login`;
@@ -14,6 +16,7 @@ export const useAuthStore = defineStore('auth', {
 					userName:"",
 					user42Name: "",
 					email: "",
+					activated2FA: false
 				}
 			}),
 	getters: {
@@ -22,24 +25,22 @@ export const useAuthStore = defineStore('auth', {
 					return false;
 				return true;
 			},
+		activated2FA(): boolean {
+				return this.userProfile.activated2FA;
+			},
 		
-		getUserName(state): string{
-			return state.userProfile.userName
+		getUserName(): string{
+			return this.userProfile.userName
 		} 
 	},
 	actions: {	
 		setUserProfile(date: any){
-			// const userProfile = {
-			// 	id: date.id,
-			// 	name: date.name,
-			// 	user42Name: date.user42Name,
-			// 	email: date.email,
-			// }
 			this.loginStatus = true;
 			this.userProfile.id = date.userId;
 			this.userProfile.userName = date.userName;
 			this.userProfile.user42Name = date.user42Name;
 			this.userProfile.email = date.email;
+			this.userProfile.activated2FA = date.activated2FA;
 		},
 		
 		async login(username: string, password: string) {
@@ -69,15 +70,35 @@ export const useAuthStore = defineStore('auth', {
 			  })
 			  .catch((err) => {
 				console.log(err);
+				this.loginStatus = false;
+				router.push('/');
 			  });
 		
 			if (response && response.data) {
+				console.log(response.data);
 			  this.setUserProfile(response.data);
 			}
 		},
+		async deactivate2FA(){
+			const response = await axios
+			.get("http://localhost:3000/auth/deactivate2FA", {
+				withCredentials: true
+			  })
+			  .catch((err) => {
+				console.log(err);
+			  });
+			  
+			if (response && (response.status == 200)) {
+				this.userProfile.activated2FA = false;
+			}
 
+		},
 
-		
+		async activate2FA(){
+			this.userProfile.activated2FA = true;
+
+		},
+
 		async logout() {
 			//TODO delete cookie and redirect
 			const response = await axios.get("http://localhost:3000/auth/logout", {

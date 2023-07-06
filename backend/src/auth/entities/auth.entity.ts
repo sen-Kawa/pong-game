@@ -9,4 +9,6 @@ export class AuthEntity {
 	user42Name: string;
 	@ApiProperty()
 	email: string;
+	@ApiProperty()
+	activated2FA: Boolean
 }

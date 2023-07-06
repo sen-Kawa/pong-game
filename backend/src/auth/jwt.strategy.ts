@@ -7,7 +7,9 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(
+    private readonly userService: UsersService
+  ) {
     super({
       ignoreExpiration: false,
       secretOrKey: jwtSecret,
@@ -23,9 +25,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload:any){
-    if(payload == null){
-        throw new UnauthorizedException();
-    }
-    return payload
+    const user = await this.userService.findOne( payload.userId );
+    if ( user == undefined) throw new UnauthorizedException();
+		if ( payload.auth == false) throw new UnauthorizedException();
+		return user;
   }
+
 }

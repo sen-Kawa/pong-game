@@ -14,6 +14,8 @@ model User {
   user42Name       String? @unique
   email            String? @default("")
   password         String
+  activated2FA     Boolean @default(false)
+  twoFactorAuthenticationSecret String?
   gamesAsPlayerOne Game[]  @relation("playerOne")
   gamesAsPlayerTwo Game[]  @relation("playerTwo")
   User_A           User[]  @relation("friends")

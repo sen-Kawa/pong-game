@@ -7,10 +7,14 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthEntity } from './entities/auth.entity'
 import * as bcrypt from 'bcrypt';
 import { UserResponseModel } from 'src/auth/model/user.response.model';
+import { UserEntity } from '../users/entities/user.entity';
+import { authenticator } from 'otplib';
+import { UsersService } from '../users/users.service';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+  constructor(private prisma: PrismaService, private jwtService: JwtService, private usersServive: UsersService) {}
   async validateUser(name: string, password: string): Promise<AuthEntity> {
 
     const user = await this.prisma.user.findUnique({ where: { user42Name: name } });
@@ -27,11 +31,64 @@ export class AuthService {
       userId: user.id,
       userName: user.name,
       user42Name: user.user42Name,
-      email: user.email
+      email: user.email,
+      activated2FA: user.activated2FA
+
     };
   }
   getToken(user: AuthEntity) {
     return this.jwtService.sign(user);
   }
 
+  async deactivate2FA(num: number) {
+   try
+   {
+      await this.prisma.user.update({
+        where: {id: num },
+        data:{
+          activated2FA:false
+        }
+      });
+   }catch(error)
+   {
+    console.log( error );
+
+   }
+  }
+  async activate2FA(num: number) {
+    try
+    {
+       await this.prisma.user.update({
+         where: {id: num },
+         data:{
+           activated2FA:true
+         }
+       });
+    }catch(error)
+    {
+     console.log( error );
+ 
+    }
+   }
+   async generate2FASecret(user: UserEntity)
+   {
+    const secret = authenticator.generateSecret();
+    const otpauthUrl = authenticator.keyuri(
+      user.email,
+      'AUTH_APP_NAME',
+      secret,
+    );
+    await this.usersServive.setTwoFactorAuthenticationSecret(
+      secret,
+      user.id ,
+    );
+      return {
+        secret, otpauthUrl
+      }
+   }
+
+   async generateQrCodeDataURL(otpAuthUrl: string) {
+    return toDataURL(otpAuthUrl);
+  }
+  
 }

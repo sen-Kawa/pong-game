@@ -47,4 +47,14 @@ export class UsersService {
   remove(id: number) {
     return this.prisma.user.delete({ where: { id } });
   }
+
+  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    this.prisma.user.update({ 
+      where: {id : userId},
+      data : {
+        twoFactorAuthenticationSecret: secret
+      }
+  })
+
+  }
 }

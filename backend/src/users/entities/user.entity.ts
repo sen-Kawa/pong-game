@@ -19,6 +19,12 @@ export class UserEntity implements User {
 	@ApiProperty()
 	email: string;
 
+	@ApiProperty()
+	activated2FA: boolean;
+
 	@Exclude()
 	password: string;
+
+	@Exclude()
+	twoFactorAuthenticationSecret: string;
 }

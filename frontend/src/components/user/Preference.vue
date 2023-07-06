@@ -1,15 +1,26 @@
 <template>
     <div class="text-center">
-      Welcome {{authStore.getUserName}}
+      Welcome {{getUserName}}
     </div>
+        <div class="text-center">
+      change user name
+    </div>
+    <Twofactor></Twofactor>
 </template>
 
 <script setup lang="ts">
 
-import User from '../../components/user/User.vue'
+import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth';
+import { ref } from 'vue';
+import Twofactor from './Twofactor.vue'
+
 
 const authStore = useAuthStore();
-authStore.userProfile();
+const { 
+  getUserName
+} = storeToRefs(authStore) 
+
 
 </script>
+

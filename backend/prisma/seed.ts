@@ -21,31 +21,35 @@ async function main() {
 	name: "Ulli Rings2",
 	user42Name: 'hrings2',
 	email: "ulli@gmx.de",
-	password: test2
+	password: test2,
     },
   });
 
   const post2 = await prisma.user.upsert({
     where: { name: "Ulli Rings" },
     update: {
-      password: test1
+      password: test1,
+      activated2FA: true
     },
     create: {
 	name: "Ulli Rings",
 	user42Name: 'hrings',
-	password: test1
+	password: test1,
+  activated2FA: true 
     },
   });
 
   const post3 = await prisma.user.upsert({
     where: { name: "Ulli Rings3" },
     update: {
-      password: test3
+      password: test3,
+      activated2FA: true
     },
     create: {
 	name: "Ulli Rings3",
 	user42Name: "hrings3",
-	password: test3
+	password: test3,
+  activated2FA: true 
     },
   });
 

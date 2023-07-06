@@ -7,6 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import {Response} from 'express'
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
+
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -30,12 +31,36 @@ export class AuthController {
     return {msg:"success"};
   }
 
+  @Get('deactivate2FA')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  deactivate2FA(@Req() req)
+  {
+    this.authService.deactivate2FA(req.user.id);
+
+  }
+
+  @Get('activate2FA')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async activate2FA(@Req() req, @Res({passthrough:true}) res:Response)
+  {
+    this.authService.activate2FA(req.user.id);
+    const { otpauthUrl } =
+      await this.authService.generate2FASecret(
+        req.user,
+      );
+      return {url :await this.authService.generateQrCodeDataURL(otpauthUrl)};
+  }
+
   @Get('user-profile')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   userProfile(@Req() req){
     return req.user;
   }
+
+
   @Get('logout')
   @ApiBearerAuth()
   async logout(@Res({passthrough:true}) res:Response){

@@ -21,6 +21,9 @@ export class CreateUserDto {
 	@ApiProperty({ required: false })
 	email: string;
 
+	@ApiProperty({ required: false })
+	activated2FA: boolean;
+
 	@IsString()
 	password: string;
 }

@@ -3,4 +3,5 @@ export interface UserResponseModel {
     userName: string;
     user42Name: string;
     email: string;
+	activated2FA: Boolean
 }
