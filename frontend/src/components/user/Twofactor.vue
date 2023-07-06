@@ -12,7 +12,8 @@
   </div>
   <div v-if="url != ''">
                 <br><img :src="url"> <br>
-                <button  @click="">Send code</button>
+				<input type="text" v-model="code">
+                <button  @click="verify2FA">Send code</button>
 </div>
 </template>
 
@@ -23,16 +24,17 @@ import { useAuthStore } from '@/stores/auth';
 import { ref } from 'vue'
 import axios from 'axios';
 
+
 const authStore = useAuthStore();
 const activated2FA = ref(authStore.activated2FA) 
 const {activate2FA , deactivate2FA } = authStore;
 
 const url = ref('')
+const code = ref('');
 
 const change2fa = () => {
   if(!activated2FA.value)
   {
-    activate2FA();
 	axios
 			.get("http://localhost:3000/auth/activate2FA", {
 				withCredentials: true
@@ -42,7 +44,7 @@ const change2fa = () => {
 			  .catch((err) => {
 				console.log(err);
 			  });
-			  activated2FA.value = true;
+			  
   }
   else
   {
@@ -50,6 +52,31 @@ const change2fa = () => {
     deactivate2FA();
 	activated2FA.value = false;
   } 
-};
+}
+const verify2FA = () => {
+	if (code.value == '') return ;
+	const body = { "code" : code.value};
+	console.log(body)
+	axios.post("http://localhost:3000/auth/verify2FA", 
+		body,  
+		{
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		withCredentials: true
+	})
+	.then( response => {
+		console.log(response)
+		if (response.status == 201){
+			url.value = '';
+			activate2FA();
+			activated2FA.value = true;
+		}
+	})
+	.catch((err) => {
+				console.log(err);
+	});
+			  
+}
 
 </script>

@@ -45,7 +45,6 @@ export class AuthController {
   @ApiBearerAuth()
   async activate2FA(@Req() req, @Res({passthrough:true}) res:Response)
   {
-    this.authService.activate2FA(req.user.id);
     const { otpauthUrl } =
       await this.authService.generate2FASecret(
         req.user,
@@ -68,4 +67,17 @@ export class AuthController {
     return {msg:"success"};
   }
 
+  @Post('verify2FA')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async verify2FA(@Req() req, @Body('code') code: string)
+  {
+    const validCode = await this.authService.verify2FA(req.user.id, code);
+    if (!validCode)
+    {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+    await this.authService.activate2FA(req.user.id);
+
+  }
 }

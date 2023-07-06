@@ -49,12 +49,11 @@ export class UsersService {
   }
 
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-    this.prisma.user.update({ 
+    await this.prisma.user.update({ 
       where: {id : userId},
       data : {
         twoFactorAuthenticationSecret: secret
       }
   })
-
   }
 }

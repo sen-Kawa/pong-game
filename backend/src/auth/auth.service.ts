@@ -90,5 +90,17 @@ export class AuthService {
    async generateQrCodeDataURL(otpAuthUrl: string) {
     return toDataURL(otpAuthUrl);
   }
-  
+
+  async verify2FA(id: number, code: string)
+  {
+      try {
+        const user = await this.usersServive.findOne(id);
+        return authenticator.verify({
+          token: code,
+          secret: user.twoFactorAuthenticationSecret,
+        });
+      } catch (error){
+        console.log( error );
+      }
+  }
 }
