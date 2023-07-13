@@ -12,6 +12,11 @@ import { authenticator } from 'otplib';
 import { UsersService } from '../users/users.service';
 import { toDataURL } from 'qrcode';
 
+export interface JwtPayload {
+  userId: number,
+	isTwoFaAuth : boolean
+}
+
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService, private usersServive: UsersService) {}
@@ -36,8 +41,9 @@ export class AuthService {
 
     };
   }
-  getToken(user: AuthEntity) {
-    return this.jwtService.sign(user);
+  getToken(userid: number, twoFactor: boolean) {
+    const payload: JwtPayload = {userId: userid, isTwoFaAuth: twoFactor}
+    return this.jwtService.sign(payload);
   }
 
   async deactivate2FA(num: number) {

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!authStore.isLoggedIn">
+    <div v-if="!isLoggedIn ">
         <h2>Login</h2>
         <Form @submit="onSubmit" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
             <div class="form-group">
@@ -29,9 +29,11 @@
 import { Form, Field } from 'vee-validate';
 import * as Yup from 'yup';
 import { useAuthStore } from '../stores/auth';
+import { storeToRefs } from 'pinia'
 
 const authStore = useAuthStore();
 
+const { isLoggedIn } = storeToRefs(authStore)
 const schema = Yup.object().shape({
     username: Yup.string().required('Username is required'),
     password: Yup.string().required('Password is required')

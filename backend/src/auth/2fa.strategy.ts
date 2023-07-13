@@ -6,7 +6,7 @@ import { jwtSecret } from './auth.module';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class TwoFAStrategy extends PassportStrategy(Strategy, '2fa') {
   constructor(
     private readonly userService: UsersService
   ) {
@@ -27,8 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload:any){
     const user = await this.userService.findOne( payload.userId );
     if ( user == undefined) throw new UnauthorizedException();
-		if ( user.activated2FA != payload.isTwoFaAuth) throw new UnauthorizedException();
-		return user;
+	  if ( payload.isTwoFaAuth != payload.isTwoFaAuth) throw new UnauthorizedException();
+	return user;
   }
-
 }

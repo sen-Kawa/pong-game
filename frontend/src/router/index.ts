@@ -36,6 +36,11 @@ const router = createRouter({
 			name: 'matchhistory',
 			component: () => import('../components/user/Matchhistory.vue')
 		},
+		{
+			path: '/user/2fa',
+			name: '2fa',
+			component: () => import('../components/user/2fa.vue')
+		},
 	]
   })
 

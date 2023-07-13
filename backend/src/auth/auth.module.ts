@@ -7,7 +7,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
-
+import { TwoFAStrategy } from './2fa.strategy';
 //TODO remove secret from files ;)
 export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
 
@@ -22,6 +22,6 @@ export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
     UsersModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy]
+  providers: [AuthService, JwtStrategy, LocalStrategy, TwoFAStrategy]
 })
 export class AuthModule {}
