@@ -20,6 +20,14 @@
             </div>
             <div v-if="errors.apiError">{{errors.apiError}}</div>
         </Form>
+    <div>
+    <button
+      class="btn btn-primary"
+      role="button"
+      v-on:click="loginFortyTwo"
+    > 42 Login
+    </button>
+</div>
     </div>
 </template>
 
@@ -30,6 +38,9 @@ import { Form, Field } from 'vee-validate';
 import * as Yup from 'yup';
 import { useAuthStore } from '../stores/auth';
 import { storeToRefs } from 'pinia'
+import router from '../router'
+import { openSignInWindow } from '../components/user/AuthPopup';
+
 
 const authStore = useAuthStore();
 
@@ -44,5 +55,21 @@ async function onSubmit(values: any, { setErrors } : any) {
     const stuff = await authStore.login(username, password);
     setErrors({apiError: stuff})
 }
+
+const receiveMessageFortyTwo = async (event: MessageEvent<any>) => {
+    console.log(event);
+  window.removeEventListener('message', receiveMessageFortyTwo);
+  await authStore.signInFortyTwo(event.data);
+  
+  
+};
+
+const loginFortyTwo = async () => {
+
+         window.addEventListener('message', receiveMessageFortyTwo);
+         openSignInWindow(`${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/42login/`);
+};
+
+
 
 </script>

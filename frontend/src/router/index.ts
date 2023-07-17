@@ -41,6 +41,11 @@ const router = createRouter({
 			name: '2fa',
 			component: () => import('../components/user/2fa.vue')
 		},
+		{
+			path: '/user/Success',
+			name: 'Success',
+			component: () => import('../components/user/LoggedIn.vue')
+		}
 	]
   })
 

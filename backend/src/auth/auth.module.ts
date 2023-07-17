@@ -8,6 +8,7 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { TwoFAStrategy } from './strategies/2fa.strategy';
+import { FTStrategy } from './strategies/42.strategy';
 import { ConfigModule, ConfigService } from "@nestjs/config";
 
 
@@ -29,6 +30,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     UsersModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy, TwoFAStrategy]
+  providers: [AuthService, JwtStrategy, LocalStrategy, TwoFAStrategy, FTStrategy]
 })
 export class AuthModule {}

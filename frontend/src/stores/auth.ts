@@ -68,7 +68,13 @@ export const useAuthStore = defineStore('auth', () => {
 				//return error.response.data.message;		
 			}
 		}
+	async function signInFortyTwo(params: string){
 
+			loginStatus.value = true;
+			router.push('/user/Preference');
+
+			
+		}
 		async function validate2fa(code: string)
 		{
 			const body = { code: code}
@@ -136,7 +142,7 @@ export const useAuthStore = defineStore('auth', () => {
 				loginStatus.value = false;
 			}
 		}
-		return { getUserName, activated2FA, isLoggedIn, login, validate2fa, getuserProfile, deactivate2FA, activate2FA, logout }
+		return { getUserName, activated2FA, isLoggedIn, login, signInFortyTwo, validate2fa, getuserProfile, deactivate2FA, activate2FA, logout }
 		}
 		
 );

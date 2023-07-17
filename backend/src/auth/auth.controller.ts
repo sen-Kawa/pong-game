@@ -18,11 +18,35 @@ export class AuthController {
 		private jwtService: JwtService,
 		private authService: AuthService) {}
 
+  @Get('42login')
+  @UseGuards(AuthGuard('42'))
+  handleLogin() {
+  }
+
+  
+  @Get('callback')
+  @UseGuards(AuthGuard('42'))
+  handleCallback(@Req() req: any, @Res({passthrough:true}) res:Response ) {
+    console.log(req.user);
+    const jwtToken = this.authService.getToken(req.user.id, false);
+    res.cookie('auth-cookie', jwtToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime()+86409000),
+    });
+      //@Res() res: Response
+      //res.send(200);
+      // return {msg: 'FT callback route'}
+      res.redirect("http://localhost:8080/user/Success")
+      return {      userId: req.user.id,
+        twoFaEnabled: req.user.activated2FA,};
+  }
+
+
   @Post('login')
   @ApiCreatedResponse({ type: AuthEntity })
   @ApiBody({type: PassEntity })
   @UseGuards(AuthGuard('local'))
-  async login(@Req() req,@Res({passthrough:true}) res:Response) {
+  async login(@Req() req: any,@Res({passthrough:true}) res:Response) {
       const jwtToken = this.authService.getToken(req.user.userId, false);
       // const secretData = {
       //   accessToken: jwtToken,
@@ -60,6 +84,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   userProfile(@Req() req){
+    console.log(req.user)
     return req.user;
   }
 
