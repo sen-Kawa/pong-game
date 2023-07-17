@@ -6,7 +6,8 @@ WORKDIR /app
 
 COPY ./backend/package*.json .
 
-RUN npm ci
+#RUN npm ci
+RUN npm install
 
 EXPOSE 3000
 

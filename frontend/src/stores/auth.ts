@@ -2,10 +2,10 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useStorage } from '@vueuse/core'
 import router from '../router'
-import { truncate } from 'fs';
 import { ref, computed } from 'vue'
 //TODO env import on vue
-const baseUrl = `${import.meta.env.VUE_APP_BACKEND_SERVER_URI}/auth/login`;
+
+const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`;
 export interface User {
 	id: number,
 	userName:string,
@@ -43,9 +43,10 @@ export const useAuthStore = defineStore('auth', () => {
 		}
 		
 	async function login(username: string, password: string) {
+		
 				const body = { "username": username, "password": password };
 				try {
-					const response = await axios.post("http://localhost:3000/auth/login", body,  {
+					const response = await axios.post(baseUrl + "login", body,  {
 						headers: {
 				  		'Content-Type': 'application/json'
 						},
@@ -72,7 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
 		{
 			const body = { code: code}
 			try {
-				const response = await axios.post("http://localhost:3000/auth/verify2FA", body,  {
+				const response = await axios.post(baseUrl + "verify2FA", body,  {
 					headers: {
 					  'Content-Type': 'application/json'
 					},
@@ -91,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
 		}
 		async function getuserProfile(){
 			const response = await axios
-			.get("http://localhost:3000/auth/user-profile", {
+			.get(baseUrl + "user-profile", {
 				withCredentials: true
 			  })
 			  .catch((err) => {
@@ -106,7 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
 		}
 		async function deactivate2FA(){
 			const response = await axios
-			.get("http://localhost:3000/auth/deactivate2FA", {
+			.get(baseUrl + "deactivate2FA", {
 				withCredentials: true
 			  })
 			  .catch((err) => {
@@ -126,7 +127,7 @@ export const useAuthStore = defineStore('auth', () => {
 
 		async function logout() {
 			//TODO delete cookie and redirect
-			const response = await axios.get("http://localhost:3000/auth/logout", {
+			const response = await axios.get(baseUrl + "logout", {
 				withCredentials: true
 			}).catch((error) => {
 				console.log(error);

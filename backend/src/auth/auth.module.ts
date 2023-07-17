@@ -5,20 +5,27 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
-import { JwtStrategy } from './jwt.strategy';
-import { LocalStrategy } from './local.strategy';
-import { TwoFAStrategy } from './2fa.strategy';
-//TODO remove secret from files ;)
-export const jwtSecret = 'zjP9h6ZI5LoSKCRj';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
+import { TwoFAStrategy } from './strategies/2fa.strategy';
+import { ConfigModule, ConfigService } from "@nestjs/config";
+
 
 @Module({
   imports: [
+    ConfigModule,
     PrismaModule,
     PassportModule,
-    JwtModule.register({
-      secret: jwtSecret,
-      signOptions: { expiresIn: '5m' }
-    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        secret: config.get<string>('JWTSECRET'),
+        signOptions: {
+          expiresIn: config.get<string>('ACCESS_TOKEN_EXPIRATION')
+        },
+      }),
+      inject: [ConfigService]
+  }),
     UsersModule
   ],
   controllers: [AuthController],

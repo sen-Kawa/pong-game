@@ -8,7 +8,7 @@ import { AuthGuard } from '@nestjs/passport';
 import {Response} from 'express'
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import {TFAAuthGuard} from './2fa-auth.guard'
+import {TFAAuthGuard} from './guards/2fa-auth.guard'
 
 @Controller('auth')
 @ApiTags('auth')
