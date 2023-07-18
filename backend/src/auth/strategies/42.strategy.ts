@@ -3,18 +3,18 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Strategy } from 'passport-42';
 import { AuthService } from "../auth.service";
 import { PrismaService } from './../../prisma/prisma.service';
-
+import { ConfigService, ConfigModule } from "@nestjs/config";
 @Injectable()
 export class FTStrategy extends PassportStrategy(Strategy) {
     constructor(
        //private readonly authService: AuthService,
-		private prisma: PrismaService
+		private prisma: PrismaService,
+        private config: ConfigService
     ) {
         super({
-            clientID: 'u-s4t2ud-1cf99f3d4feb92430dd36006565dae3b8eb14ec3ceed4490d2eb1c125a36b64e',
-            clientSecret: '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',
-            // callbackURL: 'http://localhost:3000/auth/callback',
-            callbackURL: '/auth/callback',
+            clientID: config.get<string>('CLIENTID'),
+            clientSecret: config.get<string>('CLIENTSECRET'),
+            callbackURL: config.get<string>('CALLLBACKURL'),
             scopes: ['public'],
             profileFields: {
                 'id42': function (obj) { return String(obj.id); },
