@@ -21,7 +21,6 @@ export interface JwtPayload {
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService, private usersServive: UsersService) {}
   async validateUser(name: string, password: string): Promise<AuthEntity> {
-
     const user = await this.prisma.user.findUnique({ where: { user42Name: name } });
 
     if (!user) {

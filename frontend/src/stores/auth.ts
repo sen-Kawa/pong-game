@@ -140,6 +140,7 @@ export const useAuthStore = defineStore('auth', () => {
 			});
 			if (response && response.data) {
 				loginStatus.value = false;
+				router.push('/');
 			}
 		}
 		return { getUserName, activated2FA, isLoggedIn, login, signInFortyTwo, validate2fa, getuserProfile, deactivate2FA, activate2FA, logout }
