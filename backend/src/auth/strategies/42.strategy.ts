@@ -47,8 +47,7 @@ export class FTStrategy extends PassportStrategy(Strategy) {
 					user42Name: profile.username,
 					email: profile.email,
 					activated2FA: false,
-					//TODO remove password o.O
-					password: "lalala"
+                    loginType: 'FORTY_TWO'
 				}
 			})
 		}

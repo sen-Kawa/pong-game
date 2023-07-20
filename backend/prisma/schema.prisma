@@ -9,23 +9,40 @@ datasource db {
 }
 
 model User {
-  id               Int     @id @default(autoincrement())
-  name             String? @unique @default("")
-  user42Name       String? @unique
-  email            String? @default("")
-  password         String
-  activated2FA     Boolean @default(false)
+  id                            Int        @id @default(autoincrement())
+  name                          String?    @default("")
+  user42Name                    String?    @unique
+  userName                      String?    @unique
+  email                         String?    @default("")
+  password                      String?
+  activated2FA                  Boolean    @default(false)
   twoFactorAuthenticationSecret String?
-  gamesAsPlayerOne Game[]  @relation("playerOne")
-  gamesAsPlayerTwo Game[]  @relation("playerTwo")
-  User_A           User[]  @relation("friends")
-  User_B           User[]  @relation("friends")
+  refreshToken                  String?
+  loginType                     LOGIN_TYPE @default(LOCAL)
+  followedBy User[]           @relation("UserFriend")
+  following  User[]           @relation("UserFriend")
+  matches    PlayersOnMatch[]
 }
 
-model Game {
-  id            Int    @id @default(autoincrement())
-  playerOneName String
-  playerTwoName String
-  playerOne     User   @relation("playerOne", fields: [playerOneName], references: [name])
-  playerTwo     User   @relation("playerTwo", fields: [playerTwoName], references: [name])
+model PlayersOnMatch {
+  player   User  @relation(fields: [playerId], references: [id])
+  playerId Int
+  match    Match @relation(fields: [matchId], references: [id])
+  matchId  Int
+  score    Int   @default(0)
+
+  @@id([playerId, matchId])
+}
+
+model Match {
+  id        Int              @id @default(autoincrement())
+  players   PlayersOnMatch[]
+  completed Boolean?         @default(false) // can it be infered from end beeing set?
+  start     DateTime?
+  end       DateTime?
+}
+
+enum LOGIN_TYPE {
+  LOCAL
+  FORTY_TWO
 }

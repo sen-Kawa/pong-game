@@ -6,16 +6,17 @@ import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor(
     private readonly userService: UsersService,
     readonly config: ConfigService
   ) {
     super({
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWTSECRET'),
+	  passReqToCallback: true,
+      secretOrKey: config.get<string>('REFRESH_SECRET'),
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        var data = request?.cookies['auth-cookie'];
+        var data = request?.cookies['refresh-cookie'];
         if(data == null){
             return null;
         }
@@ -25,13 +26,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload:any){
-    console.log(payload)
-    const user = await this.userService.findOne( payload.userId );
-    console.log(user)
-    if ( user == undefined) throw new UnauthorizedException();
-		if ( user.activated2FA != payload.isTwoFaAuth) throw new UnauthorizedException();
-		return user;
+  async validate(req: Request, payload:any){
+    
+    const refreshToken = req?.cookies['refresh-cookie'];
+	return { ...payload, refreshToken };
   }
 
 }

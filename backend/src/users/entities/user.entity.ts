@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User, LOGIN_TYPE } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
@@ -11,22 +11,28 @@ export class UserEntity implements User {
 	id: number;
 
 	@ApiProperty()
-	id42: number;
-
-	@ApiProperty()
 	name: string;
 
 	@ApiProperty()
 	user42Name: string;
 
 	@ApiProperty()
+	userName: string;
+
+	@ApiProperty()
 	email: string;
+
+	@Exclude()
+	password: string;
 
 	@ApiProperty()
 	activated2FA: boolean;
 
 	@Exclude()
-	password: string;
+	refreshToken: string;
+
+	@ApiProperty()
+	loginType: LOGIN_TYPE;
 
 	@Exclude()
 	twoFactorAuthenticationSecret: string;

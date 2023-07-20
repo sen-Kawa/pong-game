@@ -4,6 +4,8 @@ export class AuthEntity {
 	@ApiProperty()
 	userId: number;
 	@ApiProperty()
+	name: string;
+	@ApiProperty()
 	userName: string;
 	@ApiProperty()
 	user42Name: string;

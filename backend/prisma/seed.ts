@@ -13,63 +13,51 @@ async function main() {
   const test3 = await bcrypt.hash('test3', roundsOfHashing);
 
   const post1 = await prisma.user.upsert({
-    where: { name: "Ulli Rings2" },
+    where: { id: 1 },
     update: {
       password: test2
     },
     create: {
 	name: "Ulli Rings2",
-	user42Name: 'hrings2',
+	userName: 'hrings2',
 	email: "ulli@gmx.de",
 	password: test2,
+  activated2FA: false,
+  loginType: 'LOCAL',
     },
   });
 
   const post2 = await prisma.user.upsert({
-    where: { name: "Ulli Rings" },
+    where: { id: 2 },
     update: {
       password: test1,
       activated2FA: true
     },
     create: {
 	name: "Ulli Rings",
-	user42Name: 'hrings',
+	userName: 'hrings',
 	password: test1,
-  activated2FA: true 
+  activated2FA: false,
+  loginType: 'LOCAL',
     },
   });
 
   const post3 = await prisma.user.upsert({
-    where: { name: "Ulli Rings3" },
+    where: { id: 3 },
     update: {
       password: test3,
       activated2FA: true
     },
     create: {
 	name: "Ulli Rings3",
-	user42Name: "hrings3",
+	userName: "hrings3",
 	password: test3,
-  activated2FA: true 
+  activated2FA: false,
+  loginType: 'LOCAL',
     },
   });
 
-  const game1 = await prisma.game.upsert({
-	where: { id: 1},
-	update: {},
-	create: {
-		playerOneName: "Ulli Rings",
-		playerTwoName: "Ulli Rings2"
-		}
-	});
-	const game2 = await prisma.game.upsert({
-		where: { id: 2},
-		update: {},
-		create: {
-			playerOneName: "Ulli Rings",
-			playerTwoName: "Ulli Rings3"
-		}
-  	})
-  console.log({ post1, post2 , post3, game1, game2});
+  console.log({ post1, post2 , post3});
 }
 
 // execute the main function

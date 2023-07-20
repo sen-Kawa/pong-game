@@ -28,13 +28,18 @@ export class AuthController {
   //TODO change url to env var
   @Get('callback')
   @UseGuards(AuthGuard('42'))
-
   handleCallback(@Req() req: any, @Res({passthrough:true}) res:Response ) {
-    const jwtToken = this.authService.getToken(req.user.id, false);
+    const jwtToken = this.authService.getAccessToken(req.user.id, false);
     res.cookie('auth-cookie', jwtToken, {
       httpOnly: true,
       expires: new Date(new Date().getTime()+86409000),
     });
+    const jwtRefreshToken = this.authService.getRefreshToken(req.user.id);
+    res.cookie('refresh-cookie', jwtRefreshToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime()+86409000),
+    });
+    this.authService.updateRefreshToken(req.user.id, jwtRefreshToken);
     if (req.user.activated2FA)
       res.redirect("http://localhost:8080/user/2fa")
     else
@@ -47,11 +52,17 @@ export class AuthController {
   @ApiBody({type: PassEntity })
   @UseGuards(AuthGuard('local'))
   async login(@Req() req: any,@Res({passthrough:true}) res:Response) {
-      const jwtToken = this.authService.getToken(req.user.userId, false);
+      const jwtToken = this.authService.getAccessToken(req.user.userId, false);
       res.cookie('auth-cookie', jwtToken, {
         httpOnly: true,
         expires: new Date(new Date().getTime()+86409000),
       });
+      const jwtRefreshToken = this.authService.getRefreshToken(req.user.userId);
+      res.cookie('refresh-cookie', jwtRefreshToken, {
+        httpOnly: true,
+        expires: new Date(new Date().getTime()+86409000),
+      });
+      await this.authService.updateRefreshToken(req.user.userId, jwtRefreshToken);
     return {      userId: req.user.id,
       twoFaEnabled: req.user.activated2FA,};
   }
@@ -106,6 +117,7 @@ export class AuthController {
 
   }
 
+
   @Post('verify2FA')
   @UseGuards(AuthGuard('2fa'))
   @ApiBearerAuth()
@@ -116,12 +128,23 @@ export class AuthController {
     {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    const jwtToken = this.authService.getToken(req.user.id, true);
+    const jwtToken = this.authService.getAccessToken(req.user.id, true);
     res.cookie('auth-cookie', jwtToken, {
       httpOnly: true,
       expires: new Date(new Date().getTime()+86409000),
     });
+
   return {      userId: req.user.id,
     twoFaEnabled: req.user.activated2FA,};
+  }
+
+  @Get('refresh')
+  @UseGuards(AuthGuard('jwt-refresh'))
+  refreshTokens(@Req() req)
+  {
+    const userId = req.user.id;
+    const refreshToken = req.cookies['refreshToken'];
+    console.log("refresh")
+    return {msg: "i was here"};
   }
 }

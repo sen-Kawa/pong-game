@@ -11,6 +11,7 @@ import { UserEntity } from '../users/entities/user.entity';
 import { authenticator } from 'otplib';
 import { UsersService } from '../users/users.service';
 import { toDataURL } from 'qrcode';
+import { ConfigService, ConfigModule } from "@nestjs/config";
 
 export interface JwtPayload {
   userId: number,
@@ -19,9 +20,10 @@ export interface JwtPayload {
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService, private usersServive: UsersService) {}
+  constructor(private prisma: PrismaService, private jwtService: JwtService, private usersServive: UsersService,
+    private config: ConfigService) {}
   async validateUser(name: string, password: string): Promise<AuthEntity> {
-    const user = await this.prisma.user.findUnique({ where: { user42Name: name } });
+    const user = await this.prisma.user.findUnique({ where: { userName: name,  loginType: 'LOCAL'} });
 
     if (!user) {
       throw new NotFoundException(`No user found for Name: ${name}`);
@@ -33,16 +35,40 @@ export class AuthService {
     }
     return {
       userId: user.id,
-      userName: user.name,
+      name: user.name,
+      userName: user.userName,
       user42Name: user.user42Name,
       email: user.email,
       activated2FA: user.activated2FA
 
     };
   }
-  getToken(userid: number, twoFactor: boolean) {
+  getAccessToken(userid: number, twoFactor: boolean) {
     const payload: JwtPayload = {userId: userid, isTwoFaAuth: twoFactor}
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload,
+      {
+      secret: this.config.get<string>('ACCESS_SECRET'),
+      expiresIn: this.config.get<string>('ACCESS_TOKEN_EXPIRATION')
+      });
+  }
+
+  getRefreshToken(userid: number) {
+    return this.jwtService.sign(
+      {userId: userid},
+      {
+      secret: this.config.get<string>('REFRESH_SECRET'),
+      expiresIn: this.config.get<string>('REFRESH_TOKEN_EXPIRATION')
+      });
+  }
+  async updateRefreshToken(userid: number, Token: string)
+  {
+      await this.prisma.user.update({ 
+        where: {id : userid},
+        data: {
+          refreshToken: Token
+        }
+      })
+
   }
 
   async deactivate2FA(num: number) {

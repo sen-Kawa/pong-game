@@ -1,13 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Game } from '@prisma/client';
+import { Match, PlayersOnMatch } from '@prisma/client';
 
-export class GameEntity implements Game {
+export class MatchEntity implements Match {
 	@ApiProperty()
 	id: number;
 
 	@ApiProperty()
-	playerTwoName: string;
+	players: PlayersOnMatch;
 
 	@ApiProperty()
-	playerOneName: string;
+	completed: boolean;
+
+	@ApiProperty()
+	start: Date;
+
+	@ApiProperty()
+	end: Date;
 }

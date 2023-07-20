@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useStorage } from '@vueuse/core'
 import router from '../router'
 import { ref, computed } from 'vue'
-//TODO env import on vue
+import jwtInterceptor from '../interceptor/jwtInterceptor';
 
 const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`;
 export interface User {
@@ -97,15 +97,10 @@ export const useAuthStore = defineStore('auth', () => {
 		}
 		}
 		async function getuserProfile(){
-			const response = await axios
+			const response = await jwtInterceptor
 			.get(baseUrl + "user-profile", {
 				withCredentials: true
 			  })
-			  .catch((err) => {
-				console.log(err);
-				loginStatus.value = false;
-				router.push('/');
-			  });
 		
 			if (response && response.data) {
 			  setUserProfile(response.data);

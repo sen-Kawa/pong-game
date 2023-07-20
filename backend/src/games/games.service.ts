@@ -7,22 +7,22 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class GamesService {
   constructor(private prisma: PrismaService) {}
   create(createGameDto: CreateGameDto) {
-    return this.prisma.game.create({ data: createGameDto });
+    return this.prisma.match.create({ data: createGameDto });
   }
 
   findAll() {
-    return this.prisma.game.findMany();
+    return this.prisma.match.findMany();
   }
 
   findOne(id: number) {
-    return this.prisma.game.findUnique({ where: { id } });
+    return this.prisma.match.findUnique({ where: { id } });
   }
 
   update(id: number, updateGameDto: UpdateGameDto) {
-    return this.prisma.game.update({ where: { id }, data: updateGameDto });
+    return this.prisma.match.update({ where: { id }, data: updateGameDto });
   }
 
   remove(id: number) {
-    return this.prisma.game.delete({ where: { id } });
+    return this.prisma.match.delete({ where: { id } });
   }
 }

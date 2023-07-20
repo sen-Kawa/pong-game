@@ -9,6 +9,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { TwoFAStrategy } from './strategies/2fa.strategy';
 import { FTStrategy } from './strategies/42.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh.strategy';
 import { ConfigModule, ConfigService } from "@nestjs/config";
 
 
@@ -22,7 +23,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       useFactory: async (config: ConfigService) => ({
         secret: config.get<string>('JWTSECRET'),
         signOptions: {
-          expiresIn: config.get<string>('ACCESS_TOKEN_EXPIRATION')
+          expiresIn: config.get<string>('JWT_EXPIRATION')
         },
       }),
       inject: [ConfigService]
@@ -30,6 +31,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     UsersModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy, TwoFAStrategy, FTStrategy]
+  providers: [AuthService, JwtStrategy, LocalStrategy, TwoFAStrategy, FTStrategy, RefreshTokenStrategy]
 })
 export class AuthModule {}
