@@ -101,9 +101,11 @@ export const useAuthStore = defineStore('auth', () => {
 			.get(baseUrl + "user-profile", {
 				withCredentials: true
 			  })
-		
-			if (response && response.data) {
+			if (response && response.status == 200 ) {
 			  setUserProfile(response.data);
+			}else
+			{
+				router.push('/');
 			}
 		}
 		async function deactivate2FA(){

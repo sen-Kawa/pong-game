@@ -10,7 +10,12 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import {TFAAuthGuard} from './guards/2fa-auth.guard'
 import { ConfigService, ConfigModule } from "@nestjs/config";
-
+//TODO token and cookie to much same code
+export interface JwtPayload {
+  userId: number,
+  iat : number,
+  exp: number
+}
 
 @Controller('auth')
 @ApiTags('auth')
@@ -97,9 +102,11 @@ export class AuthController {
 
 
   @Get('logout')
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  async logout(@Res({passthrough:true}) res:Response){
+  async logout(@Req() req, @Res({passthrough:true}) res:Response){
     res.clearCookie('auth-cookie');
+    this.authService.resetRefreshToken(req.user.id);
     return {msg:"success"};
   }
 
@@ -138,13 +145,32 @@ export class AuthController {
     twoFaEnabled: req.user.activated2FA,};
   }
 
+
+
   @Get('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
-  refreshTokens(@Req() req)
+  async refreshTokens(@Req() req, @Res({passthrough:true}) res:Response)
   {
-    const userId = req.user.id;
-    const refreshToken = req.cookies['refreshToken'];
-    console.log("refresh")
-    return {msg: "i was here"};
+    const refreshToken = req.cookies['refresh-cookie'];
+    if (!refreshToken)
+    {
+      throw new UnauthorizedException();
+    }
+    const payload = this.jwtService.decode(refreshToken) as JwtPayload
+    if(this.authService.verifyRefreshToken(payload.userId, refreshToken))
+    {
+    const jwtToken = this.authService.getAccessToken(payload.userId, false);
+    res.cookie('auth-cookie', jwtToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime()+86409000),
+    });
+    const jwtRefreshToken = this.authService.getRefreshToken(payload.userId);
+    res.cookie('refresh-cookie', jwtRefreshToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime()+86409000),
+    });
+    await this.authService.updateRefreshToken(payload.userId, "TESTTEST");
+    }
+    throw new UnauthorizedException();
   }
 }

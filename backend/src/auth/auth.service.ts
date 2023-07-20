@@ -135,4 +135,31 @@ export class AuthService {
       }
   }
 
+    async verifyRefreshToken(userId: number, refreshToken: string)
+    {
+      try {
+        const user = await this.usersServive.findOne(userId);
+        if (!user)
+          return false;
+        else if (user.refreshToken != refreshToken)
+          return false;
+      }catch (error){
+      console.log( error );
+      }
+      return true;
+    }
+
+    async resetRefreshToken(userId: number)
+    {
+      try {
+        await this.prisma.user.update({
+          where: {id: userId },
+          data:{
+            refreshToken: null
+          }
+        });
+      }catch (error){
+      console.log( error );
+      }
+    }
 }
