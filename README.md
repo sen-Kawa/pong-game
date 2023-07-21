@@ -5,7 +5,7 @@ SPA for playing online multiplayer pong
 
 - run npm install in ./frontend
 - run npm install in ./backend
-- create copy the .env files in project root, /frontend, /backend => ask for details
+- create/copy the .env files in project root, /frontend, /backend => ask us for details
 - run npm migrate dev in ./backend to create/update the database (switch the db-url from db to localhost first and after that to db back again)
 
-... hopefully I did not forget something 
+... hopefully I did not forget something
