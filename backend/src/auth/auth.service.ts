@@ -141,7 +141,7 @@ export class AuthService {
         const user = await this.usersServive.findOne(userId);
         if (!user)
           return false;
-        else if (user.refreshToken != refreshToken)
+        else if (!user.refreshToken && (user.refreshToken != refreshToken))
           return false;
       }catch (error){
       console.log( error );

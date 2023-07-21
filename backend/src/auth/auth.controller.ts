@@ -106,6 +106,7 @@ export class AuthController {
   @ApiBearerAuth()
   async logout(@Req() req, @Res({passthrough:true}) res:Response){
     res.clearCookie('auth-cookie');
+    res.clearCookie('refresh-cookie');
     this.authService.resetRefreshToken(req.user.id);
     return {msg:"success"};
   }
@@ -140,7 +141,12 @@ export class AuthController {
       httpOnly: true,
       expires: new Date(new Date().getTime()+86409000),
     });
-
+    const jwtRefreshToken = this.authService.getRefreshToken(req.user.userId);
+      res.cookie('refresh-cookie', jwtRefreshToken, {
+        httpOnly: true,
+        expires: new Date(new Date().getTime()+86409000),
+      });
+    await this.authService.updateRefreshToken(req.user.userId, jwtRefreshToken);
   return {      userId: req.user.id,
     twoFaEnabled: req.user.activated2FA,};
   }
