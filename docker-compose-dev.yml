@@ -1,0 +1,59 @@
+version: '3.9'
+
+networks:
+  transcendence:
+
+services:
+  backend:
+    image: mcr.microsoft.com/devcontainers/typescript-node
+    working_dir: /workspace/backend
+    command: npm run start:dev
+    container_name: backend
+    networks:
+      - transcendence
+    volumes:
+      # Mount the root folder that contains .git
+      - .:/workspace:cached
+    ports:
+      - "3000:3000"
+  frontend:
+    image: mcr.microsoft.com/devcontainers/typescript-node
+    working_dir: /workspace/frontend
+    command: npm run dev
+    container_name: frontend
+    networks:
+      - transcendence
+    volumes:
+      # Mount the root folder that contains .git
+      - .:/workspace:cached
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - transcendence
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 5050:8080
+    networks:
+      - transcendence
+    depends_on:
+      - db
+
+volumes:
+  db:
+    driver: local

@@ -10,10 +10,14 @@
 #                                                                              #
 # **************************************************************************** #
 
-all: build up
+all: install build up
+
+install:
+	npm install --prefix backend
+	npm install --prefix frontend
 
 build:
-	@docker compose -f docker-compose.yml build 
+	@docker compose -f docker-compose.yml build
 #--no-cache
 
 up:
@@ -32,4 +36,4 @@ clean:
 fclean: clean
 	@docker system prune -f
 
-.PHONY: all re down clean fclean
+.PHONY: all re down clean fclean install
