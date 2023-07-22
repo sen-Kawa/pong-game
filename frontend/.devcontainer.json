@@ -1,0 +1,24 @@
+// https://code.visualstudio.com/remote/advancedcontainers/connect-multiple-containers
+{
+  "name": "Vue",
+  "dockerComposeFile": ["../docker-compose-dev.yml"],
+  "service": "frontend",
+  "shutdownAction": "none", // leave the container running when VS Code closes
+  "containerUser": "node",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar",
+        "Vue.vscode-typescript-vue-plugin",
+        "esbenp.prettier-vscode",
+        "mhutchie.git-graph",
+        "streetsidesoftware.code-spell-checker",
+        "ZixuanChen.vitest-explorer"
+      ],
+      "settings": {
+        "files.autoSave": "onFocusChange"
+      }
+    }
+  },
+  "workspaceFolder": "/workspace/frontend"
+}
