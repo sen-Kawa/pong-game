@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^10.2.1",
+    "javascript-time-ago": "^2.5.9",
     "pinia": "^2.1.4",
     "vee-validate": "^4.10.7",
     "vue": "^3.3.4",
