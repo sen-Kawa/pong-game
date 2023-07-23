@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest'
 
 import { mount } from '@vue/test-utils'
-import MatchVue from './Match.vue'
+import MatchItemVue from '@/components/match/MatchItem.vue'
 
-describe('Match', () => {
+describe('MatchItemItem', () => {
 	it('renders properly', () => {
 		const currentTime = new Date();
 		const futureTime = new Date();
 		futureTime.setHours(currentTime.getHours() + 1); // add one hour
 
-		const wrapper = mount(MatchVue, {
+		const wrapper = mount(MatchItemVue, {
 			props: {
 				match: {
 					id: 1,
