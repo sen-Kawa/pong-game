@@ -106,7 +106,8 @@ export class AuthService {
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(
       user.email,
-      'AUTH_APP_NAME',
+      //'AUTH_APP_NAME',
+      process.env.AUTH_APP_NAME,
       secret,
     );
     await this.usersServive.setTwoFactorAuthenticationSecret(
