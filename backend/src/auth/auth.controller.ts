@@ -1,11 +1,11 @@
-import { Header, Controller, Post, Get, Req, Res, Body, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Header, Controller, Post, Get, Req, Res, Body, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBody, ApiCreatedResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entities/auth.entity';
 import { PassEntity } from './entities/pass.entity';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
-import {Response} from 'express'
+import {Response, response} from 'express'
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import {TFAAuthGuard} from './guards/2fa-auth.guard'
@@ -72,6 +72,33 @@ export class AuthController {
       twoFaEnabled: req.user.activated2FA,};
   }
 
+  @Post('registration')
+  async registration(@Req() req: any, @Res({passthrough:true}) res:Response)
+  {
+    
+    let user = await this.userService.createUser(req.body.username, req.body.password);
+    if (!user)
+    {
+      throw new BadRequestException('Error while creating the user');
+    }
+    const jwtToken = this.authService.getAccessToken(user.id, false);
+    res.cookie('auth-cookie', jwtToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime()+86409000),
+    });
+    const jwtRefreshToken = this.authService.getRefreshToken(user.id);
+    res.cookie('refresh-cookie', jwtRefreshToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime()+86409000),
+    });
+    await this.authService.updateRefreshToken(user.id, jwtRefreshToken);
+
+    // res.redirect("http://localhost:8080/user/Preference");
+    console.log(user.id);
+    // return { msg: responseMsg}
+  }
+
+
   @Get('deactivate2FA')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -102,12 +129,12 @@ export class AuthController {
 
 
   @Get('logout')
-  @UseGuards(AuthGuard('jwt'))
+  //@UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   async logout(@Req() req, @Res({passthrough:true}) res:Response){
     res.clearCookie('auth-cookie');
     res.clearCookie('refresh-cookie');
-    this.authService.resetRefreshToken(req.user.id);
+    //this.authService.resetRefreshToken(req.user.id);
     return {msg:"success"};
   }
 

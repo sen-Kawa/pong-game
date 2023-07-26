@@ -27,6 +27,11 @@
             42 login
         </a>
     </div>
+    <div>
+        <router-link to="/user/registration">
+            Registration local account
+        </router-link>
+    </div>
 </div>
     </div>
 </template>

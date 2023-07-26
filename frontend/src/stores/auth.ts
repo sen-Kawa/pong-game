@@ -130,7 +130,7 @@ export const useAuthStore = defineStore('auth', () => {
 
 		async function logout() {
 			//TODO delete cookie and redirect
-			const response = await axios.get(baseUrl + "logout", {
+			const response = await jwtInterceptor.get(baseUrl + "logout", {
 				withCredentials: true
 			}).catch((error) => {
 				console.log(error);

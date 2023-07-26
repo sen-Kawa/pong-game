@@ -9,19 +9,20 @@ datasource db {
 }
 
 model User {
-  id                            Int        @id @default(autoincrement())
-  name                          String?    @default("")
-  user42Name                    String?    @unique
-  userName                      String?    @unique
-  email                         String?    @default("")
+  id                            Int              @id @default(autoincrement())
+  displayName                   String?          @unique
+  name                          String?          @default("")
+  user42Name                    String?          @unique
+  userName                      String?          @unique
+  email                         String?          @default("")
   password                      String?
-  activated2FA                  Boolean    @default(false)
+  activated2FA                  Boolean          @default(false)
   twoFactorAuthenticationSecret String?
   refreshToken                  String?
-  loginType                     LOGIN_TYPE @default(LOCAL)
-  followedBy User[]           @relation("UserFriend")
-  following  User[]           @relation("UserFriend")
-  matches    PlayersOnMatch[]
+  loginType                     LOGIN_TYPE       @default(LOCAL)
+  followedBy                    User[]           @relation("UserFriend")
+  following                     User[]           @relation("UserFriend")
+  matches                       PlayersOnMatch[]
 }
 
 model PlayersOnMatch {

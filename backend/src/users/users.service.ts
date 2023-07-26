@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,18 +10,18 @@ export const roundsOfHashing = 10;
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      roundsOfHashing,
-    );
+  // async create(createUserDto: CreateUserDto) {
+  //   const hashedPassword = await bcrypt.hash(
+  //     createUserDto.password,
+  //     roundsOfHashing,
+  //   );
 
-    createUserDto.password = hashedPassword;
+  //   createUserDto.password = hashedPassword;
 
-    return this.prisma.user.create({
-      data: createUserDto,
-    });
-  }
+  //   return this.prisma.user.create({
+  //     data: createUserDto,
+  //   });
+  // }
 
   findAll() {
     return this.prisma.user.findMany({ take: 10 });
@@ -55,5 +55,24 @@ export class UsersService {
         twoFactorAuthenticationSecret: secret
       }
   })
+  }
+
+  async createUser(username: string, password: string)
+  {
+    const user = await this.prisma.user.findUnique({ where: { userName: username,  loginType: 'LOCAL'} });
+    if (user)
+    {
+      throw new BadRequestException('username already used');
+    }
+    const hashedPassword = await bcrypt.hash(
+      password,
+      roundsOfHashing,
+    );
+    return this.prisma.user.create({
+      data: {
+        userName: username,
+        password: hashedPassword
+      },
+    });
   }
 }
