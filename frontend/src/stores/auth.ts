@@ -9,7 +9,7 @@ const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`;
 export interface User {
 	id: number,
 	userName:string,
-	user42Name: string,
+	name:string,
 	email: string,
 	activated2FA: boolean
   }
@@ -18,26 +18,26 @@ export const useAuthStore = defineStore('auth', () => {
 
 		const loginStatus = ref(useStorage("loginStatus",false))
 		const userProfile = ref<User>({
-				id:0, userName:"", user42Name: "", email : "", activated2FA : false
+				id:0, userName:"", name: "", email : "", activated2FA : false
 			})
 
 		const isLoggedIn = computed(() => loginStatus.value
 		)
 		const activated2FA = computed(() => userProfile.value.activated2FA) 
 		
-		const getUserName= computed(() =>  userProfile.value.userName)
+		const getUserName= computed(() =>  userProfile.value.name)
 
 	function setUserProfile(date: any){
 			// console.log(date.id);
 			// console.log(date.name);
-			// console.log(date.user42Name);
+			// console.log(date.userName);
 			// console.log(date.email);
 			// console.log(date.activated2FA);
 			// console.log(date);
 			loginStatus.value = true;
 			userProfile.value.id = date.id;
-			userProfile.value.userName = date.name;
-			userProfile.value.user42Name = date.user42Name;
+			userProfile.value.name = date.name;
+			userProfile.value.userName = date.userName;
 			userProfile.value.email = date.email;
 			userProfile.value.activated2FA = date.activated2FA;
 		}

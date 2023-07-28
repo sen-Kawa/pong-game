@@ -8,52 +8,29 @@ const roundsOfHashing = 10;
 
 async function main() {
   // create two user articles
-  const test1 = await bcrypt.hash('test1', roundsOfHashing);
-  const test2 = await bcrypt.hash('test2', roundsOfHashing);
-  const test3 = await bcrypt.hash('test3', roundsOfHashing);
 
-  const post1 = await prisma.user.upsert({
-    where: { id: 1 },
-    update: {
-      password: test2
-    },
-    create: {
+  const post1 = await prisma.user.create({
+    data: {
 	name: "Ulli Rings2",
 	userName: 'hrings2',
 	email: "ulli@gmx.de",
-	password: test2,
   activated2FA: false,
-  loginType: 'LOCAL',
     },
   });
 
-  const post2 = await prisma.user.upsert({
-    where: { id: 2 },
-    update: {
-      password: test1,
-      activated2FA: true
-    },
-    create: {
-	name: "Ulli Rings",
-	userName: 'hrings',
-	password: test1,
+  const post2 = await prisma.user.create({
+    data: {
+	name: "Ulli Rings1",
+	userName: 'hrings1',
   activated2FA: false,
-  loginType: 'LOCAL',
     },
   });
 
-  const post3 = await prisma.user.upsert({
-    where: { id: 3 },
-    update: {
-      password: test3,
-      activated2FA: true
-    },
-    create: {
+  const post3 = await prisma.user.create({
+    data: {
 	name: "Ulli Rings3",
 	userName: "hrings3",
-	password: test3,
   activated2FA: false,
-  loginType: 'LOCAL',
     },
   });
 

@@ -22,7 +22,7 @@
             // console.log(listItems)
             displayName.value = listItems.name
             // userName.value = listItems.login
-            userName.value = listItems.user42Name
+            userName.value = listItems.userName
             isTfa.value = listItems.tfa
             email.value = listItems.email
             let tfaCheckbox: any = document.querySelector('#tfa');

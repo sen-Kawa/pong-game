@@ -51,54 +51,6 @@ export class AuthController {
       res.redirect("http://localhost:8080/user/Preference")
   }
 
-
-  @Post('login')
-  @ApiCreatedResponse({ type: AuthEntity })
-  @ApiBody({ type: PassEntity })
-  @UseGuards(AuthGuard('local'))
-  async login(@Req() req: any, @Res({ passthrough: true }) res: Response) {
-    const jwtToken = this.authService.getAccessToken(req.user.userId, false);
-    res.cookie('auth-cookie', jwtToken, {
-      httpOnly: true,
-      expires: new Date(new Date().getTime() + 86409000),
-    });
-    const jwtRefreshToken = this.authService.getRefreshToken(req.user.userId);
-    res.cookie('refresh-cookie', jwtRefreshToken, {
-      httpOnly: true,
-      expires: new Date(new Date().getTime() + 86409000),
-    });
-    await this.authService.updateRefreshToken(req.user.userId, jwtRefreshToken);
-    return {
-      userId: req.user.id,
-      twoFaEnabled: req.user.activated2FA,
-    };
-  }
-
-  @Post('registration')
-  async registration(@Req() req: any, @Res({ passthrough: true }) res: Response) {
-
-    let user = await this.userService.createUser(req.body.username, req.body.password);
-    if (!user) {
-      throw new BadRequestException('Error while creating the user');
-    }
-    const jwtToken = this.authService.getAccessToken(user.id, false);
-    res.cookie('auth-cookie', jwtToken, {
-      httpOnly: true,
-      expires: new Date(new Date().getTime() + 86409000),
-    });
-    const jwtRefreshToken = this.authService.getRefreshToken(user.id);
-    res.cookie('refresh-cookie', jwtRefreshToken, {
-      httpOnly: true,
-      expires: new Date(new Date().getTime() + 86409000),
-    });
-    await this.authService.updateRefreshToken(user.id, jwtRefreshToken);
-
-    // res.redirect("http://localhost:8080/user/Preference");
-    console.log(user.id);
-    // return { msg: responseMsg}
-  }
-
-
   @Get('deactivate2FA')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -174,8 +126,6 @@ export class AuthController {
     };
   }
 
-
-
   @Get('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   async refreshTokens(@Req() req, @Res({ passthrough: true }) res: Response) {
@@ -195,8 +145,10 @@ export class AuthController {
         httpOnly: true,
         expires: new Date(new Date().getTime() + 86409000),
       });
-      await this.authService.updateRefreshToken(payload.userId, "TESTTEST");
+      await this.authService.updateRefreshToken(payload.userId, jwtRefreshToken);
     }
-    throw new UnauthorizedException();
+    else {
+      throw new UnauthorizedException();
+    }
   }
 }

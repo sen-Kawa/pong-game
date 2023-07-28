@@ -12,14 +12,11 @@ model User {
   id                            Int              @id @default(autoincrement())
   displayName                   String?          @unique
   name                          String?          @default("")
-  user42Name                    String?          @unique
   userName                      String?          @unique
   email                         String?          @default("")
-  password                      String?
   activated2FA                  Boolean          @default(false)
   twoFactorAuthenticationSecret String?
   refreshToken                  String?
-  loginType                     LOGIN_TYPE       @default(LOCAL)
   followedBy                    User[]           @relation("UserFriend")
   following                     User[]           @relation("UserFriend")
   matches                       PlayersOnMatch[]
@@ -43,7 +40,3 @@ model Match {
   end       DateTime?
 }
 
-enum LOGIN_TYPE {
-  LOCAL
-  FORTY_TWO
-}

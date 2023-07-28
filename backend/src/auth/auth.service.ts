@@ -22,27 +22,7 @@ export interface JwtPayload {
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService, private usersServive: UsersService,
     private config: ConfigService) {}
-  async validateUser(name: string, password: string): Promise<AuthEntity> {
-    const user = await this.prisma.user.findUnique({ where: { userName: name,  loginType: 'LOCAL'} });
 
-    if (!user) {
-      throw new NotFoundException(`No user found for Name: ${name}`);
-    }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
-    }
-    return {
-      userId: user.id,
-      name: user.name,
-      userName: user.userName,
-      user42Name: user.user42Name,
-      email: user.email,
-      activated2FA: user.activated2FA
-
-    };
-  }
   getAccessToken(userid: number, twoFactor: boolean) {
     const payload: JwtPayload = {userId: userid, isTwoFaAuth: twoFactor}
     return this.jwtService.sign(payload,
