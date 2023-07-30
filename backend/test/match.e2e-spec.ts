@@ -6,7 +6,7 @@ import { AppModule } from 'src/app.module'
 describe('MatchController (e2e)', () => {
   let app: INestApplication
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
     }).compile()
@@ -40,6 +40,21 @@ describe('MatchController (e2e)', () => {
         .post('/match')
         .send({ playerIds: [42424242] })
         .expect(404)
+    })
+  })
+
+  describe('/GET match', () => {
+    it('should return all matches', () => {
+      // TODO: check the content of the response?
+      return request(app.getHttpServer()).get('/match').expect(200)
+    })
+
+    it('should return a single match', () => {
+      return request(app.getHttpServer()).get('/match/1').expect(200)
+    })
+
+    it('should not find a single match that does not exist', () => {
+      return request(app.getHttpServer()).get('/match/42424242').expect(404)
     })
   })
 })

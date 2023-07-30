@@ -18,7 +18,7 @@ export class MatchService {
   }
 
   findOne(id: number) {
-    return this.prisma.match.findUnique({ where: { id } })
+    return this.prisma.match.findUniqueOrThrow({ where: { id } })
   }
 
   // update(id: number, updateGameDto: UpdateGameDto) {
