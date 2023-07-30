@@ -23,10 +23,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 @Controller('match')
 @ApiTags('match')
 export class MatchController {
-  constructor(
-    private readonly matchService: MatchService,
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly matchService: MatchService) {}
 
   /**
    * Creates a match entity.
@@ -58,6 +55,7 @@ export class MatchController {
     @Query('include-players', new ParseBoolPipe({ optional: true })) includePlayers?: boolean
   ) {
     console.log(includePlayers)
+    if (includePlayers === undefined) return this.matchService.all()
     return this.matchService.findAll(includePlayers)
   }
 
