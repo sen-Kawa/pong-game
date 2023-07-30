@@ -7,8 +7,8 @@ import { Match, Prisma } from '@prisma/client'
 export class MatchService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.MatchCreateInput): Promise<Match> {
-    return this.prisma.match.create({ data })
+  async create(data: Prisma.MatchCreateInput) {
+    return this.prisma.match.create({ data, include: { players: { include: { player: true } } } })
   }
 
   findAll(includePlayers: boolean) {
