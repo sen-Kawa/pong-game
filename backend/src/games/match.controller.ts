@@ -64,7 +64,7 @@ export class MatchController {
   @Get(':id')
   @ApiOkResponse({ type: MatchEntity })
   @ApiNotFoundResponse({ description: 'match does not exist' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<MatchEntity> {
     try {
       return await this.matchService.findOne(+id)
     } catch (error) {

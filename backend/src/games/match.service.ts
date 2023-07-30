@@ -3,6 +3,18 @@ import { UpdateGameDto } from './dto/update-match.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Match, Prisma } from '@prisma/client'
 
+const matchWithPlayers = Prisma.validator<Prisma.MatchArgs>()({
+  include: { players: { include: { player: true } } }
+})
+export type MatchWithPlayers = Prisma.MatchGetPayload<typeof matchWithPlayers>
+
+const playersOnMatchWithUserInfo = Prisma.validator<Prisma.PlayersOnMatchArgs>()({
+  include: { player: true }
+})
+export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
+  typeof playersOnMatchWithUserInfo
+>
+
 @Injectable()
 export class MatchService {
   constructor(private prisma: PrismaService) {}
@@ -17,8 +29,11 @@ export class MatchService {
     })
   }
 
-  findOne(id: number) {
-    return this.prisma.match.findUniqueOrThrow({ where: { id } })
+  findOne(id: number): Promise<MatchWithPlayers> {
+    return this.prisma.match.findUniqueOrThrow({
+      include: { players: { include: { player: true } } },
+      where: { id }
+    })
   }
 
   // update(id: number, updateGameDto: UpdateGameDto) {

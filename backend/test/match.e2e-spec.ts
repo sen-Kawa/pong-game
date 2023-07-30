@@ -49,8 +49,11 @@ describe('MatchController (e2e)', () => {
       return request(app.getHttpServer()).get('/match').expect(200)
     })
 
-    it('should return a single match', () => {
-      return request(app.getHttpServer()).get('/match/1').expect(200)
+    it('should return a single match', async () => {
+      const match = await request(app.getHttpServer()).get('/match/1')
+      expect(match.status).toEqual(200)
+      expect(match.body).toBeDefined()
+      expect(match.body.players).toBeTruthy()
     })
 
     it('should not find a single match that does not exist', () => {
