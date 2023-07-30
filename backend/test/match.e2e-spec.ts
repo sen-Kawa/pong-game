@@ -34,5 +34,12 @@ describe('MatchController (e2e)', () => {
     ])('should not accept request', (playerIds) => {
       return request(app.getHttpServer()).post('/match').send({ playerIds }).expect(400)
     })
+
+    it('should not create match for non existing players', () => {
+      return request(app.getHttpServer())
+        .post('/match')
+        .send({ playerIds: [42424242] })
+        .expect(404)
+    })
   })
 })
