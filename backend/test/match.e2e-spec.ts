@@ -24,11 +24,15 @@ describe('MatchController (e2e)', () => {
   })
 
   describe('invalid player ids', () => {
-    it('negative', () => {
-      return request(app.getHttpServer())
-        .post('/match')
-        .send({ playerIds: [1, -42] })
-        .expect(400)
+    it.each([
+      { playerIds: [] },
+      { playerIds: [0] },
+      { playerIds: [-1] },
+      { playerIds: [1, 2, 3] },
+      { playerIds: [1.2] },
+      { playerIds: [1, 1] }
+    ])('should not accept request', (playerIds) => {
+      return request(app.getHttpServer()).post('/match').send({ playerIds }).expect(400)
     })
   })
 })
