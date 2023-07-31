@@ -38,12 +38,14 @@ export class MatchService {
   /**
    *
    * @param includePlayers controls the inclusion of user information
-   * @returns a list of all matches in detailed representation
+   * @returns a list of all completed matches in detailed representation
    */
   async findAll(includePlayers: boolean) {
     const playerInfoDepth = includePlayers ? { include: { player: true } } : false
+    const whereClause: Prisma.MatchWhereInput = { completed: true } // TODO: control this with parameter
     return this.prisma.match.findMany({
-      include: { players: playerInfoDepth }
+      include: { players: playerInfoDepth },
+      where: whereClause
     })
   }
 
