@@ -6,7 +6,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
 import { TwoFAStrategy } from './strategies/2fa.strategy';
 import { FTStrategy } from './strategies/42.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh.strategy';
@@ -31,6 +30,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     UsersModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy, TwoFAStrategy, FTStrategy, RefreshTokenStrategy]
+  providers: [AuthService, JwtStrategy, TwoFAStrategy, FTStrategy, RefreshTokenStrategy]
 })
 export class AuthModule {}

@@ -38,16 +38,16 @@ export class FTStrategy extends PassportStrategy(Strategy) {
         // console.log('Username: ', profile.username);
         // console.log('Displayname: ', profile.displayName);
         // // return(profile);
-		let user = await this.prisma.user.findUnique({ where: { user42Name: profile.username } });
+        //TODO differ redirection depending if new user or not
+		let user = await this.prisma.user.findUnique({ where: { userName: profile.username } });
 		if (!user)
 		{
 			user = await this.prisma.user.create({
 				data: {
 					name: profile.displayName,
-					user42Name: profile.username,
+					userName: profile.username,
 					email: profile.email,
-					activated2FA: false,
-                    loginType: 'FORTY_TWO'
+					activated2FA: false
 				}
 			})
 		}
