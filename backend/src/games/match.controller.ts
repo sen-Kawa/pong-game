@@ -12,7 +12,8 @@ import {
   HttpStatus,
   NotFoundException,
   Patch,
-  ConflictException
+  ConflictException,
+  UseGuards
 } from '@nestjs/common'
 import { MatchService } from './match.service'
 import { CreateMatchDto } from './dto/create-match.dto'
@@ -27,9 +28,11 @@ import {
 import { MatchEntity } from './entities/match.entity'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { UpdateMatchDto } from './dto/update-match.dto'
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 
 @Controller('match')
 @ApiTags('match')
+@UseGuards(JwtAuthGuard)
 export class MatchController {
   constructor(private readonly matchService: MatchService) {}
 

@@ -10,7 +10,10 @@ export default class MatchService {
 
   public async fetchData(): Promise<MatchDTO[]> {
     try {
-      const response: AxiosResponse = await axios.get(`${this.baseUrl}/match?include-players=true`)
+      const response: AxiosResponse = await axios.get(
+        `${this.baseUrl}/match?include-players=true`,
+        { withCredentials: true }
+      )
       console.debug(response)
       return response.data
     } catch (error) {
