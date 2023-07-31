@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common'
-import { UpdateGameDto } from './dto/update-match.dto'
+import { ConflictException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { Match, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 const matchWithScore = Prisma.validator<Prisma.MatchArgs>()({
   include: { players: true }
@@ -24,7 +23,7 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
 export class MatchService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: Prisma.MatchCreateInput) {
+  async create(data: Prisma.MatchCreateInput) {
     return this.prisma.match.create({ data, include: { players: { include: { player: true } } } })
   }
 
@@ -32,7 +31,7 @@ export class MatchService {
    *
    * @returns a list of all matches in the minimal representation (no score and players)
    */
-  all() {
+  async all() {
     return this.prisma.match.findMany()
   }
 
@@ -41,25 +40,73 @@ export class MatchService {
    * @param includePlayers controls the inclusion of user information
    * @returns a list of all matches in detailed representation
    */
-  findAll(includePlayers: boolean) {
+  async findAll(includePlayers: boolean) {
     const playerInfoDepth = includePlayers ? true : { include: { player: true } }
     return this.prisma.match.findMany({
       include: { players: playerInfoDepth }
     })
   }
 
-  findOne(id: number): Promise<MatchWithPlayers> {
+  async findOne(id: number): Promise<MatchWithPlayers> {
     return this.prisma.match.findUniqueOrThrow({
       include: { players: { include: { player: true } } },
       where: { id }
     })
   }
 
-  // update(id: number, updateGameDto: UpdateGameDto) {
-  //   return this.prisma.match.update({ where: { id }, data: updateGameDto })
-  // }
+  // TODO: check if the player is already on the match
+  async addPlayer(matchId: number, additionalPlayer: number) {
+    // check if maxPlayersOnMatch already reached
+    const currentPlayerCount = await this.prisma.playersOnMatch.count({
+      where: { matchId: matchId }
+    })
 
-  remove(id: number) {
+    if (currentPlayerCount != 1) throw new ConflictException('Cannot add player to match.')
+
+    return this.prisma.match.update({
+      include: { players: true },
+      where: { id: matchId },
+      data: {
+        players: {
+          connectOrCreate: {
+            where: {
+              playerId_matchId: {
+                matchId: matchId,
+                playerId: additionalPlayer
+              }
+            },
+            create: {
+              playerId: additionalPlayer
+            }
+          }
+        }
+      }
+    })
+  }
+
+  async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
+    const playersOnMatchData = scores.map((score) => ({
+      ...score,
+      matchId: matchId
+    }))
+    console.log(playersOnMatchData)
+    return this.prisma.match.update({
+      include: { players: true },
+      where: { id: matchId },
+      data: {
+        completed: true,
+        end: new Date(),
+        players: {
+          deleteMany: { matchId: matchId },
+          createMany: {
+            data: scores
+          }
+        }
+      }
+    })
+  }
+
+  async remove(id: number) {
     return this.prisma.match.delete({ where: { id } })
   }
 }
