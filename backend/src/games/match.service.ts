@@ -41,7 +41,7 @@ export class MatchService {
    * @returns a list of all matches in detailed representation
    */
   async findAll(includePlayers: boolean) {
-    const playerInfoDepth = includePlayers ? true : { include: { player: true } }
+    const playerInfoDepth = includePlayers ? { include: { player: true } } : false
     return this.prisma.match.findMany({
       include: { players: playerInfoDepth }
     })
