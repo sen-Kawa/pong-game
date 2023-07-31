@@ -15,8 +15,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       ignoreExpiration: false,
       secretOrKey: config.get<string>('JWTSECRET'),
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        var data = request?.cookies['auth-cookie'];
-        if(data == null){
+		let data: any;
+		try {
+			data = request?.cookies['auth-cookie'];
+		} catch {
+			data = parseCookie(request['handshake']['headers']['cookie'])
+			console.log("!!!!!!!Auth cookie:" + data + "!")
+		}
+        if(data == null || data === undefined){
             return null;
         }
         ;
@@ -32,4 +38,16 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		return user;
   }
 
+}
+
+function parseCookie(cookie: string) {
+	const cookies = cookie.split(';');
+	const cookiesMap = cookies.map(cookie => {
+		return cookie.split('=');
+	});
+	const result = cookiesMap.reduce((map, obj) => {
+		map[obj[0]] = obj[1];
+		return map;
+	})
+	return result[' auth-cookie'];
 }

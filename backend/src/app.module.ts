@@ -5,6 +5,7 @@ import { GamesModule } from './games/games.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from './config/env.validation';
+import { SocketsModule } from './sockets/sockets.module'
 
 
 @Module({
@@ -14,7 +15,7 @@ import { validate } from './config/env.validation';
       envFilePath: '.env',
       validate
     }),
-    PrismaModule, UsersModule, GamesModule, AuthModule],
+    PrismaModule, UsersModule, GamesModule, AuthModule, SocketsModule],
   controllers: [],
   providers: [],
 })
