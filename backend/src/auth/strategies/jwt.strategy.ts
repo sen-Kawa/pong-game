@@ -20,8 +20,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 			data = request?.cookies['auth-cookie'];
 		} catch {
 			data = parseCookie(request['handshake']['headers']['cookie'])
-			console.log("!!!!!!!Auth cookie:" + data + "!")
 		}
+		
         if(data == null || data === undefined){
             return null;
         }

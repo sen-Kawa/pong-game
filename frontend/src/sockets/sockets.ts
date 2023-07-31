@@ -7,7 +7,6 @@ class SockManager {
 		this.socket = io('ws://localhost:3000', {
 			withCredentials: true
 		});
-		console.log("!!!!!!!!!", this.socket.io);
 		this.socket.on("hello", () => console.log("Hello World"));
 	}
 
