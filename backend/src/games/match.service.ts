@@ -42,7 +42,7 @@ export class MatchService {
    */
   async findAll(includePlayers: boolean) {
     const playerInfoDepth = includePlayers ? { include: { player: true } } : false
-    const whereClause: Prisma.MatchWhereInput = { completed: true } // TODO: control this with parameter
+    const whereClause: Prisma.MatchWhereInput = { NOT: { end: null } } // TODO: control this with parameter
     return this.prisma.match.findMany({
       include: { players: playerInfoDepth },
       where: whereClause
@@ -96,7 +96,6 @@ export class MatchService {
       include: { players: true },
       where: { id: matchId },
       data: {
-        completed: true,
         end: new Date(),
         players: {
           deleteMany: { matchId: matchId },
