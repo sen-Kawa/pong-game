@@ -23,6 +23,7 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags
 } from '@nestjs/swagger'
 import { MatchEntity } from './entities/match.entity'
@@ -61,6 +62,8 @@ export class MatchController {
   }
 
   @Get()
+  // explicitly marking param as optional, because swagger does not honor the question mark in the parameter list of the function
+  @ApiQuery({ name: 'include-players', required: false, description: 'filter query' })
   @ApiOkResponse({ type: MatchEntity, isArray: true })
   findAll(
     @Query('include-players', new ParseBoolPipe({ optional: true })) includePlayers?: boolean
