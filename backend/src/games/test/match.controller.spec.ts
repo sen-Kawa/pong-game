@@ -7,7 +7,7 @@ import {
   maximalMatch,
   maximalMatchArray,
   minimalMatchArray
-} from './match.test-data'
+} from '../../../prisma/match.test-data'
 
 const mockMatchService = {
   create: jest.fn().mockResolvedValue(matchWithScore),

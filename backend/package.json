@@ -44,6 +44,7 @@
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
     "@nestjs/cli": "^10.1.9",
     "@nestjs/schematics": "^10.0.1",
     "@nestjs/testing": "^10.1.0",

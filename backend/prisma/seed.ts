@@ -1,5 +1,12 @@
 import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
+import {
+  createFakeMatch,
+  matchWithOnePlayer,
+  matchWithScore,
+  maximalMatch,
+  minimalMatch
+} from './match.test-data'
 
 // initialize Prisma Client
 const prisma = new PrismaClient()
@@ -33,6 +40,17 @@ async function main() {
   })
 
   console.log({ post1, post2, post3 })
+
+  const match = createFakeMatch({ completed: true })
+  console.log(match)
+
+  await prisma.match.create({ data: match })
+  await prisma.match.create({ data: createFakeMatch() })
+  await prisma.match.create({ data: createFakeMatch({ withPlayers: true }) })
+  await prisma.match.create({ data: createFakeMatch({ withPlayers: true, completed: false }) })
+  await prisma.match.create({
+    data: createFakeMatch({ withPlayers: true, completed: true, maxScore: 9999 })
+  })
 }
 
 // execute the main function
