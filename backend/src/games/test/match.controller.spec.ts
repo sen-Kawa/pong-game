@@ -1,79 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { MatchController } from '../match.controller'
 import { MatchService } from '../match.service'
-
-const minimalMatch = {
-  id: 1,
-  completed: true,
-  start: new Date('2023-06-24T14:11:57.246Z'),
-  end: new Date('2023-06-24T15:00:39.111Z')
-}
-
-const minimalUncompletedMatch = { ...minimalMatch, completed: false }
-const matchWithScore = {
-  ...minimalMatch,
-  players: [
-    {
-      playerId: 1,
-      matchId: 1,
-      score: 7
-    },
-    {
-      playerId: 2,
-      matchId: 1,
-      score: 4
-    }
-  ]
-}
-const maximalMatch = {
-  ...minimalMatch,
-  players: [
-    {
-      playerId: 1,
-      matchId: 1,
-      score: 7,
-      player: {
-        id: 1,
-        name: 'Alice'
-      }
-    },
-    {
-      playerId: 2,
-      matchId: 1,
-      score: 4,
-      player: {
-        id: 2,
-        name: 'Bob'
-      }
-    }
-  ]
-}
-const matchWithOnePlayer = {
-  ...minimalMatch,
-  players: [
-    {
-      playerId: 1,
-      matchId: 1
-    }
-  ]
-}
-const matchWithTwoPlayers = {
-  ...minimalMatch,
-  players: [
-    {
-      playerId: 1,
-      matchId: 1
-    },
-    {
-      playerId: 2,
-      matchId: 1
-    }
-  ]
-}
-
-const minimalMatchArray = [{ ...minimalMatch }]
-const matchWithScoreArray = [{ ...matchWithScore }]
-const maximalMatchArray = [{ ...maximalMatch }]
+import {
+  matchWithScore,
+  matchWithScoreArray,
+  maximalMatch,
+  maximalMatchArray,
+  minimalMatchArray
+} from './match.test-data'
 
 const mockMatchService = {
   create: jest.fn().mockResolvedValue(matchWithScore),
