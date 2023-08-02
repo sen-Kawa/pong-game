@@ -14,9 +14,9 @@ export class UsersService {
     return this.prisma.user.findMany({ take: 10 });
   }
 
-  findAllFriends(id: number)
+  async findAllFriends(id: number)
   {
-    return this.prisma.user.findMany({
+    let result = await this.prisma.user.findMany({
       where: {
         id: id,
       },
@@ -28,6 +28,10 @@ export class UsersService {
         },
       }
     });
+    return result[0].following;
+    //  result.map(({result}) => ({
+    //   following: result?.following, result
+    // }));
   }
 
   findOne(id: number) {
