@@ -19,6 +19,10 @@ export default {
 	},
 	methods: {
 		async addFriend() {
+			if (!this.searchTerm) {
+				alert('Add name to search')
+				return
+			}
 			this.friendAdded = !this.friendAdded
 		}
 	}
