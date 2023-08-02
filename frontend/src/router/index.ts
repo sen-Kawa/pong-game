@@ -34,7 +34,7 @@ const router = createRouter({
 		{
 			path: '/user/Matchhistory',
 			name: 'matchhistory',
-			component: () => import('../components/user/Matchhistory.vue')
+			component: () => import('../components/user/MatchHistory.vue')
 		},
 		{
 			path: '/user/Friends',

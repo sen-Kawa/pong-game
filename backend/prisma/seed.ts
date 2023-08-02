@@ -15,6 +15,7 @@ async function main() {
 	userName: 'hrings2',
 	email: "ulli@gmx.de",
   activated2FA: false,
+	followedBy: [1],
     },
   });
 
