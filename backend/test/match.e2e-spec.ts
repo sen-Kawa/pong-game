@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { INestApplication, ValidationPipe } from '@nestjs/common'
 import * as request from 'supertest'
 import { AppModule } from 'src/app.module'
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { MockAuthGuard } from './mock-auth.guard'
+import { APP_GUARD } from '@nestjs/core'
 
 describe('MatchController (e2e)', () => {
   let app: INestApplication
@@ -9,11 +12,19 @@ describe('MatchController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile()
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useClass(MockAuthGuard)
+      .compile()
 
     app = moduleFixture.createNestApplication()
     app.useGlobalPipes(new ValidationPipe())
+    app.useGlobalGuards(new MockAuthGuard())
     await app.init()
+  })
+
+  afterAll(async () => {
+    await app.close()
   })
 
   it('/POST match', () => {
