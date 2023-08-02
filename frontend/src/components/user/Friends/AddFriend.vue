@@ -24,6 +24,7 @@ export default {
 				return
 			}
 			this.friendAdded = !this.friendAdded
+			this.searchTerm = ''
 		}
 	}
 }
