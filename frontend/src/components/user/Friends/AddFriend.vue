@@ -23,9 +23,20 @@ export default {
 				alert('Add name to search')
 				return
 			}
-			this.friendAdded = !this.friendAdded
+			console.log(this.searchTerm);
+	//		const requestOptions = {
+	//			method: "POST",
+	//			headers: { "Content-Type": "application/json" },
+	//			body: JSON.stringify({ friend-name: this.searchTerm })
+	//		};
+     //       const response = await fetch('${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/', requestOptions);
+	//		if (response.ok) {
+	//			const newFriend = await response.json();
+				//this.$emit('friend-added', searchTerm)
+				this.friendAdded = !this.friendAdded
+	//		}
 			this.searchTerm = ''
 		}
-	}
+	},
 }
 </script>

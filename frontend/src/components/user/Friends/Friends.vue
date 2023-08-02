@@ -10,7 +10,7 @@
 		<Button @btn-click="toggleShowAddFriend()"
 			:text="showAddFriend ? 'Close' : 'Add Friend'"
 			color="LightGray" />
-		<AddFriend v-show="showAddFriend" />
+		<AddFriend v-show="showAddFriend" @friendAdded="friend-added" />
     </div>
 </template>
 
@@ -21,7 +21,7 @@ export default {
 	data() {
 		return {
 			showAddFriend: false,
-			friends: [],
+			friends: [1, 2, 3],
 		};
 	},
 	components: {
@@ -34,16 +34,20 @@ export default {
 	methods: {
 		toggleShowAddFriend() {
 			this.showAddFriend = !this.showAddFriend
-			console.log("click")
 		},
 		async fetchFriendList() {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/friends/`);
-			const data = await response.json();
-			this.friends = data;
-			this.friends = [1, 2, 3]; //for testing
+            //const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/friends/`);
+			//const data = await response.json();
+			//this.friends = data;
+			this.friends; //for testing
 		},
 		async removeFriend(friendD) {
-            //await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/`);
+		//	const requestOptions = {
+		//		method: "DELETE",
+		//		headers: { "Content-Type": "application/json" },
+		//		body: JSON.stringify({ friend-name: this.friendD })
+		//	};
+            //await fetch('${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/', requestOptions);
 			this.friends = this.friends.filter(friend => friend !== friendD); //for testing
 		}
 	}
