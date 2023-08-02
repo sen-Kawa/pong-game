@@ -4,10 +4,10 @@ FROM node
 RUN mkdir -p /app
 WORKDIR /app
 
-COPY ./backend/package*.json .
+#COPY ./backend/package*.json .
 
 #RUN npm ci
-RUN npm install
+#RUN npm install
 
 EXPOSE 3000
 
