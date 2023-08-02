@@ -7,7 +7,9 @@
 		<div v-else>
 			You dont have friends yet!
 		</div>
-		<Button @btn-click="toggleShowAddFriend()" :text="showAddFriend ? 'Close' : 'Add Friend'" color="LightGray" />
+		<Button @btn-click="toggleShowAddFriend()"
+			:text="showAddFriend ? 'Close' : 'Add Friend'"
+			color="LightGray" />
 		<AddFriend v-show="showAddFriend" />
     </div>
 </template>
