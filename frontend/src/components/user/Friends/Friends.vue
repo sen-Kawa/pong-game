@@ -16,12 +16,23 @@ import Button from '../../Button.vue'
 export default {
 	data() {
 		return {
-			friends: [1, 2],
+			friends: [],
 		};
 	},
 	components: {
 		Button
 	},
+	async created() {
+		await this.fetchFriendList();
+	},
+	methods: {
+		async fetchFriendList() {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/friends/`);
+			const data = await response.json();
+			this.friends = data;
+
+		}
+	}
 }
 </script>
 
