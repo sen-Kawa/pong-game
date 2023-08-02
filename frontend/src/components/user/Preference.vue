@@ -17,7 +17,7 @@ import Twofactor from './Twofactor.vue'
 
 
 const authStore = useAuthStore();
-authStore.getuserProfile()
+//authStore.getuserProfile()
 const { 
   getUserName
 } = storeToRefs(authStore) 

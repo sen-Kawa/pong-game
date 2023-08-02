@@ -1,5 +1,5 @@
-import { createWebHistory, createRouter } from "vue-router";
-import { useAuthStore } from '../stores/auth';
+import { createWebHistory, createRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -47,9 +47,9 @@ const router = createRouter({
 			component: () => import('../components/user/2fa.vue')
 		},
 		{
-			path: '/user/Success',
-			name: 'Success',
-			component: () => import('../components/user/LoggedIn.vue')
+			path: '/user/firsttime',
+			name: 'firsttime',
+			component: () => import('../components/user/FirstTime.vue')
 		}
 	]
   })
