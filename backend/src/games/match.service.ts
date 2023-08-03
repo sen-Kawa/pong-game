@@ -41,10 +41,16 @@ export class MatchService {
    * @param includePlayers controls the inclusion of user information
    * @param started if true searches for matches with a start date
    * @param completed if true searches for matches with an end date
+   * @param player filter matches to only include matches with this player in it
    * @returns a list of all matches in detailed representation according to the query parameters
    */
-  async findAll(options: { includePlayers?: boolean; started?: boolean; completed?: boolean }) {
-    const { includePlayers, started, completed } = options
+  async findAll(options: {
+    includePlayers?: boolean
+    started?: boolean
+    completed?: boolean
+    player?: number
+  }) {
+    const { includePlayers, started, completed, player } = options
     console.debug({ options })
     return this.prisma.match.findMany({
       include: {
@@ -52,7 +58,12 @@ export class MatchService {
       },
       where: {
         start: started !== undefined ? (started ? { not: null } : null) : undefined,
-        end: completed !== undefined ? (completed ? { not: null } : null) : undefined
+        end: completed !== undefined ? (completed ? { not: null } : null) : undefined,
+        players: {
+          some: {
+            playerId: player
+          }
+        }
       }
     })
   }

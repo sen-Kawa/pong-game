@@ -9,11 +9,11 @@ export default class MatchService {
   }
 
   public async fetchData(): Promise<MatchDTO[]> {
+    // TODO: add parameters to change endpoint, query parameters, etc.
     try {
-      const response: AxiosResponse = await axios.get(
-        `${this.baseUrl}/match?include-players=true`,
-        { withCredentials: true }
-      )
+      const response: AxiosResponse = await axios.get(`${this.baseUrl}/match/me`, {
+        withCredentials: true
+      })
       console.debug(response)
       return response.data
     } catch (error) {
@@ -23,6 +23,7 @@ export default class MatchService {
   }
 
   public async getMatchHistory(): Promise<MatchResult[]> {
+    // TODO: add version for global and personal match history
     const data = await this.fetchData()
     return data.map(this.transformMatchDTOToResult)
   }

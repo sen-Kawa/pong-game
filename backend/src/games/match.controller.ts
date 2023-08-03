@@ -13,7 +13,8 @@ import {
   NotFoundException,
   Patch,
   ConflictException,
-  UseGuards
+  UseGuards,
+  Req
 } from '@nestjs/common'
 import { MatchService } from './match.service'
 import { CreateMatchDto } from './dto/create-match.dto'
@@ -81,7 +82,7 @@ export class MatchController {
     description: 'If true searches for matches with an end date.'
   })
   @ApiOkResponse({ type: MatchEntity, isArray: true })
-  findAll(
+  async findAll(
     @Query('include-players', new ParseBoolPipe({ optional: true })) includePlayers?: boolean,
     @Query('started', new ParseBoolPipe({ optional: true })) started?: boolean,
     @Query('completed', new ParseBoolPipe({ optional: true })) completed?: boolean
@@ -89,6 +90,18 @@ export class MatchController {
     if (includePlayers === undefined && started === undefined && completed === undefined)
       return this.matchService.all()
     return this.matchService.findAll({ includePlayers, started, completed })
+  }
+
+  /**
+   * Searches for all matches with the currently logged in user
+   * @param request
+   * @returns all matches in which the current user is present
+   */
+  @Get('me')
+  async findAllForCurrentUser(@Req() request) {
+    // TODO: add filter objects
+    console.debug(`Find matches for current User '${request.user}'`)
+    return this.matchService.findAll({ includePlayers: true, player: request.user.id })
   }
 
   @Get(':id')
