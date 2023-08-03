@@ -1,6 +1,6 @@
 <template>
-    <div>
-		<span>{{friend.displayName}}</span>
+    <div class="friend-item">
+		<span class="friend-name">{{friend.displayName}}</span>
 		<button @click="removeFriend">Remove Friend</button>
 	</div>
 </template>
@@ -31,6 +31,14 @@ export default {
 </script>
 
 <style scoped>
+	.friend-item {
+		display: flex;
+	}
+	.friend-name {
+		font-weight: bold;
+		margin-right: 10px;
+		font-size: 20px;
+	}
 	div.friends {
 		#display: flex;
 		#justify-content: space-between;

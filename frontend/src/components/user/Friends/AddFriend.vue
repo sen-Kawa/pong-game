@@ -48,6 +48,9 @@ export default {
 				this.messageType = "error";
 			}
 			this.friendName = ""
+			setTimeout(() => {
+				this.message = "";
+			}, 5000);
 		}
 	},
 }
