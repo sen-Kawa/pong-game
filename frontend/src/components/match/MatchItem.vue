@@ -49,11 +49,11 @@ const highscore = computed(() => {
 <template>
   <li>
     <h3>Match #{{ match.id }}</h3>
-    <p>
+    <p v-if="match.players">
       <!-- TODO: highlight the winner -->
       <span>{{ match.players[0].name }}</span> vs <span>{{ match.players[1].name }}</span>
     </p>
-    <p>{{ match.players[0].score }} : {{ match.players[1].score }}</p>
+    <p v-if="match.players">{{ match.players[0].score }} : {{ match.players[1].score }}</p>
     <p id="match-time-since-end">{{ timeSinceEnd }}</p>
     <p>duration: {{ duration }}</p>
   </li>
