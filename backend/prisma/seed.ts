@@ -12,8 +12,8 @@ async function main() {
   const user1 = await prisma.user.create({
     data: {
 	name: "Ulli Rings",
-	userName: 'hrings',
-	displayName: 'Ulli',
+	userName: "hrings",
+	displayName: "Ulli",
 	email: "ulli@gmx.de",
 	activated2FA: false,
     }
@@ -22,8 +22,8 @@ async function main() {
   const user2 = await prisma.user.create({
     data: {
 	name: "Jacob Thomsen",
-	userName: 'jthomsen',
-	displayName: 'Jacky',
+	userName: "jthomsen",
+	displayName: "Jacky",
 	email: "jacob.thomsen@example.com",
   activated2FA: false,
 	following: {
@@ -36,7 +36,7 @@ async function main() {
     data: {
 	name: "Julia Hansen",
 	userName: "jhansen",
-	displayName: 'Juli',
+	displayName: "Juli",
 	email: "julia.hansen@example.com",
   activated2FA: false,
 	following: {
@@ -49,7 +49,7 @@ async function main() {
     data: {
 	name: "Caroline Vasquez",
 	userName: "cvasquez",
-	displayName: 'Caro',
+	displayName: "Caro",
 	email: "carito@example.com",
   activated2FA: false,
 	following: {

@@ -2,8 +2,12 @@
 	<div>
 		<h2>Add Friend</h2>
 		<form @submit.prevent="addFriend">
-			<input v-model="searchTerm" type="text" placeholder="Input name">
-			<button type="submit">Add</button>
+			<label for="friendName">Friend's Name:</label>
+				<input
+					v-model="friendName"
+					type="text"
+					id="friendName">
+				<button type="submit">Add</button>
 		</form>
 		<h3 v-show="friendAdded">Friend added!</h3>
 	</div>
@@ -13,21 +17,21 @@
 export default {
 	data() {
 		return {
-			searchTerm: '',
+			friendName: "",
 			friendAdded: false,
 		};
 	},
 	methods: {
 		async addFriend() {
-			if (!this.searchTerm) {
+			if (!this.friendName) {
 				alert('Add name to search')
 				return
 			}
-			console.log(this.searchTerm);
+			console.log(this.friendName);
 			const requestOptions = {
 				method: "POST",
 				credentials: "include",
-				body: JSON.stringify({ friendName: this.searchTerm })
+				body: JSON.stringify({ friendName: this.friendName })
 			};
             const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/`, requestOptions);
 			if (response.ok) {
@@ -36,7 +40,7 @@ export default {
 			else {
 				console.log("Error adding friend");
 			}
-			this.searchTerm = ''
+			this.friendName = ""
 		}
 	},
 }
