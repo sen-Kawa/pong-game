@@ -37,15 +37,22 @@ export class MatchService {
 
   /**
    *
+   * @param options specifies what should be included and searched for
    * @param includePlayers controls the inclusion of user information
-   * @returns a list of all completed matches in detailed representation
+   * @param completed if true searches for matches with an end date
+   * @returns a list of all matches in detailed representation according to the query parameters
    */
-  async findAll(includePlayers: boolean) {
-    const playerInfoDepth = includePlayers ? { include: { player: true } } : false
-    const whereClause: Prisma.MatchWhereInput = { NOT: { end: null } } // TODO: control this with parameter
+  async findAll(options: { includePlayers?: boolean; completed?: boolean }) {
+    const { includePlayers, completed } = options
     return this.prisma.match.findMany({
-      include: { players: playerInfoDepth },
-      where: whereClause
+      include: {
+        players: {
+          include: { player: includePlayers }
+        }
+      },
+      where: {
+        end: completed !== undefined ? (completed ? { not: null } : null) : undefined
+      }
     })
   }
 

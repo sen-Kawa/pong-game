@@ -63,13 +63,23 @@ export class MatchController {
 
   @Get()
   // explicitly marking param as optional, because swagger does not honor the question mark in the parameter list of the function
-  @ApiQuery({ name: 'include-players', required: false, description: 'filter query' })
+  @ApiQuery({
+    name: 'include-players',
+    required: false,
+    description: 'controls the inclusion of user information'
+  })
+  @ApiQuery({
+    name: 'completed',
+    required: false,
+    description: 'if true searches for matches with an end date'
+  })
   @ApiOkResponse({ type: MatchEntity, isArray: true })
   findAll(
-    @Query('include-players', new ParseBoolPipe({ optional: true })) includePlayers?: boolean
+    @Query('include-players', new ParseBoolPipe({ optional: true })) includePlayers?: boolean,
+    @Query('completed', new ParseBoolPipe({ optional: true })) completed?: boolean
   ) {
-    if (includePlayers === undefined) return this.matchService.all()
-    return this.matchService.findAll(includePlayers)
+    if (includePlayers === undefined && completed === undefined) return this.matchService.all()
+    return this.matchService.findAll({ includePlayers, completed })
   }
 
   @Get(':id')
