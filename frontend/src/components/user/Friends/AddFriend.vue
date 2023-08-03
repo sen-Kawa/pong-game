@@ -27,7 +27,7 @@ export default {
 	//		const requestOptions = {
 	//			method: "POST",
 	//			headers: { "Content-Type": "application/json" },
-	//			body: JSON.stringify({ friend-name: this.searchTerm })
+	//			body: JSON.stringify({ friendName: this.searchTerm })
 	//		};
      //       const response = await fetch('${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/', requestOptions);
 	//		if (response.ok) {
