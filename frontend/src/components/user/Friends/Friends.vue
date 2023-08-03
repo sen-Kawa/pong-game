@@ -11,7 +11,7 @@
 		<Button @btn-click="toggleShowAddFriend()"
 			:text="showAddFriend ? 'Close' : 'Add Friend'"
 			color="LightGray" />
-		<AddFriend v-show="showAddFriend" />
+		<AddFriend v-show="showAddFriend" @friendAdded="onFriendAdded" />
     </div>
 </template>
 
@@ -35,6 +35,9 @@ export default {
 	methods: {
 		toggleShowAddFriend() {
 			this.showAddFriend = !this.showAddFriend
+		},
+		onFriendAdded() {
+			this.fetchFriendList();
 		},
 		async fetchFriendList() {
 			const requestOptions = {
