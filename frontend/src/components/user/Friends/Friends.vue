@@ -2,13 +2,12 @@
     <div class="friends">
 		<h1>Friends</h1>
 		<ul v-if="friends.length">
-			<li v-for="friend in friends" :key="friend.id">{{friend.displayName}}
-				<button @click="removeFriend(friend)">Remove Friend</button></li>
+			<Friend v-for="friend in friends" :key="friend.id" :friend="friend" @friendRemoved="onFriendRemoved" />
 		</ul>
 		<div v-else>
 			You dont have friends yet!
 		</div>
-		<Button @btn-click="toggleShowAddFriend()"
+		<ButtonC @btn-click="toggleShowAddFriend()"
 			:text="showAddFriend ? 'Close' : 'Add Friend'"
 			color="LightGray" />
 		<AddFriend v-show="showAddFriend" @friendAdded="onFriendAdded" />
@@ -16,8 +15,9 @@
 </template>
 
 <script>
-import Button from '../../Button.vue'
+import ButtonC from '../../Button.vue'
 import AddFriend from './AddFriend.vue'
+import Friend from './Friend.vue'
 export default {
 	data() {
 		return {
@@ -26,8 +26,9 @@ export default {
 		};
 	},
 	components: {
-		Button,
+		ButtonC,
 		AddFriend,
+		Friend,
 	},
 	mounted() {
 		this.fetchFriendList();
@@ -39,6 +40,9 @@ export default {
 		onFriendAdded() {
 			this.fetchFriendList();
 		},
+		onFriendRemoved() {
+			this.fetchFriendList();
+		},
 		async fetchFriendList() {
 			const requestOptions = {
 				method: "GET",
@@ -48,18 +52,6 @@ export default {
 			const data = await response.json();
 			this.friends = data;
 		},
-		async removeFriend(friend) {
-			const requestOptions = {
-				method: "DELETE",
-				credentials: "include",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ friendName: friend.displayName })
-			};
-            await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/`, requestOptions);
-			this.friends = this.friends.filter(friend => friend.id !== friend.id);
-		}
 	}
 }
 </script>
