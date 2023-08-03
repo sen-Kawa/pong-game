@@ -24,17 +24,18 @@ export default {
 				return
 			}
 			console.log(this.searchTerm);
-	//		const requestOptions = {
-	//			method: "POST",
-	//			headers: { "Content-Type": "application/json" },
-	//			body: JSON.stringify({ friendName: this.searchTerm })
-	//		};
-     //       const response = await fetch('${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/', requestOptions);
-	//		if (response.ok) {
-	//			const newFriend = await response.json();
-				//this.$emit('friend-added', searchTerm)
+			const requestOptions = {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify({ friendName: this.searchTerm })
+			};
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/`, requestOptions);
+			if (response.ok) {
 				this.friendAdded = !this.friendAdded
-	//		}
+			}
+			else {
+				console.log("Error adding friend");
+			}
 			this.searchTerm = ''
 		}
 	},

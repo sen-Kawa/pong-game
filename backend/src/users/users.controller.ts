@@ -32,14 +32,14 @@ export class UsersController {
 
   @Post('addFriend')
   @UseGuards(JwtAuthGuard)
-  async addFriend(@Req() req, @Body('friend-name') friendName: string)
+  async addFriend(@Req() req, @Body('friendName') friendName: string)
   {
     await this.usersService.addFriend(req.user.id, friendName);
   }
 
   @Delete('removeFriend')
   @UseGuards(JwtAuthGuard)
-  async removeFriend(@Req() req, @Body('friend-name') friendName: string)
+  async removeFriend(@Req() req, @Body('friendName') friendName: string)
   {
     await this.usersService.removeFriend(req.user.id, friendName);
   }
