@@ -9,7 +9,7 @@
 					id="friendName">
 				<button type="submit">Add</button>
 		</form>
-		<h3 v-show="friendAdded">Friend added!</h3>
+		<div v-if="message" :class="messageType">{{ message }}</div>
 	</div>
 </template>
 
@@ -18,7 +18,8 @@ export default {
 	data() {
 		return {
 			friendName: "",
-			friendAdded: false,
+			message: "",
+			messageType: "",
 		};
 	},
 	methods: {
@@ -38,13 +39,25 @@ export default {
 			};
             const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/`, requestOptions);
 			if (response.ok) {
-				this.friendAdded = !this.friendAdded
+				this.message = `Successfully added ${this.friendName} to your friend list!`;
+				this.messageType = "success";
+				this.$emit('friendAdded');
 			}
 			else {
-				console.log("Error adding friend");
+				this.message = `Failed to add ${this.friendName} to your friend list.`;
+				this.messageType = "error";
 			}
 			this.friendName = ""
 		}
 	},
 }
 </script>
+
+<style>
+.success {
+	color: green;
+}
+.error {
+	color: red;
+}
+</style>
