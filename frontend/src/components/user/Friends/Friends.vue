@@ -49,6 +49,9 @@ export default {
 			const requestOptions = {
 				method: "DELETE",
 				credentials: "include",
+				headers: {
+					'Content-Type': 'application/json'
+				},
 				body: JSON.stringify({ friendName: friend.displayName })
 			};
             await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/`, requestOptions);

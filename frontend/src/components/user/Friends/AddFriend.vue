@@ -31,7 +31,10 @@ export default {
 			const requestOptions = {
 				method: "POST",
 				credentials: "include",
-				body: JSON.stringify({ friendName: this.friendName })
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ friendName: this.friendName }),
 			};
             const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/`, requestOptions);
 			if (response.ok) {
