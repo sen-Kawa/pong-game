@@ -45,7 +45,7 @@ export default {
 		//	const requestOptions = {
 		//		method: "DELETE",
 		//		headers: { "Content-Type": "application/json" },
-		//		body: JSON.stringify({ friend-name: this.friendD })
+		//		body: JSON.stringify({ friendName: this.friendD })
 		//	};
             //await fetch('${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/', requestOptions);
 			this.friends = this.friends.filter(friend => friend !== friendD); //for testing
