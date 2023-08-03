@@ -1,21 +1,9 @@
 <script setup lang="ts">
+import type { MatchResult } from '@/types/match';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import { toRefs, type PropType } from 'vue';
+import { type PropType } from 'vue';
 import { computed } from 'vue';
-
-interface MatchResult {
-  id: number;
-  completed: boolean;
-  start: Date;
-  end: Date;
-  players: {
-    id: number;
-    score: number;
-    name: string;
-    email: string;
-  }[];
-}
 
 const props = defineProps({
   match: {
@@ -24,7 +12,7 @@ const props = defineProps({
   }
 });
 
-TimeAgo.addDefaultLocale(en);
+TimeAgo.addDefaultLocale(en); // FIXME: only add once to avoid error, maybe move to main.ts?
 
 const duration = computed(() => {
   const start = props.match.start;
