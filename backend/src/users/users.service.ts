@@ -69,12 +69,11 @@ export class UsersService {
   //TODO check if already friend?
   async addFriend(userId: number, friendName : string)
   {
-	  console.log('friend variable contents', friendName);
     const user = await this.prisma.user.findUnique({ where: { displayName: friendName } });
     if (!user)
-      throw new HttpException("User not found", HttpStatus.FORBIDDEN);
+      throw new HttpException("User not found", HttpStatus.NOT_FOUND);
     else if(user.id == userId)
-      throw new HttpException("cant be friend with yourslef", HttpStatus.FORBIDDEN);
+      throw new HttpException("Can't add yourself!", HttpStatus.FORBIDDEN);
 
     await this.prisma.user.update({
       where: {

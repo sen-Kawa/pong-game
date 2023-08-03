@@ -44,7 +44,8 @@ export default {
 				this.$emit('friendAdded');
 			}
 			else {
-				this.message = `Failed to add ${this.friendName} to your friend list.`;
+				const responseData = await response.json();
+				this.message = responseData.message || `Failed to add ${this.friendName} to your friend list.`;
 				this.messageType = "error";
 			}
 			this.friendName = ""
