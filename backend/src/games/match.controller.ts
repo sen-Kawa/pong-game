@@ -66,20 +66,29 @@ export class MatchController {
   @ApiQuery({
     name: 'include-players',
     required: false,
-    description: 'controls the inclusion of user information'
+    description:
+      'Controls the inclusion of user information. \
+      Undefined: include nothing, False: include Score, True: include Score and user information like name etc.'
+  })
+  @ApiQuery({
+    name: 'started',
+    required: false,
+    description: 'If true searches for matches with a start date.'
   })
   @ApiQuery({
     name: 'completed',
     required: false,
-    description: 'if true searches for matches with an end date'
+    description: 'If true searches for matches with an end date.'
   })
   @ApiOkResponse({ type: MatchEntity, isArray: true })
   findAll(
     @Query('include-players', new ParseBoolPipe({ optional: true })) includePlayers?: boolean,
+    @Query('started', new ParseBoolPipe({ optional: true })) started?: boolean,
     @Query('completed', new ParseBoolPipe({ optional: true })) completed?: boolean
   ) {
-    if (includePlayers === undefined && completed === undefined) return this.matchService.all()
-    return this.matchService.findAll({ includePlayers, completed })
+    if (includePlayers === undefined && started === undefined && completed === undefined)
+      return this.matchService.all()
+    return this.matchService.findAll({ includePlayers, started, completed })
   }
 
   @Get(':id')
