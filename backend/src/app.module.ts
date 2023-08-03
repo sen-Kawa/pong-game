@@ -5,6 +5,7 @@ import { GamesModule } from './games/games.module'
 import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { validate } from './config/env.validation'
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -13,6 +14,10 @@ import { validate } from './config/env.validation'
       envFilePath: '.env',
       validate
     }),
+    MulterModule.register({
+      dest: './files',
+    }),
+
     PrismaModule,
     UsersModule,
     GamesModule,

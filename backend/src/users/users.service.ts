@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, HttpException, HttpStatus } from '@nestjs/common'
-import { CreateUserDto } from './dto/create-user.dto'
+import { UserDto } from './dto/user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
@@ -29,19 +29,14 @@ export class UsersService {
       }
     })
     return result[0].following
-    //  result.map(({result}) => ({
-    //   following: result?.following, result
-    // }));
   }
 
   findOne(id: number) {
     return this.prisma.user.findFirst({ where: { id } })
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, roundsOfHashing)
-    }
+  async updateDisplayName(id: number, updateUserDto: UpdateUserDto) {
+
     return this.prisma.user.update({
       where: { id },
       data: updateUserDto
