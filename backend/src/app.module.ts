@@ -15,8 +15,13 @@ import { SocketsModule } from './sockets/sockets.module'
       envFilePath: '.env',
       validate
     }),
-    PrismaModule, UsersModule, GamesModule, AuthModule, SocketsModule],
+    PrismaModule,
+    UsersModule,
+    GamesModule,
+    AuthModule,
+	SocketsModule
+  ],
   controllers: [],
-  providers: [],
+  providers: []
 })
 export class AppModule {}

@@ -17,31 +17,26 @@
             <div class="menu-item">
               <router-link to="/user/Matchhistory">Match History</router-link>
             </div>
-            <div class="menu-item">
-              <router-link to="/user/Friends">Friends</router-link>
-            </div>
         </div>
         </transition>
     </div>
 </template>
 
 <script lang="ts">
-
-import { defineComponent, onMounted } from "vue";
+import { defineComponent, onMounted } from 'vue'
 
 export default defineComponent({
   setup() {},
   name: 'users',
   props: ['title'],
-  data () {
+  data() {
     return {
-      isOpen: false,
-      }
+      isOpen: false
     }
-});
-
+  }
+})
 </script>
 
 <style>
-@import "../../assets/menu.css"
+@import '../../assets/menu.css';
 </style>
