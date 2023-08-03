@@ -1,33 +1,33 @@
-import { User } from '@prisma/client';
-import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import { User } from '@prisma/client'
+import { ApiProperty } from '@nestjs/swagger'
+import { Exclude } from 'class-transformer'
 
 export class UserEntity implements User {
-	constructor(partial: Partial<UserEntity>) {
-		Object.assign(this, partial);
-	}
-	
-	@ApiProperty()
-	id: number;
+  constructor(partial: Partial<UserEntity>) {
+    Object.assign(this, partial)
+  }
 
-	@ApiProperty()
-	displayName: string;
+  @ApiProperty()
+  id: number
 
-	@ApiProperty()
-	name: string;
+  @ApiProperty()
+  displayName: string
 
-	@ApiProperty()
-	userName: string;
+  @ApiProperty()
+  name: string
 
-	@ApiProperty()
-	email: string;
+  @ApiProperty()
+  userName: string
 
-	@ApiProperty()
-	activated2FA: boolean;
+  @ApiProperty()
+  email: string
 
-	@Exclude()
-	refreshToken: string;
+  @ApiProperty()
+  activated2FA: boolean
 
-	@Exclude()
-	twoFactorAuthenticationSecret: string;
+  @Exclude()
+  refreshToken: string
+
+  @Exclude()
+  twoFactorAuthenticationSecret: string
 }

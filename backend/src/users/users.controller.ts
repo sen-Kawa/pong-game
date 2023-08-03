@@ -1,4 +1,4 @@
-import { 
+import {
   Controller,
   Get,
   Post,
@@ -10,13 +10,15 @@ import {
   ParseIntPipe,
   UseGuards,
   Req
-  } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { UserEntity } from './entities/user.entity';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+} from '@nestjs/common'
+import { UsersService } from './users.service'
+import { CreateUserDto } from './dto/create-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { UserEntity } from './entities/user.entity'
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { FindUserDto } from './dto/find-user.dto'
+import { FriendDto } from './dto/friend.dto'
 
 @Controller('users')
 @ApiTags('users')
@@ -25,23 +27,26 @@ export class UsersController {
 
   @Get('friends')
   @UseGuards(JwtAuthGuard)
-  async findAllFriends(@Req() req)
-  {
+  async findAllFriends(@Req() req) {
     return this.usersService.findAllFriends(req.user.id)
+  }
+
+  @Post('find')
+  @UseGuards(JwtAuthGuard)
+  async findUser(@Body() userName: FindUserDto) {
+    return this.usersService.findUser(userName.name)
   }
 
   @Post('addFriend')
   @UseGuards(JwtAuthGuard)
-  async addFriend(@Req() req, @Body('friend-name') friendName: string)
-  {
-    await this.usersService.addFriend(req.user.id, friendName);
+  async addFriend(@Req() req, @Body() name: FriendDto) {
+    await this.usersService.addFriend(req.user.id, name.friendName)
   }
 
   @Delete('removeFriend')
   @UseGuards(JwtAuthGuard)
-  async removeFriend(@Req() req, @Body('friend-name') friendName: string)
-  {
-    await this.usersService.removeFriend(req.user.id, friendName);
+  async removeFriend(@Req() req, @Body() name: FriendDto) {
+    await this.usersService.removeFriend(req.user.id, name.friendName)
   }
 
   // @Get()

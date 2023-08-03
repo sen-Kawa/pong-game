@@ -1,9 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 
 export class PassEntity {
-	@ApiProperty()
-	username: string;
-	@ApiProperty()
-	password: string;
-
+  @ApiProperty()
+  username: string
+  @ApiProperty()
+  password: string
 }
