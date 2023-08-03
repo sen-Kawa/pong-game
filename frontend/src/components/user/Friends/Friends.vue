@@ -29,8 +29,8 @@ export default {
 		Button,
 		AddFriend,
 	},
-	async created() {
-		await this.fetchFriendList();
+	mounted() {
+		this.fetchFriendList();
 	},
 	methods: {
 		toggleShowAddFriend() {
