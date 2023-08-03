@@ -20,5 +20,7 @@
       }
     }
   },
+  "postCreateCommand": "sudo chown -R node /workspace/backend/dist",
+  "postStartCommand": "npx prisma migrate reset -y",
   "workspaceFolder": "/workspace/backend"
 }
