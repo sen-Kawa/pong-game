@@ -23,7 +23,9 @@ export class UsersService {
       select: {
         following: {
           select: {
-          userName: true 
+			id: true,
+          userName: true,
+          displayName: true,
           }
         },
       }

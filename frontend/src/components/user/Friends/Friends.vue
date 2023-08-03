@@ -2,7 +2,8 @@
     <div class="friends">
 		<h1>Friends</h1>
 		<ul v-if="friends.length">
-			<li v-for="friend in friends" :key="friend">{{friend}}<button @click="removeFriend(friend)">Remove Friend</button></li>
+			<li v-for="friend in friends" :key="friend.id">{{friend.displayName}}
+				<button @click="removeFriend(friend)">Remove Friend</button></li>
 		</ul>
 		<div v-else>
 			You dont have friends yet!
@@ -10,7 +11,7 @@
 		<Button @btn-click="toggleShowAddFriend()"
 			:text="showAddFriend ? 'Close' : 'Add Friend'"
 			color="LightGray" />
-		<AddFriend v-show="showAddFriend" @friendAdded="friend-added" />
+		<AddFriend v-show="showAddFriend" />
     </div>
 </template>
 
@@ -21,7 +22,7 @@ export default {
 	data() {
 		return {
 			showAddFriend: false,
-			friends: [1, 2, 3],
+			friends: [],
 		};
 	},
 	components: {
@@ -36,19 +37,22 @@ export default {
 			this.showAddFriend = !this.showAddFriend
 		},
 		async fetchFriendList() {
-            //const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/friends/`);
-			//const data = await response.json();
-			//this.friends = data;
-			this.friends; //for testing
+			const requestOptions = {
+				method: "GET",
+				credentials: "include"
+			};
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/friends/`, requestOptions);
+			const data = await response.json();
+			this.friends = data;
 		},
-		async removeFriend(friendD) {
-		//	const requestOptions = {
-		//		method: "DELETE",
-		//		headers: { "Content-Type": "application/json" },
-		//		body: JSON.stringify({ friendName: this.friendD })
-		//	};
-            //await fetch('${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/', requestOptions);
-			this.friends = this.friends.filter(friend => friend !== friendD); //for testing
+		async removeFriend(friend) {
+			const requestOptions = {
+				method: "DELETE",
+				credentials: "include",
+				body: JSON.stringify({ friendName: friend.displayName })
+			};
+            await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/`, requestOptions);
+			this.friends = this.friends.filter(friend => friend.id !== friend.id);
 		}
 	}
 }
