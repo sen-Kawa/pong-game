@@ -51,6 +51,6 @@ export async function getFriendList() {
 		credentials: "include"
 	};
     const response = await fetch(`${BASE_URL}/friends/`, requestOptions);
-	const data = await response.json();
-	return data;
+	const responseData = await response.json();
+	return responseData;
 }

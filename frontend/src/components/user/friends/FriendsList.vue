@@ -47,7 +47,7 @@ export default {
 			this.fetchFriendList();
 		},
 		async fetchFriendList() {
-			this.friends = getFriendList();
+			this.friends = await getFriendList();
 		},
 	}
 }

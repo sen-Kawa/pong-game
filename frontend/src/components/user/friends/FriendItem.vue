@@ -19,7 +19,7 @@ export default {
 	},
 	methods: {
 		async removeFriend() {
-			deleteFriend(friend.displayName);
+			await deleteFriend(this.friend.displayName);
 			this.$emit('friendRemoved', this.friend.id);
 		}
 	}
