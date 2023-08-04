@@ -2,7 +2,7 @@
 	<div>
 		<h2>Find User</h2>
 		<form @submit.prevent="findUser">
-			<label for="name">Users's Name: </label>
+			<label for="name">User's Name: </label>
 				<input
 					v-model="name"
 					type="text"
