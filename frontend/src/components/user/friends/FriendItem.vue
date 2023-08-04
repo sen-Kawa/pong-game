@@ -7,6 +7,9 @@
 </template>
 
 <script>
+
+import { deleteFriend } from './api/friendship.api.js';
+
 export default {
 	props: {
 		friend: {
@@ -16,15 +19,7 @@ export default {
 	},
 	methods: {
 		async removeFriend() {
-			const requestOptions = {
-				method: "DELETE",
-				credentials: "include",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ friendName: this.friend.displayName })
-			};
-            await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/removeFriend/`, requestOptions);
+			deleteFriend(friend.displayName);
 			this.$emit('friendRemoved', this.friend.id);
 		}
 	}

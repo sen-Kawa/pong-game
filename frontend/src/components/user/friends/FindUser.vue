@@ -21,8 +21,10 @@
 </template>
 
 <script>
+
 import AddFriend from './AddFriend.vue'
 import { postFindUser } from './api/friendship.api.js';
+
 export default {
 	data() {
 		return {
@@ -37,11 +39,7 @@ export default {
 	},
 	methods: {
 		onFriendAdded() {
-			try {
-				this.$emit('onFriendAdded');
-			} catch(error) {
-				console.error('error emitting', error);
-			}
+			this.$emit('onFriendAdded');
 		},
 		async findUser() {
 			if (!this.name) {

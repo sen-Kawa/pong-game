@@ -15,9 +15,12 @@
 </template>
 
 <script>
+
 import ButtonC from '../../Button.vue'
 import Friend from './FriendItem.vue'
 import FindUser from './FindUser.vue'
+import { getFriendList } from './api/friendship.api.js';
+
 export default {
 	data() {
 		return {
@@ -44,13 +47,7 @@ export default {
 			this.fetchFriendList();
 		},
 		async fetchFriendList() {
-			const requestOptions = {
-				method: "GET",
-				credentials: "include"
-			};
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/friends/`, requestOptions);
-			const data = await response.json();
-			this.friends = data;
+			this.friends = getFriendList();
 		},
 	}
 }

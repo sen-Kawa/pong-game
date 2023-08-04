@@ -4,7 +4,9 @@
 </template>
 
 <script>
+
 import { postAddFriend } from './api/friendship.api.js';
+
 export default {
 	props: {
 		friendName: {
