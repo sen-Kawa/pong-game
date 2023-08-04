@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
-import { toRefs, type PropType } from 'vue';
-import { computed } from 'vue';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+import { toRefs, type PropType } from 'vue'
+import { computed } from 'vue'
 
 interface MatchResult {
-  id: number;
-  completed: boolean;
-  start: Date;
-  end: Date;
+  id: number
+  completed: boolean
+  start: Date
+  end: Date
   players: {
-    id: number;
-    score: number;
-    name: string;
-    email: string;
-  }[];
+    id: number
+    score: number
+    name: string
+    email: string
+  }[]
 }
 
 const props = defineProps({
@@ -22,28 +22,28 @@ const props = defineProps({
     type: Object as PropType<MatchResult>,
     required: true
   }
-});
+})
 
-TimeAgo.addDefaultLocale(en);
+TimeAgo.addDefaultLocale(en)
 
 const duration = computed(() => {
-  const start = props.match.start;
-  const end = props.match.end;
-  const duration = end.getTime() - start.getTime();
-  const result = new Date(duration);
+  const start = props.match.start
+  const end = props.match.end
+  const duration = end.getTime() - start.getTime()
+  const result = new Date(duration)
   return result.toLocaleTimeString('de-DE', {
     timeStyle: 'medium'
-  });
-});
+  })
+})
 
 const timeSinceEnd = computed(() => {
-  const timeAgo = new TimeAgo('en-US');
-  return timeAgo.format(props.match.end);
-});
+  const timeAgo = new TimeAgo('en-US')
+  return timeAgo.format(props.match.end)
+})
 
 const highscore = computed(() => {
-  return Math.max(props.match.players[0].score, props.match.players[1].score);
-});
+  return Math.max(props.match.players[0].score, props.match.players[1].score)
+})
 </script>
 
 <template>
