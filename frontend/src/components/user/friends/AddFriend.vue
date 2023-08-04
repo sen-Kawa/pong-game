@@ -1,11 +1,14 @@
 <template>
-	<button @click="addFriend">Add Friend</button>
+	<ButtonC @btn-click="addFriend()"
+		:text="isAdded ? 'Added' : 'Add Friend'"
+		:color="isAdded ? 'Green' : 'LightGray'" />
 	<div v-if="message" :class="messageType">{{ message }}</div>
 </template>
 
 <script>
 
 import { postAddFriend } from './api/friendship.api.js';
+import ButtonC from '../../Button.vue'
 
 export default {
 	props: {
@@ -18,7 +21,11 @@ export default {
 		return {
 			message: "",
 			messageType: "",
+			isAdded: false,
 		};
+	},
+	components: {
+		ButtonC,
 	},
 	emits: ['friendAdded'],
 	methods: {
@@ -26,6 +33,7 @@ export default {
 			const responseData = await postAddFriend(this.friendName);
 
 			if (responseData === undefined) {
+				this.isAdded = true;
 				this.message = `Successfully added ${this.friendName} to your friend list!`;
 				this.messageType = "success";
 				this.$emit('friendAdded');
