@@ -31,6 +31,7 @@ import { MatchEntity } from './entities/match.entity'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { UpdateMatchDto } from './dto/update-match.dto'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { QueryMatchDTO } from './dto/query-match.dto'
 
 @Controller('match')
 @ApiTags('match')
@@ -62,46 +63,48 @@ export class MatchController {
     }
   }
 
+  /**
+   * Finds all matches.
+   * The level of detail in the representation and the set of matches can be controlled with query parameters.
+   * @param queryMatch
+   * @returns
+   */
   @Get()
-  // explicitly marking param as optional, because swagger does not honor the question mark in the parameter list of the function
-  @ApiQuery({
-    name: 'include-players',
-    required: false,
-    description:
-      'Controls the inclusion of user information. \
-      Undefined: include nothing, False: include Score, True: include Score and user information like name etc.'
-  })
-  @ApiQuery({
-    name: 'started',
-    required: false,
-    description: 'If true searches for matches with a start date.'
-  })
-  @ApiQuery({
-    name: 'completed',
-    required: false,
-    description: 'If true searches for matches with an end date.'
-  })
   @ApiOkResponse({ type: MatchEntity, isArray: true })
-  async findAll(
-    @Query('include-players', new ParseBoolPipe({ optional: true })) includePlayers?: boolean,
-    @Query('started', new ParseBoolPipe({ optional: true })) started?: boolean,
-    @Query('completed', new ParseBoolPipe({ optional: true })) completed?: boolean
-  ) {
+  async findAll(@Query() queryMatch: QueryMatchDTO) {
+    const { includePlayers, started, completed } = queryMatch
     if (includePlayers === undefined && started === undefined && completed === undefined)
       return this.matchService.all()
     return this.matchService.findAll({ includePlayers, started, completed })
   }
 
   /**
-   * Searches for all matches with the currently logged in user
+   * Searches for all matches with the currently logged in user.
    * @param request
    * @returns all matches in which the current user is present
    */
   @Get('me')
-  async findAllForCurrentUser(@Req() request) {
-    // TODO: add filter objects
+  async findAllForCurrentUser(@Req() request, @Query() queryMatch: QueryMatchDTO) {
+    const { includePlayers, started, completed } = queryMatch
     console.debug(`Find matches for current User '${request.user}'`)
-    return this.matchService.findAll({ includePlayers: true, player: request.user.id })
+    return this.matchService.findAll({
+      includePlayers,
+      completed,
+      started,
+      player: request.user.id
+    })
+  }
+
+  // TODO: add route for getting a players matches by name
+
+  @Get('/player/:id')
+  async findAllForUser(
+    @Param('id', ParseIntPipe) playerId: number,
+    @Query() queryMatch: QueryMatchDTO
+  ) {
+    const { includePlayers, started, completed } = queryMatch
+    console.debug(`Find matches for User '${playerId}'`)
+    return this.matchService.findAll({ includePlayers, completed, started, player: playerId })
   }
 
   @Get(':id')

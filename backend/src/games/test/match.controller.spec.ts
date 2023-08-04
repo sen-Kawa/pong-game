@@ -54,7 +54,7 @@ describe('MatchController', () => {
 
   describe('all', () => {
     it('should return all matches in minimal representation', async () => {
-      const matches = await controller.findAll()
+      const matches = await controller.findAll({})
 
       expect(matches).toEqual(minimalMatchArray)
     })
@@ -62,7 +62,7 @@ describe('MatchController', () => {
     it('should return all matches with the score included', async () => {
       jest.spyOn(service, 'findAll').mockResolvedValueOnce(matchWithScoreArray)
 
-      const matches = await controller.findAll(false)
+      const matches = await controller.findAll({ includePlayers: false, completed: true })
 
       expect(matches).toEqual(matchWithScoreArray)
     })
@@ -70,7 +70,7 @@ describe('MatchController', () => {
     it('should return all matches with the score and player names included', async () => {
       jest.spyOn(service, 'findAll').mockResolvedValueOnce(maximalMatchArray)
 
-      const matches = await controller.findAll(true)
+      const matches = await controller.findAll({ includePlayers: true, completed: true })
 
       expect(matches).toEqual(maximalMatchArray)
     })

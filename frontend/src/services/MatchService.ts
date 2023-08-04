@@ -1,3 +1,4 @@
+import jwtInterceptor from '@/interceptor/jwtInterceptor'
 import type { MatchDTO, MatchResult } from '@/types/match'
 import axios, { type AxiosResponse } from 'axios'
 
@@ -12,7 +13,7 @@ export default class MatchService {
     // TODO: add parameters to change endpoint, query parameters, etc.
 
     try {
-      const response: AxiosResponse = await axios.get(this.baseUrl + path, {
+      const response: AxiosResponse = await jwtInterceptor.get(this.baseUrl + path, {
         withCredentials: true,
         params: params
       })

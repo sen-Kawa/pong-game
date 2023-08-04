@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
+import { MatchEntity } from './entities/match.entity'
 
 const matchWithScore = Prisma.validator<Prisma.MatchArgs>()({
   include: { players: true }
@@ -49,7 +50,7 @@ export class MatchService {
     started?: boolean
     completed?: boolean
     player?: number
-  }) {
+  }): Promise<MatchEntity | unknown> {
     const { includePlayers, started, completed, player } = options
     console.debug({ options })
     return this.prisma.match.findMany({
