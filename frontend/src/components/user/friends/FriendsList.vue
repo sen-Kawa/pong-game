@@ -7,35 +7,35 @@
 		<div v-else>
 			You dont have friends yet!
 		</div>
-		<ButtonC @btn-click="toggleShowAddFriend()"
-			:text="showAddFriend ? 'Close' : 'Add Friend'"
+		<ButtonC @btn-click="toggleShowFindUser()"
+			:text="showFindUser ? 'Close' : 'Find User'"
 			color="LightGray" />
-		<AddFriend v-show="showAddFriend" @friendAdded="onFriendAdded" />
+		<FindUser v-show="showFindUser" @onFriendAdded="onFriendAdded"/>
     </div>
 </template>
 
 <script>
 import ButtonC from '../../Button.vue'
-import AddFriend from './AddFriend.vue'
 import Friend from './FriendItem.vue'
+import FindUser from './FindUser.vue'
 export default {
 	data() {
 		return {
-			showAddFriend: false,
+			showFindUser: false,
 			friends: [],
 		};
 	},
 	components: {
 		ButtonC,
-		AddFriend,
 		Friend,
+		FindUser,
 	},
 	mounted() {
 		this.fetchFriendList();
 	},
 	methods: {
-		toggleShowAddFriend() {
-			this.showAddFriend = !this.showAddFriend
+		toggleShowFindUser() {
+			this.showFindUser = !this.showFindUser
 		},
 		onFriendAdded() {
 			this.fetchFriendList();
