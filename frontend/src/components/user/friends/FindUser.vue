@@ -22,6 +22,7 @@
 
 <script>
 import AddFriend from './AddFriend.vue'
+import { postFindUser } from './api/friendship.api.js';
 export default {
 	data() {
 		return {
@@ -48,26 +49,16 @@ export default {
 				return
 			}
 			this.foundUser = [];
-			const requestOptions = {
-				method: "POST",
-				credentials: "include",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ name: this.name }),
-			};
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/find/`, requestOptions);
-			console.log('API RESPONSE:', response);
-			
-			if (response.ok) {
-				const userData = await response.json();
+			const userData = await postFindUser(this.name);
+
+			if (userData.length === 0) {
+				this.message = `${this.name} not found.`;
+				this.messageType = "error";
+			}
+			else {
 				this.foundUser = userData;
 				this.message = `Found ${this.name}`;
 				this.messageType = "success";
-			}
-			else {
-				this.message = `${this.name} not found.`;
-				this.messageType = "error";
 			}
 			this.name = ""
 			setTimeout(() => {

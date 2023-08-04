@@ -4,6 +4,7 @@
 </template>
 
 <script>
+import { postAddFriend } from './api/friendship.api.js';
 export default {
 	props: {
 		friendName: {
@@ -20,22 +21,14 @@ export default {
 	emits: ['friendAdded'],
 	methods: {
 		async addFriend() {
-			const requestOptions = {
-				method: "POST",
-				credentials: "include",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ friendName: this.friendName }),
-			};
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/addFriend/`, requestOptions);
-			if (response.ok) {
+			const responseData = await postAddFriend(this.friendName);
+
+			if (responseData === undefined) {
 				this.message = `Successfully added ${this.friendName} to your friend list!`;
 				this.messageType = "success";
 				this.$emit('friendAdded');
 			}
 			else {
-				const responseData = await response.json();
 				this.message = responseData.message || `Failed to add ${this.friendName} to your friend list.`;
 				this.messageType = "error";
 			}
