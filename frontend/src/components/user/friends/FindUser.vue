@@ -46,7 +46,6 @@ export default {
 				alert('Add name to search')
 				return
 			}
-			this.foundUser = [];
 			const userData = await postFindUser(this.name);
 
 			if (userData.length === 0) {
@@ -62,6 +61,9 @@ export default {
 			setTimeout(() => {
 				this.message = "";
 			}, 5000);
+			setTimeout(() => {
+				this.foundUser = [];
+			}, 10000);
 		}
 	},
 };
