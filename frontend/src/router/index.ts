@@ -39,7 +39,7 @@ const router = createRouter({
 		{
 			path: '/user/Friends',
 			name: 'friends',
-			component: () => import('../components/user/Friends/Friends.vue')
+			component: () => import('../components/user/friends/FriendsList.vue')
 		},
 		{
 			path: '/user/2fa',

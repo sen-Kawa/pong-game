@@ -17,7 +17,7 @@
 <script>
 import ButtonC from '../../Button.vue'
 import AddFriend from './AddFriend.vue'
-import Friend from './Friend.vue'
+import Friend from './FriendItem.vue'
 export default {
 	data() {
 		return {
