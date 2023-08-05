@@ -20,6 +20,9 @@
         <div class="menu-item">
           <router-link to="/user/Matchhistory">Match History</router-link>
         </div>
+        <div class="menu-item">
+          <router-link to="/user/Friends">Friends</router-link>
+        </div>
       </div>
     </transition>
   </div>

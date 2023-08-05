@@ -12,7 +12,7 @@ export class UserDto {
   @IsNotEmpty()
   @ApiProperty()
   @Length(3)
-  displayName: string  
+  displayName: string
 
   @IsString()
   @ApiProperty({ required: false })

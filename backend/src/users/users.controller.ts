@@ -17,16 +17,22 @@ import {
 import { UsersService } from './users.service'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { FileDto } from './dto/file.dto'
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiBody,
+  ApiTags,
+  ApiConsumes
+} from '@nestjs/swagger'
 import { UserEntity } from './entities/user.entity'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { FindUserDto } from './dto/find-user.dto'
 import { FriendDto } from './dto/friend.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { diskStorage } from 'multer';
+import { diskStorage } from 'multer'
 
-import { editFileName, imageFileFilter } from './utils/file-upload.utils';
-
+import { editFileName, imageFileFilter } from './utils/file-upload.utils'
 
 @Controller('users')
 @ApiTags('users')
@@ -62,7 +68,7 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: UserEntity })
   async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    return new UserEntity(await this.usersService.updateDisplayName(req.user.id, updateUserDto));
+    return new UserEntity(await this.usersService.updateDisplayName(req.user.id, updateUserDto))
   }
 
   @Post('upload')
@@ -73,32 +79,32 @@ export class UsersController {
       properties: {
         file: {
           type: 'string',
-          format: 'binary',
-        },
-      },
-    },
+          format: 'binary'
+        }
+      }
+    }
   })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
         destination: './files',
-        filename: editFileName,
+        filename: editFileName
       }),
-      fileFilter: imageFileFilter,
-    }),
+      fileFilter: imageFileFilter
+    })
   )
   async uploadedFile(@Body() data: FileDto, @UploadedFile() file: Express.Multer.File, @Req() req) {
-      // const response = {
-      //   originalname: file.originalname,
-      //   filename: file.filename,
-      // };
-      // return response;
-      console.log(file)
+    // const response = {
+    //   originalname: file.originalname,
+    //   filename: file.filename,
+    // };
+    // return response;
+    console.log(file)
   }
 
   @Get(':imgpath')
   seeUploadedFile(@Param('imgpath') image, @Res() res) {
-    return res.sendFile(image, { root: './files' });
+    return res.sendFile(image, { root: './files' })
   }
 
   // @Get()

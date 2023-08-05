@@ -22,6 +22,7 @@ export class UsersService {
       select: {
         following: {
           select: {
+            id: true,
             userName: true,
             displayName: true
           }
@@ -36,7 +37,6 @@ export class UsersService {
   }
 
   async updateDisplayName(id: number, updateUserDto: UpdateUserDto) {
-
     return this.prisma.user.update({
       where: { id },
       data: updateUserDto
@@ -58,10 +58,9 @@ export class UsersService {
 
   //TODO check if already friend?
   async addFriend(userId: number, friendName: string) {
-    const user = await this.prisma.user.findFirst({ where: { displayName: friendName } })
-    if (!user) throw new HttpException('User not found', HttpStatus.FORBIDDEN)
-    else if (user.id == userId)
-      throw new HttpException('cant be friend with yourslef', HttpStatus.FORBIDDEN)
+    const user = await this.prisma.user.findUnique({ where: { displayName: friendName } })
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    else if (user.id == userId) throw new HttpException("Can't add yourself!", HttpStatus.FORBIDDEN)
 
     await this.prisma.user.update({
       where: {
