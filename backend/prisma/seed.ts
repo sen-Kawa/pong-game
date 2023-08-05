@@ -14,7 +14,7 @@ const prisma = new PrismaClient()
 const roundsOfHashing = 10
 
 async function main() {
-  const post1 = await prisma.user.create({
+  const user1 = await prisma.user.create({
     data: {
       name: 'Ulli Rings2',
       userName: 'hrings2',
@@ -23,7 +23,7 @@ async function main() {
     }
   })
 
-  const post2 = await prisma.user.create({
+  const user2 = await prisma.user.create({
     data: {
       name: 'Ulli Rings1',
       userName: 'hrings1',
@@ -31,7 +31,7 @@ async function main() {
     }
   })
 
-  const post3 = await prisma.user.create({
+  const user3 = await prisma.user.create({
     data: {
       name: 'Ulli Rings3',
       userName: 'hrings3',
@@ -39,7 +39,7 @@ async function main() {
     }
   })
 
-  console.log({ post1, post2, post3 })
+  console.log({ user1, user2, user3 })
 
   const match = createFakeMatch({ completed: true })
   console.log(match)
