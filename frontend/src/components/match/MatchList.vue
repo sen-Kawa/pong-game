@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type PropType, onBeforeMount, onMounted } from 'vue';
 import MatchItemVue from './MatchItem.vue';
-import type { MatchResult } from '@/types/match';
+import type { MatchDTO, MatchResult } from '@/types/match';
 import { AxiosError } from 'axios'
 
 import MatchService, { Scope } from '@/services/MatchService'
@@ -14,7 +14,7 @@ const props = defineProps({
 });
 const scope = ref(props.initialScope) // maybe emit an event and let the parent change it
 
-const matches = ref([] as MatchResult[])
+const matches = ref([] as MatchResult[] | MatchDTO[])
 let loading = ref(false);
 let error = ref("")
 
@@ -26,7 +26,10 @@ async function getMatches() {
 
   loading.value = true
   try {
-    matches.value = await matchService.getMatchHistory(scope.value);
+    if (scope.value === Scope.inProgress)
+      matches.value = await matchService.getInProgressMatches()
+    else
+      matches.value = await matchService.getMatchHistory(scope.value);
   } catch (e) {
     console.debug(e)
     if (e instanceof AxiosError)
@@ -39,7 +42,7 @@ function toggleScope() {
   matches.value = []
   if (scope.value === Scope.global)
     scope.value = Scope.personal
-  else
+  else if (scope.value === Scope.personal)
     scope.value = Scope.global
   getMatches();
 }
@@ -55,7 +58,7 @@ onMounted(async () => {
   <div class="match-list">
     <h2>{{ Scope[scope] }} Match List</h2>
 
-    <button @click="toggleScope">Switch Scope</button>
+    <button @click="toggleScope" v-if="scope !== Scope.inProgress">Switch Scope</button>
 
     <div v-if="loading" class="loading">
       Loading...

@@ -2,7 +2,7 @@
 export interface MatchResult {
   id: number
   start: Date
-  end: Date
+  end?: Date
   players: {
     id: number
     score: number

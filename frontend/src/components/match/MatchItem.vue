@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MatchResult } from '@/types/match';
+import type { MatchDTO, MatchResult } from '@/types/match';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { type PropType } from 'vue';
@@ -12,11 +12,12 @@ const props = defineProps({
   }
 });
 
-TimeAgo.addDefaultLocale(en); // FIXME: only add once to avoid error, maybe move to main.ts?
+// FIXME: only add once to avoid error, maybe move to main.ts?
 
 const duration = computed(() => {
   const start = props.match.start;
-  const end = props.match.end;
+  const end = props.match.end ?? new Date(Date.now());
+  console.debug({ start, end })
   const duration = end.getTime() - start.getTime();
   const result = new Date(duration);
   return result.toLocaleTimeString('de-DE', {
@@ -25,6 +26,8 @@ const duration = computed(() => {
 });
 
 const timeSinceEnd = computed(() => {
+  if (!props.match.end)
+    return
   const timeAgo = new TimeAgo('en-US');
   return timeAgo.format(props.match.end);
 });
@@ -43,6 +46,7 @@ const highscore = computed(() => {
     </p>
     <p v-if="match.players">{{ match.players[0].score }} : {{ match.players[1].score }}</p>
     <p id="match-time-since-end">{{ timeSinceEnd }}</p>
+    <!-- TODO: watch to live update the duration for matches in progress -->
     <p>duration: {{ duration }}</p>
   </li>
 </template>
