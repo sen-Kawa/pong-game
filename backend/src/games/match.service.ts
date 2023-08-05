@@ -37,41 +37,63 @@ export class MatchService {
   }
 
   /**
-   *
+   * Finds all matches according to filters and includes additional data.
    * @param options specifies what should be included and searched for
+   * @param includeScores controls the inclusion of score information
    * @param includePlayers controls the inclusion of user information
    * @param started if true searches for matches with a start date
    * @param completed if true searches for matches with an end date
-   * @param player filter matches to only include matches with this player in it
+   * @param players filter matches to only include matches with these players in it
    * @returns a list of all matches in detailed representation according to the query parameters
    */
   async findAll(options: {
+    includeScores?: boolean
     includePlayers?: boolean
     started?: boolean
     completed?: boolean
-    player?: number
+    players?: number[]
   }): Promise<MatchEntity | unknown> {
-    const { includePlayers, started, completed, player } = options
+    // TODO: add sorting and limit
+    const { includeScores, includePlayers, started, completed, players } = options
     console.debug({ options })
+
+    const playersOnMatchFilter =
+      players?.length > 1
+        ? { every: { playerId: { in: players } } }
+        : { some: { playerId: { in: players } } }
+
+    let includes = { players: undefined }
+    if (includeScores) includes = { players: true }
+    if (includePlayers) {
+      includes = { players: { include: { player: true } } }
+    }
+
     return this.prisma.match.findMany({
-      include: {
-        players: includePlayers !== undefined ? { include: { player: includePlayers } } : undefined
-      },
+      include: includes,
       where: {
         start: started !== undefined ? (started ? { not: null } : null) : undefined,
         end: completed !== undefined ? (completed ? { not: null } : null) : undefined,
-        players: {
-          some: {
-            playerId: player
-          }
-        }
+        players: playersOnMatchFilter
       }
     })
   }
 
-  async findOne(id: number): Promise<MatchWithPlayers> {
+  async findOne(
+    id: number,
+    options?: {
+      includeScores?: boolean
+      includePlayers?: boolean
+    }
+  ) {
+    const { includeScores, includePlayers } = options
+    let includes = { players: undefined }
+    if (includeScores) includes = { players: true }
+    if (includePlayers) {
+      includes = { players: { include: { player: true } } }
+    }
+
     return this.prisma.match.findUniqueOrThrow({
-      include: { players: { include: { player: true } } },
+      include: includes,
       where: { id }
     })
   }

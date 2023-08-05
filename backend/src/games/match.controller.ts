@@ -1,37 +1,37 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  ConflictException,
+  Controller,
   Delete,
-  ParseIntPipe,
-  ParseBoolPipe,
-  Query,
+  Get,
   HttpException,
   HttpStatus,
   NotFoundException,
+  Param,
+  ParseIntPipe,
   Patch,
-  ConflictException,
-  UseGuards,
-  Req
+  Post,
+  Query,
+  Req,
+  UseGuards
 } from '@nestjs/common'
-import { MatchService } from './match.service'
-import { CreateMatchDto } from './dto/create-match.dto'
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiQuery,
   ApiTags
 } from '@nestjs/swagger'
-import { MatchEntity } from './entities/match.entity'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import { UpdateMatchDto } from './dto/update-match.dto'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
-import { QueryMatchDTO } from './dto/query-match.dto'
+import { CreateMatchDto } from './dto/create-match.dto'
+import { QueryPersonalMatchDTO } from './dto/query-personal-match.dto'
+import { QueryPlayerMatchDTO } from './dto/query-player-match.dto'
+import { QuerySingleMatchDTO } from './dto/query-single-match.dto'
+import { UpdateMatchDto } from './dto/update-match.dto'
+import { MatchEntity } from './entities/match.entity'
+import { MatchService } from './match.service'
 
 @Controller('match')
 @ApiTags('match')
@@ -71,11 +71,8 @@ export class MatchController {
    */
   @Get()
   @ApiOkResponse({ type: MatchEntity, isArray: true })
-  async findAll(@Query() queryMatch: QueryMatchDTO) {
-    const { includePlayers, started, completed } = queryMatch
-    if (includePlayers === undefined && started === undefined && completed === undefined)
-      return this.matchService.all()
-    return this.matchService.findAll({ includePlayers, started, completed })
+  async findAll(@Query() queryMatch: QueryPlayerMatchDTO) {
+    return this.matchService.findAll(queryMatch)
   }
 
   /**
@@ -84,14 +81,10 @@ export class MatchController {
    * @returns all matches in which the current user is present
    */
   @Get('me')
-  async findAllForCurrentUser(@Req() request, @Query() queryMatch: QueryMatchDTO) {
-    const { includePlayers, started, completed } = queryMatch
-    console.debug(`Find matches for current User '${request.user}'`)
+  async findAllForCurrentUser(@Req() request, @Query() queryMatch: QueryPersonalMatchDTO) {
     return this.matchService.findAll({
-      includePlayers,
-      completed,
-      started,
-      player: request.user.id
+      ...queryMatch,
+      players: queryMatch.opponent ? [request.user.id, queryMatch.opponent] : [request.user.id]
     })
   }
 
@@ -100,19 +93,23 @@ export class MatchController {
   @Get('/player/:id')
   async findAllForUser(
     @Param('id', ParseIntPipe) playerId: number,
-    @Query() queryMatch: QueryMatchDTO
+    @Query() queryMatch: QueryPersonalMatchDTO
   ) {
-    const { includePlayers, started, completed } = queryMatch
-    console.debug(`Find matches for User '${playerId}'`)
-    return this.matchService.findAll({ includePlayers, completed, started, player: playerId })
+    return this.matchService.findAll({
+      ...queryMatch,
+      players: queryMatch.opponent ? [playerId, queryMatch.opponent] : [playerId]
+    })
   }
 
   @Get(':id')
   @ApiOkResponse({ type: MatchEntity })
   @ApiNotFoundResponse({ description: 'match does not exist' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<MatchEntity> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() queryMatch: QuerySingleMatchDTO
+  ): Promise<MatchEntity> {
     try {
-      return await this.matchService.findOne(+id)
+      return await this.matchService.findOne(id, queryMatch)
     } catch (error) {
       throw new NotFoundException('match does not exist')
     }
@@ -131,7 +128,7 @@ export class MatchController {
       throw new HttpException('not modified', HttpStatus.NO_CONTENT) // TODO: NOT MODIFIED is 304
 
     try {
-      await this.matchService.findOne(+id)
+      await this.matchService.findOne(id)
     } catch (error) {
       throw new NotFoundException('match does not exist')
     }
