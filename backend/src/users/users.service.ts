@@ -119,4 +119,14 @@ export class UsersService {
     })
     return result
   }
+  async getUserAvatarUrl(test: number) {
+    return await this.prisma.userAvatar.findUnique({
+      where: {
+        id: test
+      },
+      select: {
+        filename: true
+      }
+    })
+  }
 }

@@ -6,9 +6,15 @@ WORKDIR /app
 
 #COPY ./backend/package*.json .
 
-#RUN npm ci
-#RUN npm install
+
+COPY ./backend .
+
+
 
 EXPOSE 3000
-
-CMD npm run start:dev
+COPY	./backend/entrypoint.sh .
+COPY	./backend/.env .
+RUN		chmod 777 entrypoint.sh
+#CMD tail -f /dev/null
+ENTRYPOINT ["sh",  "entrypoint.sh" ]
+#CMD npm run start:dev

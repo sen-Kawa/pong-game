@@ -26,6 +26,9 @@ export class UserEntity implements User {
   activated2FA: boolean
 
   @Exclude()
+  avatarId: number
+
+  @Exclude()
   refreshToken: string
 
   @Exclude()

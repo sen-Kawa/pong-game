@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgres://postgres:password@db:5432/transcendence"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -20,6 +20,8 @@ model User {
   followedBy                    User[]           @relation("UserFriend")
   following                     User[]           @relation("UserFriend")
   matches                       PlayersOnMatch[]
+  avatar                        UserAvatar @relation(fields: [avatarId],references: [id])
+  avatarId Int @default(1)
 }
 
 model PlayersOnMatch {
@@ -40,3 +42,9 @@ model Match {
   end       DateTime?
 }
 
+model UserAvatar {
+  id       Int    @id @default(autoincrement())
+  userId User[]
+  private Boolean @default(true)
+  filename String @unique
+}

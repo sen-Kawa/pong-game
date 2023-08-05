@@ -102,9 +102,11 @@ export class UsersController {
     console.log(file)
   }
 
-  @Get(':imgpath')
-  seeUploadedFile(@Param('imgpath') image, @Res() res) {
-    return res.sendFile(image, { root: './files' })
+  @Get('userImage')
+  @UseGuards(JwtAuthGuard)
+  async seeUploadedFile(@Req() req, @Res() res) {
+    const image = await this.usersService.getUserAvatarUrl(req.user.avatarId)
+    return res.sendFile(image.filename, { root: './files' })
   }
 
   // @Get()

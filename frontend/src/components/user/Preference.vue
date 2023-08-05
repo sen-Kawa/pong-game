@@ -1,6 +1,8 @@
 <template>
   <div class="text-center">Welcome {{ getUserName }}</div>
   <div class="text-center">change user name</div>
+
+  <img v-bind:src="avatarUrl" width="50" height="60" />
   <Twofactor></Twofactor>
 </template>
 
@@ -11,6 +13,7 @@ import { ref } from 'vue'
 import Twofactor from './Twofactor.vue'
 
 const authStore = useAuthStore()
-//authStore.getuserProfile()
+const avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage`
+
 const { getUserName } = storeToRefs(authStore)
 </script>

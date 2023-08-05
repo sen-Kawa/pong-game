@@ -4,8 +4,10 @@ import { useStorage } from '@vueuse/core'
 import router from '../router'
 import { ref, computed } from 'vue'
 import jwtInterceptor from '../interceptor/jwtInterceptor'
+import { AxiosError } from 'axios'
 
-const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
+const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
+const baseUrlUser = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/`
 export interface User {
   id: number
   userName: string
@@ -44,28 +46,28 @@ export const useAuthStore = defineStore('auth', () => {
     userProfile.value.activated2FA = date.activated2FA
   }
 
-  async function login(username: string, password: string) {
-    const body = { username: username, password: password }
-    try {
-      const response = await axios.post(baseUrl + 'login', body, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      })
-      if (response.data.twoFaEnabled) router.push('/user/2fa')
-      else {
-        loginStatus.value = true
-        router.push('/user/Preference')
-      }
-      //console.log(response.data);
-      //return "Succes";
-    } catch (error: any) {
-      //TODO improve error handling
-      console.log(error)
-      //return error.response.data.message;
-    }
-  }
+  // async function login(username: string, password: string) {
+  //   const body = { username: username, password: password }
+  //   try {
+  //     const response = await axios.post(baseUrlauth + 'login', body, {
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       withCredentials: true
+  //     })
+  //     if (response.data.twoFaEnabled) router.push('/user/2fa')
+  //     else {
+  //       loginStatus.value = true
+  //       router.push('/user/Preference')
+  //     }
+  //     //console.log(response.data);
+  //     //return "Succes";
+  //   } catch (error: any) {
+  //     //TODO improve error handling
+  //     console.log(error)
+  //     //return error.response.data.message;
+  //   }
+  // }
   async function signInFortyTwo(params: string) {
     loginStatus.value = true
     router.push('/user/Preference')
@@ -73,7 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function validate2fa(code: string) {
     const body = { code: code }
     try {
-      const response = await axios.post(baseUrl + 'verify2FA', body, {
+      const response = await axios.post(baseUrlauth + 'verify2FA', body, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -90,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   async function getuserProfile() {
-    const response = await jwtInterceptor.get(baseUrl + 'user-profile', {
+    const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
     if (response && response.status == 200) {
@@ -101,7 +103,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   async function deactivate2FA() {
     const response = await axios
-      .get(baseUrl + 'deactivate2FA', {
+      .get(baseUrlauth + 'deactivate2FA', {
         withCredentials: true
       })
       .catch((err) => {
@@ -120,7 +122,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     //TODO delete cookie and redirect
     const response = await jwtInterceptor
-      .get(baseUrl + 'logout', {
+      .get(baseUrlauth + 'logout', {
         withCredentials: true
       })
       .catch((error) => {
@@ -131,16 +133,38 @@ export const useAuthStore = defineStore('auth', () => {
       router.push('/')
     }
   }
+  async function setDisplayName(displayName: string) {
+    const body = { displayName: displayName }
+    try {
+      const response = await axios.patch(baseUrlUser + 'changeDisplay', body, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      })
+      if (response && response.data) {
+        loginStatus.value = true
+        router.push('/user/Preference')
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return error.response?.data?.message
+      } else {
+        return error
+      }
+    }
+  }
+
   return {
     getUserName,
     activated2FA,
     isLoggedIn,
-    login,
     signInFortyTwo,
     validate2fa,
     getuserProfile,
     deactivate2FA,
     activate2FA,
-    logout
+    logout,
+    setDisplayName
   }
 })
