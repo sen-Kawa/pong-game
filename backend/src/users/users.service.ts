@@ -204,4 +204,27 @@ export class UsersService {
     })
     return user
   }
+
+  async updateAvatar(id: number, fileName: string)
+  {
+    try{
+      const avatar = await this.prisma.userAvatar.create({
+        data: {
+          filename: fileName
+        }
+      })
+      await this.prisma.user.update({
+        where: {
+          id: id
+        },
+        data:{
+          avatarId: avatar.id
+        }
+      })
+    }
+    catch(error){
+      console.log(error)
+      throw new InternalServerErrorException("updateAvatar")
+    }
+  }
 }

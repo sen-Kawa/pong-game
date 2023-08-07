@@ -71,6 +71,7 @@ export class UsersController {
   }
 
   @Post('upload')
+  @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -94,6 +95,7 @@ export class UsersController {
     // };
     // return response;
     console.log(file)
+    await this.usersService.updateAvatar(req.user.id, file.filename)
   }
 
   @Get('userImage')
