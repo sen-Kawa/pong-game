@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import { User, Status } from '@prisma/client'
 import { ApiProperty } from '@nestjs/swagger'
 import { Exclude } from 'class-transformer'
 
@@ -25,6 +25,9 @@ export class UserEntity implements User {
   @ApiProperty()
   activated2FA: boolean
 
+  @ApiProperty()
+  currentStatus: Status
+  
   @Exclude()
   avatarId: number
 

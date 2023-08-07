@@ -1,14 +1,14 @@
-import { BadRequestException, Injectable, HttpException, HttpStatus } from '@nestjs/common'
+import { BadRequestException, Injectable, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common'
 import { UserDto } from './dto/user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
-
+import { Status } from "@prisma/client";
 export const roundsOfHashing = 10
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   findAll() {
     return this.prisma.user.findMany({ take: 10 })
@@ -37,10 +37,25 @@ export class UsersService {
   }
 
   async updateDisplayName(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
-      where: { id },
-      data: updateUserDto
+    const test = await this.prisma.user.findUnique({
+      where: {
+        displayName: updateUserDto.displayName
+      }
     })
+    if (test)
+      throw new HttpException("DisplayName already taken", HttpStatus.FORBIDDEN)
+    try {
+      const result = this.prisma.user.update({
+        where: { id },
+        data: updateUserDto
+
+      })
+      return result
+    }
+    catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException("updateDisplayName")
+    }
   }
 
   remove(id: number) {
@@ -78,9 +93,9 @@ export class UsersService {
 
   async removeFriend(userId: number, friendName: string) {
     const user = await this.prisma.user.findFirst({ where: { displayName: friendName } })
-    if (!user) throw new HttpException('User not found', HttpStatus.FORBIDDEN)
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     else if (user.id == userId)
-      throw new HttpException('cant be friend with yourslef', HttpStatus.FORBIDDEN)
+      throw new HttpException("Can't add yourself!", HttpStatus.FORBIDDEN)
 
     await this.prisma.user.update({
       where: {
@@ -129,4 +144,22 @@ export class UsersService {
       }
     })
   }
+
+  async setUserStatus(userId: number, status: Status) {
+    try {
+      await this.prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          currentStatus: status
+        }
+      })
+    }
+    catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException("updateUserStatus")
+    }
+  }
+
 }
