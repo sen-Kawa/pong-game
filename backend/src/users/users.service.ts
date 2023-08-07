@@ -1,16 +1,22 @@
-import { BadRequestException, Injectable, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  HttpException,
+  HttpStatus,
+  InternalServerErrorException
+} from '@nestjs/common'
 import { UserDto } from './dto/user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
-import { Status } from "@prisma/client";
+import { Status } from '@prisma/client'
 export const roundsOfHashing = 10
-import * as https from 'https';
-import * as fs from 'fs';
+import * as https from 'https'
+import * as fs from 'fs'
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   findAll() {
     return this.prisma.user.findMany({ take: 10 })
@@ -44,19 +50,16 @@ export class UsersService {
         displayName: updateUserDto.displayName
       }
     })
-    if (test)
-      throw new HttpException("DisplayName already taken", HttpStatus.FORBIDDEN)
+    if (test) throw new HttpException('DisplayName already taken', HttpStatus.FORBIDDEN)
     try {
       const result = this.prisma.user.update({
         where: { id },
         data: updateUserDto
-
       })
       return result
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error)
-      throw new InternalServerErrorException("updateDisplayName")
+      throw new InternalServerErrorException('updateDisplayName')
     }
   }
 
@@ -96,8 +99,7 @@ export class UsersService {
   async removeFriend(userId: number, friendName: string) {
     const user = await this.prisma.user.findFirst({ where: { displayName: friendName } })
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
-    else if (user.id == userId)
-      throw new HttpException("Can't add yourself!", HttpStatus.FORBIDDEN)
+    else if (user.id == userId) throw new HttpException("Can't add yourself!", HttpStatus.FORBIDDEN)
 
     await this.prisma.user.update({
       where: {
@@ -157,10 +159,9 @@ export class UsersService {
           currentStatus: status
         }
       })
-    }
-    catch (error) {
+    } catch (error) {
       console.log(error)
-      throw new InternalServerErrorException("updateUserStatus")
+      throw new InternalServerErrorException('updateUserStatus')
     }
   }
 
@@ -169,26 +170,27 @@ export class UsersService {
     const dest = './files/' + fileName + '.jpg'
     const file = fs.createWriteStream(dest)
     https.get(url, function (res) {
-      res.pipe(file);
-      file.on('finish', function () {
-        file.close();
-      }).on('error', function () {
-        fs.unlink(dest, null);
-      })
+      res.pipe(file)
+      file
+        .on('finish', function () {
+          file.close()
+        })
+        .on('error', function () {
+          fs.unlink(dest, null)
+        })
     })
-    return true;
+    return true
   }
 
   async createUser(profile: any): Promise<any> {
-    var avatar: any;
+    var avatar: any
     if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
       avatar = await this.prisma.userAvatar.create({
         data: {
           filename: profile.username + '.jpg'
         }
       })
-    }
-    else {
+    } else {
       avatar = { id: 1 }
     }
 
@@ -205,9 +207,8 @@ export class UsersService {
     return user
   }
 
-  async updateAvatar(id: number, fileName: string)
-  {
-    try{
+  async updateAvatar(id: number, fileName: string) {
+    try {
       const avatar = await this.prisma.userAvatar.create({
         data: {
           filename: fileName
@@ -217,14 +218,13 @@ export class UsersService {
         where: {
           id: id
         },
-        data:{
+        data: {
           avatarId: avatar.id
         }
       })
-    }
-    catch(error){
+    } catch (error) {
       console.log(error)
-      throw new InternalServerErrorException("updateAvatar")
+      throw new InternalServerErrorException('updateAvatar')
     }
   }
 }

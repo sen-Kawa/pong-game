@@ -31,7 +31,7 @@ import { FindUserDto } from './dto/find-user.dto'
 import { FriendDto } from './dto/friend.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
-import { multerOptions } from 'src/config/multer.config';
+import { multerOptions } from 'src/config/multer.config'
 
 @Controller('users')
 @ApiTags('users')
@@ -84,17 +84,8 @@ export class UsersController {
       }
     }
   })
-  @UseInterceptors(
-    FileInterceptor('file', multerOptions
-)
-  )
-  async uploadedFile(@Body() data: FileDto, @UploadedFile() file: Express.Multer.File, @Req() req) {
-    // const response = {
-    //   originalname: file.originalname,
-    //   filename: file.filename,
-    // };
-    // return response;
-    console.log(file)
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  async uploadedFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
     await this.usersService.updateAvatar(req.user.id, file.filename)
   }
 
@@ -104,5 +95,4 @@ export class UsersController {
     const image = await this.usersService.getUserAvatarUrl(req.user.avatarId)
     return res.sendFile(image.filename, { root: './files' })
   }
-
 }

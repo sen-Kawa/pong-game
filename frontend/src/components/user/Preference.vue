@@ -4,6 +4,7 @@
 
   <img v-bind:src="avatarUrl" width="50" height="60" />
   <Twofactor></Twofactor>
+  <FileUpload></FileUpload>
 </template>
 
 <script setup lang="ts">
@@ -11,7 +12,7 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { ref } from 'vue'
 import Twofactor from './Twofactor.vue'
-
+import FileUpload from './FileUpload.vue'
 const authStore = useAuthStore()
 const avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage`
 

@@ -27,7 +27,7 @@ export class UserEntity implements User {
 
   @ApiProperty()
   currentStatus: Status
-  
+
   @Exclude()
   avatarId: number
 
