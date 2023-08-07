@@ -31,8 +31,7 @@ import { FindUserDto } from './dto/find-user.dto'
 import { FriendDto } from './dto/friend.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
-
-import { editFileName, imageFileFilter } from './utils/file-upload.utils'
+import { multerOptions } from 'src/config/multer.config';
 
 @Controller('users')
 @ApiTags('users')
@@ -85,13 +84,8 @@ export class UsersController {
     }
   })
   @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './files',
-        filename: editFileName
-      }),
-      fileFilter: imageFileFilter
-    })
+    FileInterceptor('file', multerOptions
+)
   )
   async uploadedFile(@Body() data: FileDto, @UploadedFile() file: Express.Multer.File, @Req() req) {
     // const response = {

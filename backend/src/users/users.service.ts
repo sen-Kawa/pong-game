@@ -5,6 +5,8 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
 import { Status } from "@prisma/client";
 export const roundsOfHashing = 10
+import * as https from 'https';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -162,4 +164,44 @@ export class UsersService {
     }
   }
 
+  //TODO fail on download handle
+  downloadProfil(url: string, fileName: string): boolean {
+    const dest = './files/' + fileName + '.jpg'
+    const file = fs.createWriteStream(dest)
+    https.get(url, function (res) {
+      res.pipe(file);
+      file.on('finish', function () {
+        file.close();
+      }).on('error', function () {
+        fs.unlink(dest, null);
+      })
+    })
+    return true;
+  }
+
+  async createUser(profile: any): Promise<any> {
+    var avatar: any;
+    if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
+      avatar = await this.prisma.userAvatar.create({
+        data: {
+          filename: profile.username + '.jpg'
+        }
+      })
+    }
+    else {
+      avatar = { id: 1 }
+    }
+
+    const user = await this.prisma.user.create({
+      data: {
+        displayName: profile.userName,
+        name: profile.displayName,
+        userName: profile.username,
+        email: profile.email,
+        activated2FA: false,
+        avatarId: avatar.id
+      }
+    })
+    return user
+  }
 }

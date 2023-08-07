@@ -4,12 +4,15 @@ import { Strategy } from 'passport-42'
 import { AuthService } from '../auth.service'
 import { PrismaService } from './../../prisma/prisma.service'
 import { ConfigService, ConfigModule } from '@nestjs/config'
+import { UsersService } from '../../users/users.service'
+
 @Injectable()
 export class FTStrategy extends PassportStrategy(Strategy) {
   constructor(
     //private readonly authService: AuthService,
     private prisma: PrismaService,
-    private config: ConfigService
+    private config: ConfigService,
+    private userService: UsersService,
   ) {
     super({
       clientID: config.get<string>('CLIENTID'),
@@ -34,7 +37,7 @@ export class FTStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any): Promise<any> {
-    // console.log(profile)
+
     // console.log('Displayname: ', JSON.parse(profile._raw)['displayname']);
     // console.log('42ID:     ', profile.id42)
     // console.log('Username: ', profile.username);
@@ -44,15 +47,8 @@ export class FTStrategy extends PassportStrategy(Strategy) {
     //TODO display name not default as username
     let user = await this.prisma.user.findUnique({ where: { userName: profile.username } })
     if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          displayName: profile.userName,
-          name: profile.displayName,
-          userName: profile.username,
-          email: profile.email,
-          activated2FA: false
-        }
-      })
+      user = await this.userService.createUser(profile)
+
     }
     return user || null
   }
