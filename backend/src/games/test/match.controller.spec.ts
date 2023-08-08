@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { MatchController } from '../match.controller'
 import { MatchService } from '../match.service'
 import { verify } from 'crypto'
+import { UsersModule } from 'src/users/users.module'
 
 const oneMatch = {
   id: 1,
@@ -32,6 +33,7 @@ describe('MatchController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [UsersModule],
       controllers: [MatchController],
       providers: [
         {
