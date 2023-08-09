@@ -1,14 +1,12 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { PrismaService } from './../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
-import { AuthEntity } from './entities/auth.entity'
-import * as bcrypt from 'bcrypt'
-import { UserResponseModel } from 'src/auth/model/user.response.model'
+
 import { UserEntity } from '../users/entities/user.entity'
 import { authenticator } from 'otplib'
 import { UsersService } from '../users/users.service'
 import { toDataURL } from 'qrcode'
-import { ConfigService, ConfigModule } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 
 export interface JwtPayload {
   userId: number

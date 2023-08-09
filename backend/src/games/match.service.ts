@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { UpdateGameDto } from './dto/update-match.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import { Match, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 const matchWithPlayers = Prisma.validator<Prisma.MatchArgs>()({
   include: { players: { include: { player: true } } }

@@ -8,25 +8,18 @@ import {
   ParseIntPipe,
   ParseBoolPipe,
   Query,
-  HttpException,
-  HttpStatus,
   NotFoundException
 } from '@nestjs/common'
 import { MatchService } from './match.service'
 import { CreateMatchDto } from './dto/create-match.dto'
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { MatchEntity } from './entities/match.entity'
-import { UsersService } from 'src/users/users.service'
-import { isInstance } from 'class-validator'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 @Controller('match')
 @ApiTags('match')
 export class MatchController {
-  constructor(
-    private readonly matchService: MatchService,
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly matchService: MatchService) {}
 
   /**
    * Creates a match entity.

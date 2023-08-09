@@ -1,16 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  HttpException,
-  HttpStatus,
-  InternalServerErrorException
-} from '@nestjs/common'
-import { UserDto } from './dto/user.dto'
+import { Injectable, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import * as bcrypt from 'bcrypt'
 import { Status } from '@prisma/client'
-export const roundsOfHashing = 10
 import * as https from 'https'
 import * as fs from 'fs'
 
@@ -23,7 +14,7 @@ export class UsersService {
   }
 
   async findAllFriends(id: number) {
-    let result = await this.prisma.user.findMany({
+    const result = await this.prisma.user.findMany({
       where: {
         id: id
       },
@@ -116,7 +107,7 @@ export class UsersService {
   }
 
   async findUser(name: string) {
-    let result = await this.prisma.user.findMany({
+    const result = await this.prisma.user.findMany({
       where: {
         OR: [
           {
@@ -183,7 +174,7 @@ export class UsersService {
   }
 
   async createUser(profile: any): Promise<any> {
-    var avatar: any
+    let avatar: any
     if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
       avatar = await this.prisma.userAvatar.create({
         data: {
