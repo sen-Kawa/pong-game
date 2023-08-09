@@ -29,7 +29,7 @@ async function upload() {
   formData.append('file', file.value)
   console.log(formData)
   try {
-    const response = await axios.post(baseUrl + 'upload', formData, {
+    await axios.post(baseUrl + 'upload', formData, {
       headers: {
         'Content-Type': 'image/png'
       },

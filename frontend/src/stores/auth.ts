@@ -68,14 +68,15 @@ export const useAuthStore = defineStore('auth', () => {
   //     //return error.response.data.message;
   //   }
   // }
-  async function signInFortyTwo(params: string) {
+  async function signInFortyTwo() {
     loginStatus.value = true
     router.push('/user/Preference')
   }
   async function validate2fa(code: string) {
     const body = { code: code }
     try {
-      const response = await axios.post(baseUrlauth + 'verify2FA', body, {
+      //TODO error handling
+      await axios.post(baseUrlauth + 'verify2FA', body, {
         headers: {
           'Content-Type': 'application/json'
         },

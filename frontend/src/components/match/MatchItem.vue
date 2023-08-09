@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
-import { toRefs, type PropType } from 'vue'
+import { type PropType } from 'vue'
 import { computed } from 'vue'
 
 interface MatchResult {
@@ -41,9 +41,9 @@ const timeSinceEnd = computed(() => {
   return timeAgo.format(props.match.end)
 })
 
-const highscore = computed(() => {
-  return Math.max(props.match.players[0].score, props.match.players[1].score)
-})
+// const highscore = computed(() => {
+//   return Math.max(props.match.players[0].score, props.match.players[1].score)
+// })
 </script>
 
 <template>
