@@ -78,7 +78,7 @@ describe('UsersController Unit Tests', () => {
     }),
     updateDisplayName: jest.fn().mockImplementation((UserId: number, update: UpdateUserDto) => {
       findUserResult.id = UserId
-      mockUser.displayName = update.displayName
+      mockUser.displayName = update.displayName!
       return mockUser
     }),
     updateAvatar: jest.fn().mockImplementation((UserId: number, filename: string) => {

@@ -9,9 +9,9 @@ import * as fs from 'fs'
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.user.findMany({ take: 10 })
-  }
+  // findAll() {
+  //   return this.prisma.user.findMany({ take: 10 })
+  // }
 
   async findAllFriends(id: number) {
     const result = await this.prisma.user.findMany({
@@ -31,9 +31,9 @@ export class UsersService {
     return result[0].following
   }
 
-  findOne(id: number) {
-    return this.prisma.user.findFirst({ where: { id } })
-  }
+  // findOne(id: number) {
+  //   return this.prisma.user.findFirst({ where: { id } })
+  // }
 
   async updateDisplayName(id: number, updateUserDto: UpdateUserDto) {
     const test = await this.prisma.user.findUnique({
@@ -54,10 +54,10 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete({ where: { id } })
-  }
-
+  // remove(id: number) {
+  //   return this.prisma.user.delete({ where: { id } })
+  // }
+  //TODO error handling?
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
     await this.prisma.user.update({
       where: { id: userId },
@@ -88,9 +88,10 @@ export class UsersService {
   }
 
   async removeFriend(userId: number, friendName: string) {
-    const user = await this.prisma.user.findFirst({ where: { displayName: friendName } })
+    const user = await this.prisma.user.findUnique({ where: { displayName: friendName } })
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
-    else if (user.id == userId) throw new HttpException("Can't add yourself!", HttpStatus.FORBIDDEN)
+    else if (user.id == userId)
+      throw new HttpException("Can't have yourself as friend!", HttpStatus.FORBIDDEN)
 
     await this.prisma.user.update({
       where: {
@@ -156,7 +157,7 @@ export class UsersService {
     }
   }
 
-  //TODO fail on download handle
+  //TODO fail on download handle / and tests?
   downloadProfil(url: string, fileName: string): boolean {
     const dest = './files/' + fileName + '.jpg'
     const file = fs.createWriteStream(dest)
@@ -167,7 +168,10 @@ export class UsersService {
           file.close()
         })
         .on('error', function () {
-          fs.unlink(dest, null)
+          fs.unlink(dest, (err) => {
+            if (err) throw err
+            console.log('path/file.txt was deleted')
+          })
         })
     })
     return true
