@@ -16,11 +16,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       secretOrKey: config.get<string>('JWTSECRET'),
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          const data = request?.cookies['auth-cookie']
-          if (data == null) {
+          if (!request.cookies) {
             return null
           }
-          return data
+          return request?.cookies['auth-cookie']
         }
       ])
     })

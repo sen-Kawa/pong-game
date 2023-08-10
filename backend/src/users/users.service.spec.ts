@@ -1,13 +1,14 @@
-// @ts-nocheck
-//needs to be added as otherwise the mpyOn findMany throws an error
 import { Test, TestingModule } from '@nestjs/testing'
 import { UsersService } from './users.service'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { HttpException, InternalServerErrorException } from '@nestjs/common'
 import prisma from 'src/prisma/__mocks__/prisma'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 describe('Unit test for UsersService', () => {
   let service: UsersService
+  const mockDtoUpdateUser = new UpdateUserDto()
+  mockDtoUpdateUser.displayName = 'updateDisplayNameTest'
   jest.mock('src/prisma/prisma.service')
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +26,7 @@ describe('Unit test for UsersService', () => {
   })
 
   it('findAllFriends should return list of friends', async () => {
+    // @ts-ignore
     const spy = jest.spyOn(prisma.user, 'findMany')
     const mockFriendList = [
       {
@@ -159,10 +161,10 @@ describe('Unit test for UsersService', () => {
     prisma.user.findUnique.mockResolvedValue(resultUser as any)
 
     expect(async () => {
-      await service.updateDisplayName(1, 'SecretName')
+      await service.updateDisplayName(1, mockDtoUpdateUser)
     }).rejects.toThrow(HttpException)
     expect(async () => {
-      await service.updateDisplayName(1, 'SecretName')
+      await service.updateDisplayName(1, mockDtoUpdateUser)
     }).rejects.toThrow('DisplayName already taken')
   })
 
@@ -173,7 +175,7 @@ describe('Unit test for UsersService', () => {
     })
 
     expect(async () => {
-      await service.updateDisplayName(2, 'Test')
+      await service.updateDisplayName(2, mockDtoUpdateUser)
     }).rejects.toThrow('updateDisplayName')
   })
 
@@ -382,6 +384,7 @@ describe('Unit test for UsersService', () => {
     expect(user).toStrictEqual(resultUser)
   })
   it('getUserAvatarUrl should return an url', async () => {
+    // @ts-ignore
     const spy = jest.spyOn(prisma.userAvatar, 'findUnique')
     const resultUrl = {
       filename: 'Test'
