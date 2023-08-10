@@ -31,9 +31,9 @@ export class UsersService {
     return result[0].following
   }
 
-  // findOne(id: number) {
-  //   return this.prisma.user.findFirst({ where: { id } })
-  // }
+  findOne(id: number) {
+    return this.prisma.user.findUnique({ where: { id } })
+  }
 
   async updateDisplayName(id: number, updateUserDto: UpdateUserDto) {
     const test = await this.prisma.user.findUnique({
@@ -49,7 +49,6 @@ export class UsersService {
       })
       return result
     } catch (error) {
-      console.log(error)
       throw new InternalServerErrorException('updateDisplayName')
     }
   }
@@ -152,7 +151,6 @@ export class UsersService {
         }
       })
     } catch (error) {
-      console.log(error)
       throw new InternalServerErrorException('updateUserStatus')
     }
   }

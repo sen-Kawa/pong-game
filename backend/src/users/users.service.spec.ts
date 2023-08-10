@@ -1,3 +1,5 @@
+// @ts-nocheck
+//needs to be added as otherwise the mpyOn findMany throws an error
 import { Test, TestingModule } from '@nestjs/testing'
 import { UsersService } from './users.service'
 import { PrismaService } from 'src/prisma/prisma.service'
@@ -80,6 +82,99 @@ describe('Unit test for UsersService', () => {
       }
     })
     expect(frindlist).toStrictEqual(resultFriendList)
+  })
+
+  it('findOne should return a user', async () => {
+    const spy = jest.spyOn(prisma.user, 'findUnique')
+    const resultUser = {
+      id: 1,
+      name: 'test',
+      displayName: 'displayTest',
+      userName: 'test',
+      email: 'test@test.de',
+      activated2FA: false,
+      twoFactorAuthenticationSecret: '',
+      refreshToken: '',
+      currentStatus: 'OFFLINE',
+      avatarId: 1
+    }
+    prisma.user.findUnique.mockResolvedValue(resultUser as any)
+    const user = await service.findOne(1)
+
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith({
+      where: {
+        id: 1
+      }
+    })
+    expect(user).toStrictEqual(resultUser)
+  })
+
+  it('updateDisplayName should return a user if valid displayName', async () => {
+    const spy = jest.spyOn(prisma.user, 'findUnique')
+    const spy2 = jest.spyOn(prisma.user, 'update')
+    const resultUser = {
+      id: 1,
+      name: 'test',
+      displayName: 'displayTest',
+      userName: 'test',
+      email: 'test@test.de',
+      activated2FA: false,
+      twoFactorAuthenticationSecret: '',
+      refreshToken: '',
+      currentStatus: 'OFFLINE',
+      avatarId: 1
+    }
+    prisma.user.findUnique.mockResolvedValue(null as any)
+    prisma.user.update.mockResolvedValue({ ...resultUser, displayName: 'SecretName' } as any)
+    const user = await service.updateDisplayName(1, { displayName: 'SecretName' })
+
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith({
+      where: {
+        displayName: 'SecretName'
+      }
+    })
+    expect(spy2).toBeCalledTimes(1)
+    expect(spy2).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { displayName: 'SecretName' }
+    })
+    expect(user).toStrictEqual({ ...resultUser, displayName: 'SecretName' })
+  })
+
+  it('updateDisplayName should throw an error if name taken', async () => {
+    const resultUser = {
+      id: 1,
+      name: 'test',
+      displayName: 'displayTest',
+      userName: 'test',
+      email: 'test@test.de',
+      activated2FA: false,
+      twoFactorAuthenticationSecret: '',
+      refreshToken: '',
+      currentStatus: 'OFFLINE',
+      avatarId: 1
+    }
+    prisma.user.findUnique.mockResolvedValue(resultUser as any)
+
+    expect(async () => {
+      await service.updateDisplayName(1, 'SecretName')
+    }).rejects.toThrow(HttpException)
+    expect(async () => {
+      await service.updateDisplayName(1, 'SecretName')
+    }).rejects.toThrow('DisplayName already taken')
+  })
+
+  it('updateDisplayName throws an error if update fails', async () => {
+    prisma.user.findUnique.mockResolvedValue(null as any)
+    prisma.user.update.mockImplementation(() => {
+      throw new InternalServerErrorException('updateUserStatus')
+    })
+
+    expect(async () => {
+      await service.updateDisplayName(2, 'Test')
+    }).rejects.toThrow('updateDisplayName')
   })
 
   it('setTwoFactorAuthenticationSecret should run update', async () => {
