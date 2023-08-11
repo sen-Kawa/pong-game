@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  ONLINE
+  OFFLINE
+  INGAME
+}
+
 model User {
   id                            Int              @id @default(autoincrement())
   displayName                   String?          @unique
@@ -17,9 +23,14 @@ model User {
   activated2FA                  Boolean          @default(false)
   twoFactorAuthenticationSecret String?
   refreshToken                  String?
-  followedBy                    User[]           @relation("UserFriend")
+  currentStatus                 Status           @default(OFFLINE)
   following                     User[]           @relation("UserFriend")
+  followedBy                    User[]           @relation("UserFriend")
+  blocked                       User[]           @relation("UserBlocked")
+  blockedBy                     User[]           @relation("UserBlocked")
   matches                       PlayersOnMatch[]
+  avatar                        UserAvatar       @relation(fields: [avatarId], references: [id])
+  avatarId                      Int              @default(1)
 }
 
 model PlayersOnMatch {
@@ -40,3 +51,9 @@ model Match {
   end       DateTime?
 }
 
+model UserAvatar {
+  id       Int     @id @default(autoincrement())
+  userId   User[]
+  private  Boolean @default(true)
+  filename String  @unique
+}

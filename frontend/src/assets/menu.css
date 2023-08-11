@@ -1,6 +1,6 @@
 nav .menu-item svg {
-    width: 10px;
-    margin-left: 10px;
+  width: 10px;
+  margin-left: 10px;
 }
 nav .menu-item .sub-menu {
   position: absolute;
@@ -13,7 +13,7 @@ nav .menu-item .sub-menu {
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: all .5s ease-out;
+  transition: all 0.5s ease-out;
 }
 .fade-enter,
 .fade-leave-to {
