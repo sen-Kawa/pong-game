@@ -10,9 +10,7 @@ const props = defineProps({
     type: Object as PropType<MatchResult>,
     required: true
   }
-});
-
-// FIXME: only add once to avoid error, maybe move to main.ts?
+})
 
 const duration = computed(() => {
   const start = props.match.start;
@@ -22,8 +20,8 @@ const duration = computed(() => {
   const result = new Date(duration);
   return result.toLocaleTimeString('de-DE', {
     timeStyle: 'medium'
-  });
-});
+  })
+})
 
 const timeSinceEnd = computed(() => {
   if (!props.match.end)
@@ -33,8 +31,8 @@ const timeSinceEnd = computed(() => {
 });
 
 const highscore = computed(() => {
-  return Math.max(props.match.players[0].score, props.match.players[1].score);
-});
+  return Math.max(props.match.players[0].score, props.match.players[1].score)
+})
 </script>
 
 <template>

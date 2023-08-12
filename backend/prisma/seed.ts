@@ -14,37 +14,85 @@ const prisma = new PrismaClient()
 const roundsOfHashing = 10
 
 async function main() {
-  const user1 = await prisma.user.create({
-    data: {
-      name: 'Ulli Rings2',
-      userName: 'hrings2',
+  // create two user articles
+  const avatar1 = await prisma.userAvatar.upsert({
+    where: {
+      id: 1
+    },
+    update: {},
+    create: {
+      private: false,
+      filename: 'default.jpg'
+    }
+  })
+  const user1 = await prisma.user.upsert({
+    where: {
+      userName: 'test'
+    },
+    update: {},
+    create: {
+      name: 'Ulli Test',
+      userName: 'test',
+      displayName: 'Ulli',
       email: 'ulli@gmx.de',
       activated2FA: false
     }
   })
 
-  const user2 = await prisma.user.create({
-    data: {
-      name: 'Ulli Rings1',
-      userName: 'hrings1',
-      activated2FA: false
+  const user2 = await prisma.user.upsert({
+    where: {
+      userName: 'jthomsen'
+    },
+    update: {},
+    create: {
+      name: 'Jacob Thomsen',
+      userName: 'jthomsen',
+      displayName: 'Jacky',
+      email: 'jacob.thomsen@example.com',
+      activated2FA: false,
+      following: {
+        connect: { id: user1.id }
+      }
     }
   })
 
-  const user3 = await prisma.user.create({
-    data: {
-      name: 'Ulli Rings3',
-      userName: 'hrings3',
-      activated2FA: false
+  const user3 = await prisma.user.upsert({
+    where: {
+      userName: 'jhansen'
+    },
+    update: {},
+    create: {
+      name: 'Julia Hansen',
+      userName: 'jhansen',
+      displayName: 'Juli',
+      email: 'julia.hansen@example.com',
+      activated2FA: false,
+      following: {
+        connect: { id: user2.id }
+      }
     }
   })
 
-  console.log({ user1, user2, user3 })
+  const user4 = await prisma.user.upsert({
+    where: {
+      userName: 'cvasquez'
+    },
+    update: {},
+    create: {
+      name: 'Caroline Vasquez',
+      userName: 'cvasquez',
+      displayName: 'Caro',
+      email: 'carito@example.com',
+      activated2FA: false,
+      following: {
+        connect: [{ id: user1.id }, { id: user3.id }]
+      }
+    }
+  })
 
-  const match = createFakeMatch({ completed: true })
-  console.log(match)
+  console.log({ avatar1, user1, user2, user3, user4 })
 
-  await prisma.match.create({ data: match })
+  await prisma.match.create({ data: createFakeMatch({ completed: true }) })
   await prisma.match.create({ data: createFakeMatch() })
   await prisma.match.create({ data: createFakeMatch({ withPlayers: true }) })
   await prisma.match.create({ data: createFakeMatch({ withPlayers: true, completed: false }) })

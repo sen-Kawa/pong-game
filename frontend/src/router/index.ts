@@ -21,20 +21,25 @@ const router = createRouter({
       component: () => import('../views/Leader.vue')
     },
     {
-      path: '/user/preference',
+      path: '/user/Preference',
       name: 'preference',
       meta: { requiredAuth: true },
       component: () => import('../components/user/Preference.vue')
     },
     {
-      path: '/user/profile',
+      path: '/user/Profile',
       name: 'profile',
       component: () => import('../components/user/Profile.vue')
     },
     {
-      path: '/user/matchhistory',
+      path: '/user/Matchhistory',
       name: 'matchhistory',
       component: () => import('../components/user/MatchHistory.vue')
+    },
+    {
+      path: '/user/Friends',
+      name: 'friends',
+      component: () => import('../components/user/friends/FriendsList.vue')
     },
     {
       path: '/user/2fa',
@@ -42,9 +47,9 @@ const router = createRouter({
       component: () => import('../components/user/2fa.vue')
     },
     {
-      path: '/user/success',
-      name: 'Success',
-      component: () => import('../components/user/LoggedIn.vue')
+      path: '/user/firsttime',
+      name: 'firsttime',
+      component: () => import('../components/user/FirstTime.vue')
     }
   ]
 })

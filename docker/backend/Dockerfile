@@ -3,15 +3,17 @@ FROM node
 RUN mkdir -p /app
 WORKDIR /app
 
-COPY ./backend/package*.json .
-#RUN npm ci
-RUN npm install
+#COPY ./backend/package*.json .
 
-COPY ./backend/docker-entrypoint.sh /bin/
-RUN chmod +x /bin/docker-entrypoint.sh
+
+COPY ./backend .
+
+
 
 EXPOSE 3000
-
-ENTRYPOINT [ "/bin/docker-entrypoint.sh" ]
-# CMD npm run start:dev
-# CMD sleep infinity # for getting rid of the nests "watch for file changes" that mess up the container logs
+COPY	./backend/entrypoint.sh .
+COPY	./backend/.env .
+RUN		chmod 777 entrypoint.sh
+#CMD tail -f /dev/null
+ENTRYPOINT ["sh",  "entrypoint.sh" ]
+#CMD npm run start:dev
