@@ -63,6 +63,11 @@ export class MatchController {
     }
   }
 
+  /**
+   * Creates a new match with the current user already in it.
+   * @param request contains the user that send the request.
+   * @returns a detailed representation of the created match.
+   */
   @Post('me')
   async createMatchForCurrentUser(@Req() request) {
     return await this.matchService.create({
@@ -99,6 +104,12 @@ export class MatchController {
 
   // TODO: add route for getting a players matches by name
 
+  /**
+   * Searches for all matches where the specified user participated.
+   * @param playerId user id of the player to search for.
+   * @param queryMatch additional options for what to include and filter for.
+   * @returns
+   */
   @Get('/player/:id')
   async findAllForUser(
     @Param('id', ParseIntPipe) playerId: number,
@@ -110,6 +121,12 @@ export class MatchController {
     })
   }
 
+  /**
+   * Finds one match.
+   * @param id id of the match to find.
+   * @param queryMatch
+   * @returns
+   */
   @Get(':id')
   @ApiOkResponse({ type: MatchEntity })
   @ApiNotFoundResponse({ description: 'match does not exist' })
@@ -124,6 +141,11 @@ export class MatchController {
     }
   }
 
+  /**
+   * Starts the match.
+   * Updates the start time of the match with the current time.
+   * @param id id of the match to start.
+   */
   @Patch(':id/start')
   async startMatch(@Param('id', ParseIntPipe) id: number) {
     console.debug(`start match with id ${id}`)
@@ -131,6 +153,13 @@ export class MatchController {
     await this.matchService.start(id)
   }
 
+  /**
+   * Updates the match.
+   * Useful for adding new players or reporting the result.
+   * @param id
+   * @param updateGameDto
+   * @returns
+   */
   @Patch(':id')
   @ApiOkResponse({ type: MatchEntity, description: 'returns the modified entity' })
   @ApiNoContentResponse({ description: 'not modified' })
@@ -165,6 +194,11 @@ export class MatchController {
     return entity
   }
 
+  /**
+   * Deletes the match.
+   * @param id
+   * @returns
+   */
   @Delete(':id')
   @ApiOkResponse({ type: MatchEntity })
   remove(@Param('id', ParseIntPipe) id: number) {

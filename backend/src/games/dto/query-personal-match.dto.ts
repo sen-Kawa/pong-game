@@ -4,7 +4,7 @@ import { QueryMatchDTO } from './query-match.dto'
 
 export class QueryPersonalMatchDTO extends QueryMatchDTO {
   /**
-   * The id of a user you played against.
+   * The id of a opponent user.
    * @example 1
    */
   @IsOptional()
