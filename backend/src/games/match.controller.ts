@@ -63,6 +63,15 @@ export class MatchController {
     }
   }
 
+  @Post('me')
+  async createMatchForCurrentUser(@Req() request) {
+    return await this.matchService.create({
+      players: {
+        create: { playerId: request.user.id }
+      }
+    })
+  }
+
   /**
    * Finds all matches.
    * The level of detail in the representation and the set of matches can be controlled with query parameters.
@@ -113,6 +122,13 @@ export class MatchController {
     } catch (error) {
       throw new NotFoundException('match does not exist')
     }
+  }
+
+  @Patch(':id/start')
+  async startMatch(@Param('id', ParseIntPipe) id: number) {
+    console.debug(`start match with id ${id}`)
+    // TODO: check if players where added
+    await this.matchService.start(id)
   }
 
   @Patch(':id')

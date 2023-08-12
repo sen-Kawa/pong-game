@@ -128,6 +128,15 @@ export class MatchService {
     })
   }
 
+  async start(matchId: number) {
+    await this.prisma.match.update({
+      where: { id: matchId },
+      data: {
+        start: new Date(Date.now())
+      }
+    })
+  }
+
   async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
     const playersOnMatchData = scores.map((score) => ({
       ...score,

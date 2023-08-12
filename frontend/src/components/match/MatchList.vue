@@ -14,7 +14,7 @@ const props = defineProps({
 });
 const scope = ref(props.initialScope) // maybe emit an event and let the parent change it
 
-const matches = ref([] as MatchResult[] | MatchDTO[])
+const matches = ref([] as MatchResult[])
 let loading = ref(false);
 let error = ref("")
 

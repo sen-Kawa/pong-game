@@ -69,6 +69,36 @@ export default class MatchService {
     return data.map(this.transformMatchDTOToResult)
   }
 
+  public async createMatch() {
+    const requestPath = this.baseUrl + MatchService.BASE_PATH + '/me'
+    try {
+      const response = await jwtInterceptor.post(
+        requestPath,
+        {},
+        {
+          withCredentials: true
+        }
+      )
+      return response
+    } catch (error) {
+      console.error('Failed to create match for current player', error)
+      throw error
+    }
+  }
+
+  public async startMatch(matchId: number) {
+    const requestPath = this.baseUrl + MatchService.BASE_PATH + '/' + matchId + '/start'
+    try {
+      const response = await jwtInterceptor.patch(
+        requestPath,
+        {},
+        {
+          withCredentials: true
+        }
+      )
+    } catch (error) {}
+  }
+
   private transformMatchDTOToResult(dto: MatchDTO): MatchResult {
     const result: MatchResult = {
       id: dto.id,
