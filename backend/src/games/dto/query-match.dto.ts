@@ -1,21 +1,6 @@
-// TODO: add validation
-
-import { ApiProperty } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  ArrayUnique,
-  IsArray,
-  IsBoolean,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsPositive
-} from 'class-validator'
+import { IsBoolean, IsOptional } from 'class-validator'
 import { ToBoolean } from 'src/custom-validators/ToBoolean'
 
-// TODO: use this in the controller
 export class QueryMatchDTO {
   /**
    * Controls the inclusion of the scores.
@@ -49,23 +34,4 @@ export class QueryMatchDTO {
   @IsBoolean()
   @ToBoolean()
   readonly completed?: boolean
-
-  /**
-   * Find matches in which these players are.
-   */
-  // @ApiProperty({
-  //   name: 'players[]',
-  //   isArray: true,
-  //   type: [Number]
-  // })
-  // @IsOptional()
-  // @IsArray()
-  // @ArrayMinSize(1)
-  // @ArrayMaxSize(2)
-  // @Type(() => Number)
-  // @IsNumber({}, { each: true })
-  // @IsPositive({ each: true })
-  // @IsInt({ each: true })
-  // @ArrayUnique()
-  // readonly players?: number[]
 }

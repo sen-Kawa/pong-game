@@ -1,16 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  ArrayUnique,
-  IsArray,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsPositive
-} from 'class-validator'
-import { QueryMatchDTO } from './query-match.dto'
 import { Type } from 'class-transformer'
+import { ArrayUnique, IsInt, IsNumber, IsOptional, IsPositive } from 'class-validator'
+import { QueryMatchDTO } from './query-match.dto'
 
 export class QueryPlayerMatchDTO extends QueryMatchDTO {
   /**
@@ -23,9 +14,6 @@ export class QueryPlayerMatchDTO extends QueryMatchDTO {
     maxItems: 2
   })
   @IsOptional()
-  // @IsArray()
-  // @ArrayMinSize(1)
-  // @ArrayMaxSize(2)
   @Type(() => Number)
   @IsNumber({}, { each: true })
   @IsPositive({ each: true })
