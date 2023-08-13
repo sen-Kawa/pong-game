@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { MatchDTO, MatchResult } from '@/types/match';
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
-import { type PropType } from 'vue';
-import { computed } from 'vue';
+import type { MatchResult } from '@/types/match'
+import TimeAgo from 'javascript-time-ago'
+import { type PropType } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   match: {
@@ -13,21 +12,20 @@ const props = defineProps({
 })
 
 const duration = computed(() => {
-  const start = props.match.start;
-  const end = props.match.end ?? new Date(Date.now());
-  const duration = end.getTime() - start.getTime();
-  const result = new Date(duration);
+  const start = props.match.start
+  const end = props.match.end ?? new Date(Date.now())
+  const duration = end.getTime() - start.getTime()
+  const result = new Date(duration)
   return result.toLocaleTimeString('de-DE', {
     timeStyle: 'medium'
   })
 })
 
 const timeSinceEnd = computed(() => {
-  if (!props.match.end)
-    return
-  const timeAgo = new TimeAgo('en-US');
-  return timeAgo.format(props.match.end);
-});
+  if (!props.match.end) return
+  const timeAgo = new TimeAgo('en-US')
+  return timeAgo.format(props.match.end)
+})
 
 const highscore = computed(() => {
   return Math.max(props.match.players[0].score, props.match.players[1].score)

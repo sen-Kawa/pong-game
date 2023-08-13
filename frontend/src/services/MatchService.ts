@@ -1,7 +1,10 @@
 import jwtInterceptor from '@/interceptor/jwtInterceptor'
 import type { MatchDTO, MatchResult } from '@/types/match'
-import axios, { type AxiosResponse } from 'axios'
+import { type AxiosResponse } from 'axios'
 
+/**
+ * Central Interface for talking to the Backend API endpoints for matches.
+ */
 export default class MatchService {
   private static BASE_PATH = '/match'
 
@@ -95,7 +98,10 @@ export default class MatchService {
           withCredentials: true
         }
       )
-    } catch (error) {}
+      console.debug(response)
+    } catch (error) {
+      // TODO: handle error
+    }
   }
 
   private transformMatchDTOToResult(dto: MatchDTO): MatchResult {
