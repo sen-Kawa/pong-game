@@ -20,7 +20,6 @@ export default class MatchService {
         withCredentials: true,
         params: params
       })
-      console.debug(response)
       return response.data
     } catch (error) {
       console.error('Error fetching data from the backend:', error)

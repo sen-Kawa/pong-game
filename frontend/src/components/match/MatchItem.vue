@@ -15,7 +15,6 @@ const props = defineProps({
 const duration = computed(() => {
   const start = props.match.start;
   const end = props.match.end ?? new Date(Date.now());
-  console.debug({ start, end })
   const duration = end.getTime() - start.getTime();
   const result = new Date(duration);
   return result.toLocaleTimeString('de-DE', {
