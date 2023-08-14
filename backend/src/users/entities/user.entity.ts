@@ -10,6 +10,9 @@ export class UserEntity implements User {
 	@ApiProperty()
 	id: number;
 
+	@ApiProperty()
+	displayName: string
+
   @ApiProperty()
   name: string
 
