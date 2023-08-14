@@ -204,12 +204,19 @@ export class UsersController {
     await this.usersService.updateAvatar(req.user.id, file.filename)
   }
 
+  //TODO checks for failure in database request
   /**
    * Returns the User Profil Picture as stream
    * @param req USerID
    * @param res
    * @returns the User Profil Picture
    */
+  @ApiOkResponse({
+    description: 'Returns an image object of the Profil Picture'
+  })
+  @ApiForbiddenResponse({
+    description: 'Unauthorized if user is not logged in'
+  })
   @Get('userImage')
   @UseGuards(JwtAuthGuard)
   async seeUploadedFile(@Req() req, @Res() res) {
@@ -217,7 +224,24 @@ export class UsersController {
     return res.sendFile(image.filename, { root: './files' })
   }
 
+  /**
+   * changes the currentStatus of a User, uses the Status enum
+   * @param req UserId
+   * @param updateUserDto the new status type: Status enum
+   */
   @Patch('changeStatus')
+  @ApiForbiddenResponse({
+    description: 'Unauthorized if user is not logged in'
+  })
+  @ApiOkResponse({
+    description: 'If the Status is updated'
+  })
+  @ApiBadRequestResponse({
+    description: 'currentStatus needs to be of type Status'
+  })
+  @ApiBody({
+    type: UpdateStatusDto
+  })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async updateStatus(@Req() req, @Body() updateUserDto: UpdateStatusDto) {

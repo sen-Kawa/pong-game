@@ -36,13 +36,6 @@ export class FTStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: any): Promise<any> {
-    // console.log('Displayname: ', JSON.parse(profile._raw)['displayname']);
-    // console.log('42ID:     ', profile.id42)
-    // console.log('Username: ', profile.username);
-    // console.log('Displayname: ', profile.displayName);
-    // // return(profile);
-    //TODO differ redirection depending if new user or not
-    //TODO display name not default as username
     let user = await this.prisma.user.findUnique({ where: { userName: profile.username } })
     if (!user) {
       user = await this.userService.createUser(profile)

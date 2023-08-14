@@ -458,6 +458,53 @@ describe('Test for diffrent routes', () => {
 
       expect(status).toBe(200)
     })
+
+    // [PATCH] /users/changeStatus tests
+    it('[PATCH] /users/changeStatus changes the User Status', async () => {
+      const mockUser = { id: 1 }
+      prisma.user.update.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .patch('/users/changeStatus')
+        .set('Accept', 'application/json')
+        .send({ currentStatus: 'OFFLINE' })
+
+      expect(body).toStrictEqual({})
+      expect(status).toBe(200)
+    })
+
+    it('[PATCH] /users/changeStatus if currentStatus is not valid returns an error', async () => {
+      const mockUser = { id: 1 }
+      prisma.user.update.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .patch('/users/changeStatus')
+        .set('Accept', 'application/json')
+        .send({ currentStatus: 'offline' })
+
+      expect(body).toStrictEqual({
+        error: 'Bad Request',
+        message: ['currentStatus must be one of the following values: ONLINE, OFFLINE, INGAME'],
+        statusCode: 400
+      })
+      expect(status).toBe(400)
+    })
+    it('[PATCH] /users/changeStatus if currentStatus is empty returns an error', async () => {
+      const mockUser = { id: 1 }
+      prisma.user.update.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .patch('/users/changeStatus')
+        .set('Accept', 'application/json')
+        .send({})
+
+      expect(body).toStrictEqual({
+        error: 'Bad Request',
+        message: [
+          'currentStatus must be one of the following values: ONLINE, OFFLINE, INGAME',
+          'currentStatus should not be empty'
+        ],
+        statusCode: 400
+      })
+      expect(status).toBe(400)
+    })
   })
 
   describe('Test if all routes are guarded', () => {

@@ -49,9 +49,6 @@ export class UsersService {
     }
   }
 
-  // remove(id: number) {
-  //   return this.prisma.user.delete({ where: { id } })
-  // }
   //TODO error handling?
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
     await this.prisma.user.update({
@@ -62,7 +59,6 @@ export class UsersService {
     })
   }
 
-  //TODO check if already friend?
   async addFriend(userId: number, friendName: string) {
     const user = await this.prisma.user.findUnique({ where: { displayName: friendName } })
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref} from 'vue'
+import { ref } from 'vue'
 let displayName = ref('Test User')
 let userName = ref('test')
 let isTfa = ref('false')
