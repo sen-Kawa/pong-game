@@ -7,7 +7,9 @@ import { FindUserDto } from './dto/find-user.dto'
 import { FriendDto } from './dto/friend.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { Readable } from 'stream'
-
+import { UpdateStatusDto } from './dto/updateStatus.dto'
+import { Status } from '@prisma/client'
+import { DisplayNameDto } from './dto/displayName.dto'
 //TODO check return values? right type not value
 describe('UsersController Unit Tests', () => {
   let userController: UsersController
@@ -22,11 +24,14 @@ describe('UsersController Unit Tests', () => {
   const mockDtoFriend = new FriendDto()
   mockDtoFriend.friendName = 'addFriendTest'
 
-  const mockDtoUpdateUser = new UpdateUserDto()
-  mockDtoUpdateUser.displayName = 'updateDisplayNameTest'
+  const mockDtoDisplayNAme = new DisplayNameDto()
+  mockDtoDisplayNAme.displayName = 'updateDisplayNameTest'
 
   const mockDtoFriendr = new FriendDto()
   mockDtoFriendr.friendName = 'removeFriendTest'
+
+  const mockDtoStatus = new UpdateStatusDto()
+  mockDtoStatus.currentStatus = 'ONLINE'
 
   const file: Express.Multer.File = {
     filename: 'AvatarUrlString',
@@ -89,6 +94,10 @@ describe('UsersController Unit Tests', () => {
     getUserAvatarUrl: jest.fn().mockImplementation((avatarId: number) => {
       findUserResult.avatarId = avatarId
       return { filename: 'AvatarUrlString' }
+    }),
+    setUserStatus: jest.fn().mockImplementation((id: number, status: Status) => {
+      findUserResult.id = id
+      findUserResult.currentStatus = status
     })
   }
 
@@ -138,9 +147,9 @@ describe('UsersController Unit Tests', () => {
 
   it('update should be called and called with the right value', async () => {
     const spy = jest.spyOn(mockUsersService, 'updateDisplayName')
-    await userController.update(mockRequest, mockDtoUpdateUser)
+    await userController.update(mockRequest, mockDtoDisplayNAme)
     expect(spy).toBeCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith(1, mockDtoUpdateUser)
+    expect(spy).toHaveBeenCalledWith(1, mockDtoDisplayNAme)
   })
 
   it('uploadedFile should be called and called with the right value', async () => {
@@ -156,5 +165,12 @@ describe('UsersController Unit Tests', () => {
     await userController.seeUploadedFile(mockRequest, mockResponse)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(2)
+  })
+
+  it('setUserStatus should be called and called with the right value', async () => {
+    const spy = jest.spyOn(mockUsersService, 'setUserStatus')
+    await userController.updateStatus(mockRequest, mockDtoStatus)
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(1, mockDtoStatus.currentStatus)
   })
 })

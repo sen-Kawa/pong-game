@@ -5,6 +5,6 @@ import AddFriend from '@/components/user/friends/AddFriend.vue'
 describe('AddFriend', () => {
   it('renders the component', () => {
     const wrapper = mount(AddFriend)
-    expect(wrapper / exists()).toBe(true)
+    expect(wrapper.exists()).toBe(true)
   })
 })

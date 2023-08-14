@@ -9,11 +9,24 @@ import {
   Req,
   Res,
   UseInterceptors,
-  UploadedFile
+  UploadedFile,
+  Param,
+  HttpException,
+  HttpStatus
 } from '@nestjs/common'
 import { UsersService } from './users.service'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { ApiBearerAuth, ApiCreatedResponse, ApiBody, ApiTags, ApiConsumes } from '@nestjs/swagger'
+import { DisplayNameDto } from './dto/displayName.dto'
+import { UpdateStatusDto } from './dto/updateStatus.dto'
+import {
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiBody,
+  ApiTags,
+  ApiConsumes,
+  ApiForbiddenResponse
+} from '@nestjs/swagger'
 import { UserEntity } from './entities/user.entity'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { FindUserDto } from './dto/find-user.dto'
@@ -26,12 +39,59 @@ import { multerOptions } from 'src/config/multer.config'
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * Returns a list of the friends of the user
+   */
+  @ApiForbiddenResponse({ description: 'Unauthorized if user is not logged in' })
+  @ApiOkResponse({
+    description:
+      'Database has been searched and result was returned as an Array, if noone is founds the array is empty',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'number', example: 1 },
+          userName: { type: 'string', example: 'UserName' },
+          displayName: { type: 'string', example: 'DisplayName' }
+        }
+      }
+    }
+  })
   @Get('friends')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAllFriends(@Req() req) {
     return this.usersService.findAllFriends(req.user.id)
   }
 
+  /**
+   * Returns a list of the user where the userName or DisplayName starts with the
+   */
+  @ApiForbiddenResponse({ description: 'Unauthorized if user is not logged in' })
+  @ApiOkResponse({
+    description:
+      'Database has been searched and result was returned as an Array, if noone is founds the array is empty',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          userName: { type: 'string', example: 'UserName' },
+          displayName: { type: 'string', example: 'DisplayName' }
+        }
+      }
+    }
+  })
+  @ApiBadRequestResponse({ description: 'Search String needs to be atleast 3 Letters long' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'UserName' }
+      }
+    }
+  })
   @Post('find')
   @UseGuards(JwtAuthGuard)
   findUser(@Body() userName: FindUserDto) {
@@ -55,7 +115,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: UserEntity })
-  async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Req() req, @Body() updateUserDto: DisplayNameDto) {
     return new UserEntity(await this.usersService.updateDisplayName(req.user.id, updateUserDto))
   }
 
@@ -83,5 +143,20 @@ export class UsersController {
   async seeUploadedFile(@Req() req, @Res() res) {
     const image = await this.usersService.getUserAvatarUrl(req.user.avatarId)
     return res.sendFile(image.filename, { root: './files' })
+  }
+
+  @Patch('changeStatus')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async updateStatus(@Req() req, @Body() updateUserDto: UpdateStatusDto) {
+    await this.usersService.setUserStatus(req.user.id, updateUserDto.currentStatus)
+  }
+  //TODO success check displayname check?
+  @Get('userImage/:displayName')
+  @UseGuards(JwtAuthGuard)
+  async seeUploadedFileOthers(@Param('displayName') displayName: string, @Res() res) {
+    const image = await this.usersService.getOtherAvatarUrl(displayName)
+    if (!image) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    return res.sendFile(image.avatar.filename, { root: './files' })
   }
 }

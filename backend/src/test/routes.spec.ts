@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { describe } from 'node:test'
 import { PrismaService } from 'src/prisma/prisma.service'
 import prisma from 'src/prisma/__mocks__/prisma'
 import * as request from 'supertest'
@@ -142,6 +141,14 @@ describe('Test for diffrent routes', () => {
     it('[GET] /users/userImage guard test', async () => {
       const { status } = await request(app.getHttpServer())
         .get('/users/userImage')
+        .set('Accept', 'application/json')
+        .set('auth-cookie', '')
+        .expect('Content-Type', /json/)
+      expect(status).toBe(401)
+    })
+    it('[PATCH] /users/changeStatus guard test', async () => {
+      const { status } = await request(app.getHttpServer())
+        .patch('/users/changeStatus')
         .set('Accept', 'application/json')
         .set('auth-cookie', '')
         .expect('Content-Type', /json/)

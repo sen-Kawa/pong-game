@@ -9,10 +9,6 @@ import * as fs from 'fs'
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // findAll() {
-  //   return this.prisma.user.findMany({ take: 10 })
-  // }
-
   async findAllFriends(id: number) {
     const result = await this.prisma.user.findMany({
       where: {
@@ -219,5 +215,20 @@ export class UsersService {
       console.log(error)
       throw new InternalServerErrorException('updateAvatar')
     }
+  }
+
+  async getOtherAvatarUrl(name: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        userName: name
+      },
+      select: {
+        avatar: {
+          select: {
+            filename: true
+          }
+        }
+      }
+    })
   }
 }
