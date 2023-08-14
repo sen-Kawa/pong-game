@@ -16,12 +16,7 @@ import FileUpload from './FileUpload.vue'
 const authStore = useAuthStore()
 const avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage`
 
-
-const authStore = useAuthStore();
-authStore.getuserProfile()
-const {
-  getUserName
-} = storeToRefs(authStore)
+const { getUserName } = storeToRefs(authStore)
 
 
 </script>
