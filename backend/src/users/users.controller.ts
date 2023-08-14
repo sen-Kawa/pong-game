@@ -22,7 +22,6 @@ import {
   ApiOkResponse,
   ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiBody,
   ApiTags,
   ApiConsumes,
@@ -87,16 +86,12 @@ export class UsersController {
   })
   @ApiBadRequestResponse({ description: 'Search String needs to be atleast 3 Letters long' })
   @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', example: 'UserName' }
-      }
-    }
+    type: FindUserDto
   })
   @Post('find')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findUser(@Body() userName: FindUserDto) {
     return this.usersService.findUser(userName.name)
   }
@@ -109,14 +104,9 @@ export class UsersController {
   @ApiForbiddenResponse({
     description: 'Unauthorized if user is not logged in or if trying to add yourself as friend'
   })
-  @ApiBadRequestResponse({ description: 'Search String needs to be atleast 3 Letters long' })
+  @ApiBadRequestResponse({ description: 'Name String needs to be atleast 3 Letters long' })
   @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        friendName: { type: 'string', example: 'FriendName' }
-      }
-    }
+    type: FriendDto
   })
   @ApiOkResponse({
     description: 'added friend, doesnt matter if already had as friend or not'
@@ -125,20 +115,53 @@ export class UsersController {
   @Post('addFriend')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async addFriend(@Req() req, @Body() name: FriendDto) {
     await this.usersService.addFriend(req.user.id, name.friendName)
   }
-  //TODO return value?
+
+  /**
+   * Removes a Friend based on the DisplayName
+   * @param req UserId
+   * @param name the display Name of the friend
+   */
+  @ApiForbiddenResponse({
+    description: 'Unauthorized if user is not logged in or if trying to remove yourself as friend'
+  })
+  @ApiBadRequestResponse({ description: 'Name String needs to be atleast 3 Letters long' })
+  @ApiBody({
+    type: FriendDto
+  })
+  @ApiOkResponse({
+    description: 'removed friend'
+  })
+  @ApiNotFoundResponse({ description: 'No User with this displayName was found' })
   @Delete('removeFriend')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JwtAuthGuard')
   async removeFriend(@Req() req, @Body() name: FriendDto) {
     await this.usersService.removeFriend(req.user.id, name.friendName)
   }
-
+  /**
+   * changes the Display of the User
+   * @param req UserId
+   * @param updateUserDto DisplayName
+   * @returns UserEntity
+   */
+  @ApiForbiddenResponse({
+    description: 'Unauthorized if user is not logged in or if the DisplayName is already taken'
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Name String needs to be atleast 3 Letters long and only Contain the Letters: (a-z)(A-Z)'
+  })
+  @ApiBody({
+    type: DisplayNameDto
+  })
   @Patch('changeDisplay')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiCreatedResponse({ type: UserEntity })
+  @ApiOkResponse({ description: 'Returns the User with the new DisplayName', type: UserEntity })
   async update(@Req() req, @Body() updateUserDto: DisplayNameDto) {
     return new UserEntity(await this.usersService.updateDisplayName(req.user.id, updateUserDto))
   }
