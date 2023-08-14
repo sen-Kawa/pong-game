@@ -5,7 +5,7 @@
       <div class="menu-item"><router-link to="/game">Game</router-link></div>
       <div class="menu-item"><router-link to="/leader">Leaderboard</router-link></div>
       <User title="User" />
-      <a @click="authStore.logout()" class="menu-item"><router-link to="/">Logout</router-link></a>
+      <router-link @click="authStore.logout()" class="menu-item" to="/">Logout</router-link>
     </nav>
   </div>
   <div v-if="!authStore.isLoggedIn">

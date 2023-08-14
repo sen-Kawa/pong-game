@@ -34,12 +34,7 @@ const router = createRouter({
 		{
 			path: '/user/Matchhistory',
 			name: 'matchhistory',
-			component: () => import('../components/user/MatchHistory.vue')
-		},
-		{
-			path: '/user/Friends',
-			name: 'friends',
-			component: () => import('../components/user/friends/FriendsList.vue')
+			component: () => import('../components/user/Matchhistory.vue')
 		},
 		{
 			path: '/user/2fa',
@@ -47,9 +42,9 @@ const router = createRouter({
 			component: () => import('../components/user/2fa.vue')
 		},
 		{
-			path: '/user/firsttime',
-			name: 'firsttime',
-			component: () => import('../components/user/FirstTime.vue')
+			path: '/user/Success',
+			name: 'Success',
+			component: () => import('../components/user/LoggedIn.vue')
 		}
 	]
   })

@@ -1,21 +1,8 @@
 <script setup lang="ts">
+import type { MatchResult } from '@/types/match'
 import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
-import { toRefs, type PropType } from 'vue'
+import { type PropType } from 'vue'
 import { computed } from 'vue'
-
-interface MatchResult {
-  id: number
-  completed: boolean
-  start: Date
-  end: Date
-  players: {
-    id: number
-    score: number
-    name: string
-    email: string
-  }[]
-}
 
 const props = defineProps({
   match: {
@@ -24,11 +11,9 @@ const props = defineProps({
   }
 })
 
-TimeAgo.addDefaultLocale(en)
-
 const duration = computed(() => {
   const start = props.match.start
-  const end = props.match.end
+  const end = props.match.end ?? new Date(Date.now())
   const duration = end.getTime() - start.getTime()
   const result = new Date(duration)
   return result.toLocaleTimeString('de-DE', {
@@ -37,6 +22,7 @@ const duration = computed(() => {
 })
 
 const timeSinceEnd = computed(() => {
+  if (!props.match.end) return
   const timeAgo = new TimeAgo('en-US')
   return timeAgo.format(props.match.end)
 })
@@ -49,12 +35,17 @@ const highscore = computed(() => {
 <template>
   <li>
     <h3>Match #{{ match.id }}</h3>
-    <p>
+    <p v-if="match.players">
       <!-- TODO: highlight the winner -->
-      <span>{{ match.players[0].name }}</span> vs <span>{{ match.players[1].name }}</span>
+      <span v-if="match.players[0]">{{ match.players[0].name }}</span>
+      vs
+      <span v-if="match.players[1]">{{ match.players[1].name }}</span>
+      <span v-else>???</span>
     </p>
-    <p>{{ match.players[0].score }} : {{ match.players[1].score }}</p>
+    <p v-if="match.end">{{ match.players[0].score }} : {{ match.players[1].score }}</p>
     <p id="match-time-since-end">{{ timeSinceEnd }}</p>
+    <!-- TODO: watch to live update the duration for matches in progress -->
     <p>duration: {{ duration }}</p>
+    <button v-if="!match.end">Join Game</button>
   </li>
 </template>

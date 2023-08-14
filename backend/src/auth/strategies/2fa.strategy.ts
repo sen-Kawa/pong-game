@@ -14,15 +14,13 @@ export class TwoFAStrategy extends PassportStrategy(Strategy, '2fa') {
     super({
       ignoreExpiration: false,
       secretOrKey: config.get<string>('JWTSECRET'),
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          var data = request?.cookies['auth-cookie']
-          if (data == null) {
-            return null
-          }
-          return data
+      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+        var data = request?.cookies['auth-cookie'];
+        if(data == null){
+            return null;
         }
-      ])
+		return data;
+	}])
     })
   }
 

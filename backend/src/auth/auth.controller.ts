@@ -57,7 +57,10 @@ export class AuthController {
     })
     this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
     if (req.user.activated2FA) res.redirect('http://localhost:8080/user/2fa')
-    else res.redirect('http://localhost:8080/user/Preference')
+    else {
+      if (req.user.displayName) res.redirect('http://localhost:8080/user/Preference')
+      else res.redirect('http://localhost:8080/user/firsttime')
+    }
   }
 
   @Get('deactivate2FA')

@@ -25,7 +25,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         if(data == null || data === undefined){
             return null;
         }
-      ])
+		return data;
+	}])
     })
   }
 

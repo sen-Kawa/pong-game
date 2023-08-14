@@ -1,65 +1,64 @@
 <template>
-    <div class="friends">
-		<h1>Friends</h1>
-		<ul v-if="friends.length">
-			<Friend v-for="friend in friends" :key="friend.id" :friend="friend" @friendRemoved="onFriendRemoved" />
-		</ul>
-		<div v-else>
-			You dont have friends yet!
-		</div>
-		<ButtonC @btn-click="toggleShowAddFriend()"
-			:text="showAddFriend ? 'Close' : 'Add Friend'"
-			color="LightGray" />
-		<AddFriend v-show="showAddFriend" @friendAdded="onFriendAdded" />
-    </div>
+  <div class="friends">
+    <h1>Friends</h1>
+    <ul v-if="friends.length">
+      <Friend
+        v-for="friend in friends"
+        :key="friend['id']"
+        :friend="friend"
+        @friendRemoved="onFriendRemoved"
+      />
+    </ul>
+    <div v-else>You dont have friends yet!</div>
+    <ButtonC
+      @btn-click="toggleShowFindUser()"
+      :text="showFindUser ? 'Close' : 'Find User'"
+      color="LightGray"
+    />
+    <FindUser v-show="showFindUser" @onFriendAdded="onFriendAdded" />
+  </div>
 </template>
 
-<script>
+<script lang="ts">
 import ButtonC from '../../Button.vue'
-import AddFriend from './AddFriend.vue'
 import Friend from './FriendItem.vue'
+import FindUser from './FindUser.vue'
+import { getFriendList } from './api/friendship.api.js'
+
 export default {
-	data() {
-		return {
-			showAddFriend: false,
-			friends: [],
-		};
-	},
-	components: {
-		ButtonC,
-		AddFriend,
-		Friend,
-	},
-	mounted() {
-		this.fetchFriendList();
-	},
-	methods: {
-		toggleShowAddFriend() {
-			this.showAddFriend = !this.showAddFriend
-		},
-		onFriendAdded() {
-			this.fetchFriendList();
-		},
-		onFriendRemoved() {
-			this.fetchFriendList();
-		},
-		async fetchFriendList() {
-			const requestOptions = {
-				method: "GET",
-				credentials: "include"
-			};
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/friends/`, requestOptions);
-			const data = await response.json();
-			this.friends = data;
-		},
-	}
+  data() {
+    return {
+      showFindUser: false,
+      friends: []
+    }
+  },
+  components: {
+    ButtonC,
+    Friend,
+    FindUser
+  },
+  mounted() {
+    this.fetchFriendList()
+  },
+  methods: {
+    toggleShowFindUser() {
+      this.showFindUser = !this.showFindUser
+    },
+    onFriendAdded() {
+      this.fetchFriendList()
+    },
+    onFriendRemoved() {
+      this.fetchFriendList()
+    },
+    async fetchFriendList() {
+      this.friends = await getFriendList()
+    }
+  }
 }
 </script>
 
 <style scoped>
-	div.friends {
-		#display: flex;
-		#justify-content: space-between;
-		#align-items: center;
-	}
+div.friends {
+  align-items: center;
+}
 </style>

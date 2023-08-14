@@ -3,6 +3,7 @@ version: '3.9'
 networks:
   transcendence:
 
+
 services:
   backend:
     restart: always
@@ -12,11 +13,16 @@ services:
       dockerfile: ./docker/backend/Dockerfile
     networks:
       - transcendence
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
     volumes:
       - $PWD/backend/:/app
     tty: true
     ports:
       - "3000:3000"
+
   frontend:
     restart: always
     image: frontend
@@ -30,7 +36,6 @@ services:
     ports:
       - "8080:8080"
 
-
   db:
     image: postgres:latest
     container_name: db
@@ -41,10 +46,16 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - '5432:5432'
-    volumes: 
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
       - db:/var/lib/postgresql/data
     networks:
       - transcendence
+
   adminer:
     image: adminer
     container_name: adminer
@@ -54,7 +65,9 @@ services:
     networks:
       - transcendence
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+        restart: true
 
 volumes:
   db:
