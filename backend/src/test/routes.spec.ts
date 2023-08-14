@@ -408,6 +408,56 @@ describe('Test for diffrent routes', () => {
       })
       expect(status).toBe(403)
     })
+    // [POST] /users/upload tests
+    //TODO more test, mock interceptor?
+    it('[POST] /users/upload uploading a to big file should return an error', async () => {
+      const { status, body } = await request(app.getHttpServer())
+        .post('/users/upload')
+        .attach('file', __dirname + '/files/tobigfile.jpg')
+
+      expect(body).toStrictEqual({
+        error: 'Payload Too Large',
+        message: 'File too large',
+        statusCode: 413
+      })
+      expect(status).toBe(413)
+    })
+    it('[POST] /users/upload uploading a file with wrong type should return an error', async () => {
+      const mockUser = { id: 1 }
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .post('/users/upload')
+        .attach('file', __dirname + '/files/default.txt')
+
+      expect(body).toStrictEqual({
+        message: 'Unsupported file type .txt',
+        statusCode: 400
+      })
+      expect(status).toBe(400)
+    })
+    it('[POST] /users/upload uploading a null pointer returns an error', async () => {
+      const mockUser = { id: 1 }
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .post('/users/upload')
+        .attach('file', null)
+
+      expect(body).toStrictEqual({
+        message: 'missing file',
+        statusCode: 400
+      })
+      expect(status).toBe(400)
+    })
+    // [GET] /users/userImage tests
+    //TODO more checks if picture ok?
+    it('[GET] /users/userImage should return the Profil Picture', async () => {
+      const mockFile = { filename: 'default.jpg' }
+      // @ts-ignore
+      prisma.userAvatar.findUnique.mockResolvedValue(mockFile as any)
+      const { status } = await request(app.getHttpServer()).get('/users/userImage')
+
+      expect(status).toBe(200)
+    })
   })
 
   describe('Test if all routes are guarded', () => {

@@ -26,7 +26,9 @@ import {
   ApiTags,
   ApiConsumes,
   ApiForbiddenResponse,
-  ApiNotFoundResponse
+  ApiNotFoundResponse,
+  ApiPayloadTooLargeResponse,
+  ApiCreatedResponse
 } from '@nestjs/swagger'
 import { UserEntity } from './entities/user.entity'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
@@ -165,7 +167,23 @@ export class UsersController {
   async update(@Req() req, @Body() updateUserDto: DisplayNameDto) {
     return new UserEntity(await this.usersService.updateDisplayName(req.user.id, updateUserDto))
   }
-
+  /**
+   * upload a file that get used as Profil Picture
+   * @param file a file
+   * @param req UserId
+   */
+  @ApiForbiddenResponse({
+    description: 'Unauthorized if user is not logged in'
+  })
+  @ApiBadRequestResponse({
+    description: 'File needs to be of type jpg,jpeg,png or gif'
+  })
+  @ApiPayloadTooLargeResponse({
+    description: 'File needs to smaller then MAXSIZE'
+  })
+  @ApiCreatedResponse({
+    description: 'File was uploaded and saved and is now the new Profile Picture'
+  })
   @Post('upload')
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
@@ -182,9 +200,16 @@ export class UsersController {
   })
   @UseInterceptors(FileInterceptor('file', multerOptions))
   async uploadedFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
+    if (!file) throw new HttpException('missing file', HttpStatus.BAD_REQUEST)
     await this.usersService.updateAvatar(req.user.id, file.filename)
   }
 
+  /**
+   * Returns the User Profil Picture as stream
+   * @param req USerID
+   * @param res
+   * @returns the User Profil Picture
+   */
   @Get('userImage')
   @UseGuards(JwtAuthGuard)
   async seeUploadedFile(@Req() req, @Res() res) {
