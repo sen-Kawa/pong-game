@@ -12,7 +12,8 @@ import {
   UploadedFile,
   Param,
   HttpException,
-  HttpStatus
+  HttpStatus,
+  HttpCode
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { DisplayNameDto } from './dto/displayName.dto'
@@ -25,7 +26,8 @@ import {
   ApiBody,
   ApiTags,
   ApiConsumes,
-  ApiForbiddenResponse
+  ApiForbiddenResponse,
+  ApiNotFoundResponse
 } from '@nestjs/swagger'
 import { UserEntity } from './entities/user.entity'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
@@ -93,13 +95,35 @@ export class UsersController {
     }
   })
   @Post('find')
+  @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   findUser(@Body() userName: FindUserDto) {
     return this.usersService.findUser(userName.name)
   }
 
-  //TODO return value?
+  /**
+   * adds an user based on the DisplayName as a friend
+   * @param req UserId
+   * @param name the DisplayName of the friend
+   */
+  @ApiForbiddenResponse({
+    description: 'Unauthorized if user is not logged in or if trying to add yourself as friend'
+  })
+  @ApiBadRequestResponse({ description: 'Search String needs to be atleast 3 Letters long' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        friendName: { type: 'string', example: 'FriendName' }
+      }
+    }
+  })
+  @ApiOkResponse({
+    description: 'added friend, doesnt matter if already had as friend or not'
+  })
+  @ApiNotFoundResponse({ description: 'No User with this displayName was found' })
   @Post('addFriend')
+  @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   async addFriend(@Req() req, @Body() name: FriendDto) {
     await this.usersService.addFriend(req.user.id, name.friendName)
