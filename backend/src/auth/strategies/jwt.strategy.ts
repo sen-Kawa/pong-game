@@ -16,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       secretOrKey: config.get<string>('JWTSECRET'),
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          var data = request?.cookies['auth-cookie']
+          const data = request?.cookies['auth-cookie']
           if (data == null) {
             return null
           }

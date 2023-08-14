@@ -34,3 +34,7 @@ nohup.out
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# avatars
+files/
+!default.jpg

@@ -16,7 +16,7 @@ export class TwoFAStrategy extends PassportStrategy(Strategy, '2fa') {
       secretOrKey: config.get<string>('JWTSECRET'),
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          var data = request?.cookies['auth-cookie']
+          const data = request?.cookies['auth-cookie']
           if (data == null) {
             return null
           }

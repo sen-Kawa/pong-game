@@ -5,8 +5,12 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
 
 const app = createApp(App)
+
+TimeAgo.addDefaultLocale(en)
 
 app.use(createPinia())
 app.use(router)

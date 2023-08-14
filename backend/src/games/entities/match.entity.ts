@@ -1,4 +1,4 @@
-import { Match } from '@prisma/client'
+import { Match, PlayersOnMatch } from '@prisma/client'
 import { PlayersOnMatchWithUserInfo } from '../match.service'
 
 export class MatchEntity implements Match {
@@ -10,11 +10,10 @@ export class MatchEntity implements Match {
   /**
    * List of player on the match. Includes the score and user information about the player.
    */
-  players: PlayersOnMatchWithUserInfo[]
-  /**
-   * Indicates match completion. If false the match is in progress or not yet started
-   */
-  completed: boolean
+  players: PlayersOnMatchWithUserInfo[] | PlayersOnMatch[] | undefined
   start: Date
+  /**
+   * Indicates time of match completion. If null the match is in progress or not yet started
+   */
   end: Date
 }

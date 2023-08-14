@@ -23,7 +23,7 @@ export class UsersService {
   }
 
   async findAllFriends(id: number) {
-    let result = await this.prisma.user.findMany({
+    const result = await this.prisma.user.findMany({
       where: {
         id: id
       },
@@ -116,7 +116,7 @@ export class UsersService {
   }
 
   async findUser(name: string) {
-    let result = await this.prisma.user.findMany({
+    const result = await this.prisma.user.findMany({
       where: {
         OR: [
           {
@@ -183,7 +183,7 @@ export class UsersService {
   }
 
   async createUser(profile: any): Promise<any> {
-    var avatar: any
+    let avatar: any
     if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
       avatar = await this.prisma.userAvatar.create({
         data: {
