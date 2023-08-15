@@ -1,7 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
-import { mount } from '@vue/test-utils'
 import MatchItemVue from '@/components/match/MatchItem.vue'
+import { mount } from '@vue/test-utils'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+
+beforeAll(() => {
+  TimeAgo.addDefaultLocale(en)
+})
 
 describe('MatchItemItem', () => {
   it('renders properly', () => {
@@ -13,7 +19,6 @@ describe('MatchItemItem', () => {
       props: {
         match: {
           id: 1,
-          completed: true,
           start: currentTime,
           end: futureTime,
           players: [

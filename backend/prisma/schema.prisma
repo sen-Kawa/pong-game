@@ -44,11 +44,10 @@ model PlayersOnMatch {
 }
 
 model Match {
-  id        Int              @id @default(autoincrement())
-  players   PlayersOnMatch[]
-  completed Boolean?         @default(false) // can it be infered from end beeing set?
-  start     DateTime?
-  end       DateTime?
+  id      Int              @id @default(autoincrement())
+  players PlayersOnMatch[]
+  start   DateTime?
+  end     DateTime?
 }
 
 model UserAvatar {
