@@ -13,7 +13,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { AuthGuard } from '@nestjs/passport'
 import { Response } from 'express'
 import { JwtService } from '@nestjs/jwt'
-import { UsersService } from 'src/users/users.service'
 
 //TODO token and cookie to much same code
 export interface JwtPayload {
@@ -26,7 +25,6 @@ export interface JwtPayload {
 @ApiTags('auth')
 export class AuthController {
   constructor(
-    // private userService: UsersService,
     private jwtService: JwtService,
     private authService: AuthService
   ) {}

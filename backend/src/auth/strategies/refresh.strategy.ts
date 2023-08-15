@@ -10,7 +10,9 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refres
     super({
       ignoreExpiration: false,
       passReqToCallback: true,
-      secretOrKey: config.get<string>('REFRESH_SECRET'),
+      //TODO undo but added a secret for github action
+      //secretOrKey: config.get<string>('REFRESH_SECRET'),
+      secretOrKey: 'SuperSecretSecretDontTell',
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           const data = request?.cookies['refresh-cookie']

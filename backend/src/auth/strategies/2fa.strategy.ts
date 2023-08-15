@@ -13,7 +13,9 @@ export class TwoFAStrategy extends PassportStrategy(Strategy, '2fa') {
   ) {
     super({
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWTSECRET'),
+      //TODO undo but added a secret for github action
+      //secretOrKey: config.get<string>('JWTSECRET'),
+      secretOrKey: 'SuperSecretSecretDontTell',
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           const data = request?.cookies['auth-cookie']
