@@ -170,26 +170,33 @@ export class UsersService {
   async createUser(profile: any): Promise<any> {
     let avatar: any
     if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
-      avatar = await this.prisma.userAvatar.create({
-        data: {
-          filename: profile.username + '.jpg'
-        }
-      })
+      try {
+        avatar = await this.prisma.userAvatar.create({
+          data: {
+            filename: profile.username + '.jpg'
+          }
+        })
+      } catch (error) {
+        avatar = { id: 1 }
+      }
     } else {
       avatar = { id: 1 }
     }
-
-    const user = await this.prisma.user.create({
-      data: {
-        displayName: profile.userName,
-        name: profile.displayName,
-        userName: profile.username,
-        email: profile.email,
-        activated2FA: false,
-        avatarId: avatar.id
-      }
-    })
-    return user
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          displayName: profile.userName,
+          name: profile.displayName,
+          userName: profile.username,
+          email: profile.email,
+          activated2FA: false,
+          avatarId: avatar.id
+        }
+      })
+      return user
+    } catch (error) {
+      throw new InternalServerErrorException('createUser')
+    }
   }
 
   async updateAvatar(id: number, fileName: string) {

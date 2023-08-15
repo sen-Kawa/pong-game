@@ -13,7 +13,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWTSECRET'),
+      //TODO undo but added a secret for github action
+      //secretOrKey: config.get<string>('JWTSECRET'),
+      secretOrKey: 'SuperSecretSecretDontTell',
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           if (!request.cookies) {

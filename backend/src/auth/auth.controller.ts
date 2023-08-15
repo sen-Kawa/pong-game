@@ -26,7 +26,7 @@ export interface JwtPayload {
 @ApiTags('auth')
 export class AuthController {
   constructor(
-    private userService: UsersService,
+    // private userService: UsersService,
     private jwtService: JwtService,
     private authService: AuthService
   ) {}
@@ -118,12 +118,12 @@ export class AuthController {
       httpOnly: true,
       expires: new Date(new Date().getTime() + 86409000)
     })
-    const jwtRefreshToken = this.authService.getRefreshToken(req.user.userId)
+    const jwtRefreshToken = this.authService.getRefreshToken(req.user.id)
     res.cookie('refresh-cookie', jwtRefreshToken, {
       httpOnly: true,
       expires: new Date(new Date().getTime() + 86409000)
     })
-    await this.authService.updateRefreshToken(req.user.userId, jwtRefreshToken)
+    await this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
     return {
       userId: req.user.id,
       twoFaEnabled: req.user.activated2FA
@@ -144,12 +144,12 @@ export class AuthController {
         httpOnly: true,
         expires: new Date(new Date().getTime() + 86409000)
       })
-      const jwtRefreshToken = this.authService.getRefreshToken(payload.userId)
-      res.cookie('refresh-cookie', jwtRefreshToken, {
-        httpOnly: true,
-        expires: new Date(new Date().getTime() + 86409000)
-      })
-      await this.authService.updateRefreshToken(payload.userId, jwtRefreshToken)
+      // const jwtRefreshToken = this.authService.getRefreshToken(payload.userId)
+      // res.cookie('refresh-cookie', jwtRefreshToken, {
+      //   httpOnly: true,
+      //   expires: new Date(new Date().getTime() + 86409000)
+      // })
+      // await this.authService.updateRefreshToken(payload.userId, jwtRefreshToken)
     } else {
       throw new UnauthorizedException()
     }
