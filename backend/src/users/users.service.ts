@@ -216,7 +216,7 @@ export class UsersService {
   async getOtherAvatarUrl(name: string) {
     return await this.prisma.user.findUnique({
       where: {
-        userName: name
+        displayName: name
       },
       select: {
         avatar: {

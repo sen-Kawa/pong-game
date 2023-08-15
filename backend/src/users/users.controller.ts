@@ -63,7 +63,7 @@ export class UsersController {
   })
   @Get('friends')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JwtAuthGuard')
   findAllFriends(@Req() req) {
     return this.usersService.findAllFriends(req.user.id)
   }
@@ -93,7 +93,7 @@ export class UsersController {
   @Post('find')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JwtAuthGuard')
   findUser(@Body() userName: FindUserDto) {
     return this.usersService.findUser(userName.name)
   }
@@ -117,7 +117,7 @@ export class UsersController {
   @Post('addFriend')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JwtAuthGuard')
   async addFriend(@Req() req, @Body() name: FriendDto) {
     await this.usersService.addFriend(req.user.id, name.friendName)
   }
@@ -162,7 +162,7 @@ export class UsersController {
   })
   @Patch('changeDisplay')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JwtAuthGuard')
   @ApiOkResponse({ description: 'Returns the User with the new DisplayName', type: UserEntity })
   async update(@Req() req, @Body() updateUserDto: DisplayNameDto) {
     return new UserEntity(await this.usersService.updateDisplayName(req.user.id, updateUserDto))
@@ -186,6 +186,7 @@ export class UsersController {
   })
   @Post('upload')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JwtAuthGuard')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -219,6 +220,7 @@ export class UsersController {
   })
   @Get('userImage')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JwtAuthGuard')
   async seeUploadedFile(@Req() req, @Res() res) {
     const image = await this.usersService.getUserAvatarUrl(req.user.avatarId)
     return res.sendFile(image.filename, { root: './files' })
@@ -243,15 +245,30 @@ export class UsersController {
     type: UpdateStatusDto
   })
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JwtAuthGuard')
   async updateStatus(@Req() req, @Body() updateUserDto: UpdateStatusDto) {
     await this.usersService.setUserStatus(req.user.id, updateUserDto.currentStatus)
   }
-  //TODO success check displayname check?
+
+  /**
+   * Returns the Profil Picture of a another User
+   * @param displayName the DisplayName of a User
+   * @param res
+   * @returns the User Profil Picture
+   */
+  @ApiOkResponse({
+    description: 'Returns an image object of the Profil Picture'
+  })
+  @ApiForbiddenResponse({
+    description: 'Unauthorized if user is not logged in'
+  })
+  @ApiNotFoundResponse({ description: 'No User with this displayName was found' })
   @Get('userImage/:displayName')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JwtAuthGuard')
   async seeUploadedFileOthers(@Param('displayName') displayName: string, @Res() res) {
     const image = await this.usersService.getOtherAvatarUrl(displayName)
+    console.log(image)
     if (!image) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     return res.sendFile(image.avatar.filename, { root: './files' })
   }
