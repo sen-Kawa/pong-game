@@ -98,6 +98,9 @@ describe('UsersController Unit Tests', () => {
     setUserStatus: jest.fn().mockImplementation((id: number, status: Status) => {
       findUserResult.id = id
       findUserResult.currentStatus = status
+    }),
+    getOtherAvatarUrl: jest.fn().mockImplementation((displayName: string) => {
+      return { avatar: { filename: displayName } }
     })
   }
 
@@ -172,5 +175,11 @@ describe('UsersController Unit Tests', () => {
     await userController.updateStatus(mockRequest, mockDtoStatus)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(1, mockDtoStatus.currentStatus)
+  })
+  it('seeUploadedFileOthers should be called and called with the right value', async () => {
+    const spy = jest.spyOn(mockUsersService, 'getOtherAvatarUrl')
+    await userController.seeUploadedFileOthers('TestDisplayName', mockResponse)
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith('TestDisplayName')
   })
 })

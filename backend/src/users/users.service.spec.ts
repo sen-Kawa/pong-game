@@ -180,6 +180,7 @@ describe('Unit test for UsersService', () => {
   })
 
   it('setTwoFactorAuthenticationSecret should run update', async () => {
+    // @ts-ignore
     const spy = jest.spyOn(prisma.user, 'update')
     const resultUser = {
       id: 1,
@@ -405,6 +406,7 @@ describe('Unit test for UsersService', () => {
   })
 
   it('setUserStatus should run update', async () => {
+    // @ts-ignore
     const spy = jest.spyOn(prisma.user, 'update')
 
     prisma.userAvatar.findUnique.mockResolvedValue({} as any)
@@ -445,7 +447,7 @@ describe('Unit test for UsersService', () => {
       }
     }
     jest.spyOn(service, 'downloadProfil').mockReturnValue(false)
-
+    // @ts-ignore
     prisma.user.create.mockResolvedValue({
       id: 1,
       name: newUser.userName,
@@ -472,5 +474,99 @@ describe('Unit test for UsersService', () => {
     }
     const user = await service.createUser(newUser)
     expect(user).toStrictEqual(resultUser)
+  })
+  it('updateAvatar should create an Avatar entry and update the user', async () => {
+    // @ts-ignore
+    const spy = jest.spyOn(prisma.userAvatar, 'create')
+    // @ts-ignore
+    const spy2 = jest.spyOn(prisma.user, 'update')
+    const resultAvatar = {
+      id: 2,
+      private: false,
+      filename: 'TestUpdateAvatar.jpg'
+    }
+    const resultUser = {
+      id: 2,
+      name: 'test',
+      displayName: 'displayTest',
+      userName: 'test',
+      email: 'test@test.de',
+      activated2FA: false,
+      twoFactorAuthenticationSecret: '',
+      refreshToken: '',
+      currentStatus: 'OFFLINE',
+      avatarId: 2
+    }
+    // @ts-ignore
+    prisma.userAvatar.create.mockResolvedValue(resultAvatar as any)
+    prisma.user.update.mockResolvedValue(resultUser as any)
+    await service.updateAvatar(2, resultAvatar.filename)
+
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith({
+      data: {
+        filename: resultAvatar.filename
+      }
+    })
+    expect(spy2).toBeCalledTimes(1)
+    expect(spy2).toHaveBeenCalledWith({
+      where: {
+        id: 2
+      },
+      data: {
+        avatarId: resultAvatar.id
+      }
+    })
+  })
+  it('updateAvatar throws an error if create Avatar fails', async () => {
+    prisma.userAvatar.create.mockImplementation(() => {
+      throw new InternalServerErrorException('updateAvatar')
+    })
+
+    expect(async () => {
+      await service.updateAvatar(2, 'Test')
+    }).rejects.toThrow('updateAvatar')
+  })
+  it('updateAvatar throws an error if update User fails', async () => {
+    const resultAvatar = {
+      id: 2,
+      private: false,
+      filename: 'TestUpdateAvatar.jpg'
+    }
+    prisma.userAvatar.create.mockResolvedValue(resultAvatar as any)
+    prisma.user.update.mockImplementation(() => {
+      throw new InternalServerErrorException('updateAvatar')
+    })
+
+    expect(async () => {
+      await service.updateAvatar(2, 'Test')
+    }).rejects.toThrow('updateAvatar')
+  })
+
+  it('getOtherAvatarUrl should return an avatar object with filename', async () => {
+    // @ts-ignore
+    const spy = jest.spyOn(prisma.user, 'findUnique')
+    const resultUser = {
+      avatar: {
+        filename: 'TestgetOtherAvatarUrl'
+      }
+    }
+    prisma.user.findUnique.mockResolvedValue(resultUser as any)
+    const result = await service.getOtherAvatarUrl('TestOtherAvatar')
+
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith({
+      where: {
+        displayName: 'TestOtherAvatar'
+      },
+      select: {
+        avatar: {
+          select: {
+            filename: true
+          }
+        }
+      }
+    })
+    expect(result).toStrictEqual(resultUser)
   })
 })

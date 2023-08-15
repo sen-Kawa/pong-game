@@ -268,7 +268,6 @@ export class UsersController {
   @ApiBearerAuth('JwtAuthGuard')
   async seeUploadedFileOthers(@Param('displayName') displayName: string, @Res() res) {
     const image = await this.usersService.getOtherAvatarUrl(displayName)
-    console.log(image)
     if (!image) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     return res.sendFile(image.avatar.filename, { root: './files' })
   }
