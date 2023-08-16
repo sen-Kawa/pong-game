@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { PrismaService } from './../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
 
@@ -40,12 +40,16 @@ export class AuthService {
     )
   }
   async updateRefreshToken(userid: number, Token: string) {
-    await this.prisma.user.update({
-      where: { id: userid },
-      data: {
-        refreshToken: Token
-      }
-    })
+    try {
+      await this.prisma.user.update({
+        where: { id: userid },
+        data: {
+          refreshToken: Token
+        }
+      })
+    } catch (error) {
+      throw new InternalServerErrorException('updateRefreshToken')
+    }
   }
 
   async deactivate2FA(num: number) {
@@ -57,7 +61,7 @@ export class AuthService {
         }
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('deactivate2FA')
     }
   }
   async activate2FA(num: number) {
@@ -69,15 +73,15 @@ export class AuthService {
         }
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('activate2FA')
     }
   }
+
   async generate2FASecret(user: UserEntity) {
     const secret = authenticator.generateSecret()
     const otpauthUrl = authenticator.keyuri(
       user.email,
-      //'AUTH_APP_NAME',
-      process.env.AUTH_APP_NAME,
+      this.config.get<string>('AUTH_APP_NAME'),
       secret
     )
     await this.usersServive.setTwoFactorAuthenticationSecret(secret, user.id)
@@ -99,7 +103,7 @@ export class AuthService {
         secret: user.twoFactorAuthenticationSecret
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('verify2FA')
     }
   }
 
@@ -107,9 +111,9 @@ export class AuthService {
     try {
       const user = await this.usersServive.findOne(userId)
       if (!user) return false
-      else if (!user.refreshToken && user.refreshToken != refreshToken) return false
+      else if (!user.refreshToken || user.refreshToken != refreshToken) return false
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('verifyRefreshToken')
     }
     return true
   }
@@ -123,7 +127,7 @@ export class AuthService {
         }
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('resetRefreshToken')
     }
   }
 }
