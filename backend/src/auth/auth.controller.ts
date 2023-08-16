@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { AuthGuard } from '@nestjs/passport'
 import { Response } from 'express'
 import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
 
 //TODO token and cookie to much same code
 export interface JwtPayload {
@@ -26,7 +27,8 @@ export interface JwtPayload {
 export class AuthController {
   constructor(
     private jwtService: JwtService,
-    private authService: AuthService
+    private authService: AuthService,
+    private config: ConfigService
   ) {}
 
   @Get('42login')
@@ -48,10 +50,11 @@ export class AuthController {
       expires: new Date(new Date().getTime() + 86409000)
     })
     this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
-    if (req.user.activated2FA) res.redirect('http://localhost:8080/user/2fa')
+    if (req.user.activated2FA) res.redirect(this.config.get<string>('FRONTEND_URL') + '/user/2fa')
     else {
-      if (req.user.displayName) res.redirect('http://localhost:8080/user/Preference')
-      else res.redirect('http://localhost:8080/user/firsttime')
+      if (req.user.displayName)
+        res.redirect(this.config.get<string>('FRONTEND_URL') + '/user/Preference')
+      else res.redirect(this.config.get<string>('FRONTEND_URL') + '/user/firsttime')
     }
   }
 
@@ -77,14 +80,13 @@ export class AuthController {
     return req.user
   }
 
-  //TODO later undo: removed guard and db stuff that it always works
   @Get('logout')
-  //@UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
     res.clearCookie('auth-cookie')
     res.clearCookie('refresh-cookie')
-    //this.authService.resetRefreshToken(req.user.id);
+    this.authService.resetRefreshToken(req.user.id)
     return { msg: 'success' }
   }
 
@@ -128,6 +130,7 @@ export class AuthController {
     }
   }
 
+  //TODO check if refresh token valid?
   @Get('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   async refreshTokens(@Req() req, @Res({ passthrough: true }) res: Response) {
@@ -136,18 +139,13 @@ export class AuthController {
       throw new UnauthorizedException()
     }
     const payload = this.jwtService.decode(refreshToken) as JwtPayload
-    if (this.authService.verifyRefreshToken(payload.userId, refreshToken)) {
+    const test = await this.authService.verifyRefreshToken(payload.userId, refreshToken)
+    if (test) {
       const jwtToken = this.authService.getAccessToken(payload.userId, false)
       res.cookie('auth-cookie', jwtToken, {
         httpOnly: true,
         expires: new Date(new Date().getTime() + 86409000)
       })
-      // const jwtRefreshToken = this.authService.getRefreshToken(payload.userId)
-      // res.cookie('refresh-cookie', jwtRefreshToken, {
-      //   httpOnly: true,
-      //   expires: new Date(new Date().getTime() + 86409000)
-      // })
-      // await this.authService.updateRefreshToken(payload.userId, jwtRefreshToken)
     } else {
       throw new UnauthorizedException()
     }

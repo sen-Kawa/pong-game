@@ -56,6 +56,7 @@ describe('AuthService', () => {
           refreshToken: testRefreshToken,
           twoFactorAuthenticationSecret: testUser.twoFactorAuthenticationSecret
         }
+      else if (userId == testUser.id + 1) return null
       throw new InternalServerErrorException('testError')
     })
   }
@@ -242,13 +243,22 @@ describe('AuthService', () => {
     }).rejects.toThrow('verify2FA')
   })
 
-  it('verifyRefreshToken should be called and called with the right value', async () => {
+  it('verifyRefreshToken should return true if called with a valid RefreshToken', async () => {
     const spy = jest.spyOn(mockUsersService, 'findOne')
 
     const result = await service.verifyRefreshToken(testUser.id, testRefreshToken)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(testUser.id)
     expect(result).toStrictEqual(true)
+  })
+
+  it('verifyRefreshToken should return false if user isnt found', async () => {
+    const spy = jest.spyOn(mockUsersService, 'findOne')
+
+    const result = await service.verifyRefreshToken(testUser.id + 1, testRefreshToken)
+    expect(spy).toBeCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(testUser.id + 1)
+    expect(result).toStrictEqual(false)
   })
 
   it('verifyRefreshToken should return false if false RefreshToken', async () => {

@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { PrismaService } from './../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
-
 import { UserEntity } from '../users/entities/user.entity'
 import { authenticator } from 'otplib'
 import { UsersService } from '../users/users.service'
@@ -111,7 +110,8 @@ export class AuthService {
     try {
       const user = await this.usersServive.findOne(userId)
       if (!user) return false
-      else if (!user.refreshToken || user.refreshToken != refreshToken) return false
+      else if (!user.refreshToken) return false
+      else if (user.refreshToken != refreshToken) return false
     } catch (error) {
       throw new InternalServerErrorException('verifyRefreshToken')
     }

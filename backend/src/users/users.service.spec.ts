@@ -531,6 +531,7 @@ describe('Unit test for UsersService', () => {
       await service.updateAvatar(2, 'Test')
     }).rejects.toThrow('updateAvatar')
   })
+
   it('updateAvatar throws an error if update User fails', async () => {
     const resultAvatar = {
       id: 2,
