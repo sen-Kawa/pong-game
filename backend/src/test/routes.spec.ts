@@ -28,6 +28,11 @@ describe('Test for diffrent routes', () => {
       app.useGlobalGuards(new MockAuthGuard())
       await app.init()
     })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
     // [GET] /users/friends friends
     it('[GET] /users/friends valid request returns list', async () => {
       const mockFriendList = [
