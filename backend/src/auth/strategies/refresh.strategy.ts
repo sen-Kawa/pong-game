@@ -16,7 +16,7 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refres
           if (!request.cookies) {
             return null
           }
-          return request?.cookies['auth-cookie']
+          return request?.cookies['refresh-cookie']
         }
       ])
     })
