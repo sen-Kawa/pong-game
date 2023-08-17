@@ -28,7 +28,8 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiPayloadTooLargeResponse,
-  ApiCreatedResponse
+  ApiCreatedResponse,
+  ApiUnauthorizedResponse
 } from '@nestjs/swagger'
 import { UserEntity } from './entities/user.entity'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
@@ -45,7 +46,7 @@ export class UsersController {
   /**
    * Returns a list of the friends of the user
    */
-  @ApiForbiddenResponse({ description: 'Unauthorized if user is not logged in' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiOkResponse({
     description:
       'Database has been searched and result was returned as an Array, if noone is founds the array is empty',
@@ -71,7 +72,7 @@ export class UsersController {
   /**
    * Returns a list of the user where the userName or DisplayName starts with the
    */
-  @ApiForbiddenResponse({ description: 'Unauthorized if user is not logged in' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiOkResponse({
     description:
       'Database has been searched and result was returned as an Array, if noone is founds the array is empty',
@@ -104,8 +105,9 @@ export class UsersController {
    * @param name the DisplayName of the friend
    */
   @ApiForbiddenResponse({
-    description: 'Unauthorized if user is not logged in or if trying to add yourself as friend'
+    description: 'if trying to add yourself as friend'
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiBadRequestResponse({ description: 'Name String needs to be atleast 3 Letters long' })
   @ApiBody({
     type: FriendDto
@@ -128,8 +130,9 @@ export class UsersController {
    * @param name the display Name of the friend
    */
   @ApiForbiddenResponse({
-    description: 'Unauthorized if user is not logged in or if trying to remove yourself as friend'
+    description: 'if trying to remove yourself as friend'
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiBadRequestResponse({ description: 'Name String needs to be atleast 3 Letters long' })
   @ApiBody({
     type: FriendDto
@@ -151,8 +154,9 @@ export class UsersController {
    * @returns UserEntity
    */
   @ApiForbiddenResponse({
-    description: 'Unauthorized if user is not logged in or if the DisplayName is already taken'
+    description: 'if the DisplayName is already taken'
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiBadRequestResponse({
     description:
       'Name String needs to be atleast 3 Letters long and only Contain the Letters: (a-z)(A-Z)'
@@ -172,9 +176,7 @@ export class UsersController {
    * @param file a file
    * @param req UserId
    */
-  @ApiForbiddenResponse({
-    description: 'Unauthorized if user is not logged in'
-  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiBadRequestResponse({
     description: 'File needs to be of type jpg,jpeg,png or gif'
   })
@@ -215,9 +217,7 @@ export class UsersController {
   @ApiOkResponse({
     description: 'Returns an image object of the Profil Picture'
   })
-  @ApiForbiddenResponse({
-    description: 'Unauthorized if user is not logged in'
-  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @Get('userImage')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JwtAuthGuard')
@@ -232,9 +232,7 @@ export class UsersController {
    * @param updateUserDto the new status type: Status enum
    */
   @Patch('changeStatus')
-  @ApiForbiddenResponse({
-    description: 'Unauthorized if user is not logged in'
-  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiOkResponse({
     description: 'If the Status is updated'
   })
@@ -259,9 +257,7 @@ export class UsersController {
   @ApiOkResponse({
     description: 'Returns an image object of the Profil Picture'
   })
-  @ApiForbiddenResponse({
-    description: 'Unauthorized if user is not logged in'
-  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiNotFoundResponse({ description: 'No User with this displayName was found' })
   @Get('userImage/:displayName')
   @UseGuards(JwtAuthGuard)

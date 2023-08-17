@@ -17,7 +17,6 @@ describe('Test for diffrent routes', () => {
         imports: [AppModule]
       })
         .overrideProvider(PrismaService)
-
         .useValue(prisma)
         .overrideGuard(JwtAuthGuard)
         .useClass(MockAuthGuard)
@@ -545,6 +544,9 @@ describe('Test for diffrent routes', () => {
       app = moduleFixture.createNestApplication()
       app.useGlobalPipes(new ValidationPipe())
       await app.init()
+    })
+    afterEach(() => {
+      jest.clearAllMocks()
     })
 
     it('[GET] /users/friends guard test', async () => {
