@@ -281,7 +281,7 @@ describe('AuthController', () => {
 
     expect(async () => {
       await controller.activate2fa(mockRequest, mockWrongCode)
-    }).rejects.toThrow('Wrong authentication code')
+    }).rejects.toThrow('Code could not be Validated')
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedUserID, mockWrongCode)
   })
@@ -323,7 +323,7 @@ describe('AuthController', () => {
 
     expect(async () => {
       await controller.verify2FA(mockRequest, mockWrongCode, mockResponse)
-    }).rejects.toThrow('Wrong authentication code')
+    }).rejects.toThrow('Code could not be Validated')
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedUserID, mockWrongCode)
   })
@@ -388,7 +388,7 @@ describe('AuthController', () => {
 
     expect(async () => {
       await controller.refreshTokens(mockRequest, mockResponse)
-    }).rejects.toThrow('Unauthorized')
+    }).rejects.toThrow('No Valid RefreshToken')
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith('WrongRefreshToken')
     expect(spy2).toBeCalledTimes(1)
@@ -411,7 +411,7 @@ describe('AuthController', () => {
 
     expect(async () => {
       await controller.refreshTokens(mockRequest, mockResponse)
-    }).rejects.toThrow('Unauthorized')
+    }).rejects.toThrow('No Valid RefreshToken')
     expect(spy).toBeCalledTimes(0)
     expect(spy2).toBeCalledTimes(0)
     expect(spy3).toBeCalledTimes(0)
