@@ -48,12 +48,14 @@ describe('AuthService', () => {
         return {
           id: userId,
           refreshToken: null,
+          activated2FA: true,
           twoFactorAuthenticationSecret: testUser.twoFactorAuthenticationSecret
         }
       else if (userId == testUser.id)
         return {
           id: userId,
           refreshToken: testRefreshToken,
+          activated2FA: true,
           twoFactorAuthenticationSecret: testUser.twoFactorAuthenticationSecret
         }
       else if (userId == testUser.id + 1) return null
@@ -249,7 +251,7 @@ describe('AuthService', () => {
     const result = await service.verifyRefreshToken(testUser.id, testRefreshToken)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(testUser.id)
-    expect(result).toStrictEqual(true)
+    expect(result).toStrictEqual({ test: true, twoFactor: true })
   })
 
   it('verifyRefreshToken should return false if user isnt found', async () => {
@@ -258,7 +260,7 @@ describe('AuthService', () => {
     const result = await service.verifyRefreshToken(testUser.id + 1, testRefreshToken)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(testUser.id + 1)
-    expect(result).toStrictEqual(false)
+    expect(result).toStrictEqual({ test: false, twoFactor: false })
   })
 
   it('verifyRefreshToken should return false if false RefreshToken', async () => {
@@ -267,7 +269,7 @@ describe('AuthService', () => {
     const result = await service.verifyRefreshToken(testUser.id, failTestRefreshToken)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(testUser.id)
-    expect(result).toStrictEqual(false)
+    expect(result).toStrictEqual({ test: false, twoFactor: false })
   })
 
   it('verifyRefreshToken should return false if user has no RefreshToken', async () => {
@@ -275,7 +277,7 @@ describe('AuthService', () => {
     const result = await service.verifyRefreshToken(userWithOutRefreshToken, testRefreshToken)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(userWithOutRefreshToken)
-    expect(result).toStrictEqual(false)
+    expect(result).toStrictEqual({ test: false, twoFactor: false })
   })
 
   it('verifyRefreshToken throws an error if find a User fails', async () => {

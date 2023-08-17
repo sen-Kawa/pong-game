@@ -38,7 +38,7 @@ export class AuthController {
   //TODO change url to env var
   @Get('callback')
   @UseGuards(AuthGuard('42'))
-  handleCallback(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+  async handleCallback(@Req() req: any, @Res({ passthrough: true }) res: Response) {
     const jwtToken = this.authService.getAccessToken(req.user.id, false)
     res.cookie('auth-cookie', jwtToken, {
       httpOnly: true,
@@ -49,7 +49,7 @@ export class AuthController {
       httpOnly: true,
       expires: new Date(new Date().getTime() + 86409000)
     })
-    this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
+    await this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
     if (req.user.activated2FA) res.redirect(this.config.get<string>('FRONTEND_URL') + '/user/2fa')
     else {
       if (req.user.displayName)
@@ -128,9 +128,10 @@ export class AuthController {
       userId: req.user.id,
       twoFaEnabled: req.user.activated2FA
     }
+    //TODO cors and redirect o.O
+    //res.redirect(this.config.get<string>('FRONTEND_URL') + '/user/Preference')
   }
 
-  //TODO check if refresh token valid?
   @Get('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   async refreshTokens(@Req() req, @Res({ passthrough: true }) res: Response) {
@@ -139,9 +140,12 @@ export class AuthController {
       throw new UnauthorizedException()
     }
     const payload = this.jwtService.decode(refreshToken) as JwtPayload
-    const test = await this.authService.verifyRefreshToken(payload.userId, refreshToken)
+    const { test, twoFactor } = await this.authService.verifyRefreshToken(
+      payload.userId,
+      refreshToken
+    )
     if (test) {
-      const jwtToken = this.authService.getAccessToken(payload.userId, false)
+      const jwtToken = this.authService.getAccessToken(payload.userId, twoFactor)
       res.cookie('auth-cookie', jwtToken, {
         httpOnly: true,
         expires: new Date(new Date().getTime() + 86409000)

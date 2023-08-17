@@ -109,13 +109,13 @@ export class AuthService {
   async verifyRefreshToken(userId: number, refreshToken: string) {
     try {
       const user = await this.usersServive.findOne(userId)
-      if (!user) return false
-      else if (!user.refreshToken) return false
-      else if (user.refreshToken != refreshToken) return false
+      if (!user) return { test: false, twoFactor: false }
+      else if (!user.refreshToken) return { test: false, twoFactor: false }
+      else if (user.refreshToken != refreshToken) return { test: false, twoFactor: false }
+      return { test: true, twoFactor: user.activated2FA }
     } catch (error) {
       throw new InternalServerErrorException('verifyRefreshToken')
     }
-    return true
   }
 
   async resetRefreshToken(userId: number) {
