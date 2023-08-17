@@ -7,5 +7,5 @@
 
 ### Overview
 - **Backend:** NestJs
-- **Frontend:** Vue
+- **Frontend:** Vue.js
 - **Database:** PostgreSQL
