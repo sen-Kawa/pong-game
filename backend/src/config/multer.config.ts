@@ -1,7 +1,6 @@
 import { extname } from 'path'
 import { existsSync, mkdirSync } from 'fs'
 import { diskStorage } from 'multer'
-import { v4 as uuid } from 'uuid'
 import { HttpException, HttpStatus } from '@nestjs/common'
 
 //TODO file location in env? process.env.UPLOAD_LOCATION
@@ -12,7 +11,7 @@ export const multerConfig = {
   dest: fileLocation
 }
 
-export const editFileName = (req, file, callback) => {
+export const editFileName = (req: any, file: any, callback: any) => {
   const name = file.originalname.split('.')[0]
   const fileExtName = extname(file.originalname)
   const randomName = Array(4)

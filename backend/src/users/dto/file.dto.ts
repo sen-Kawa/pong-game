@@ -1,16 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-  IsString,
-  IsNotEmpty,
-  Length,
-  ArrayUnique,
-  IsArray,
-  IsInt,
-  IsNumber,
-  IsPositive
-} from 'class-validator'
+import { IsString, IsNotEmpty } from 'class-validator'
 
 export class FileDto {
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   fileName: string
 }

@@ -23,22 +23,22 @@ const gameArray = [
   }
 ]
 
-const uncompletedGame = {
-  id: 1,
-  completed: false,
-  start: new Date('2023-06-24T14:11:57.246Z'),
-  end: null,
-  players: [
-    {
-      playerId: 1,
-      gameId: 1
-    },
-    {
-      playerId: 3,
-      gameId: 1
-    }
-  ]
-}
+// const uncompletedGame = {
+//   id: 1,
+//   completed: false,
+//   start: new Date('2023-06-24T14:11:57.246Z'),
+//   end: null,
+//   players: [
+//     {
+//       playerId: 1,
+//       gameId: 1
+//     },
+//     {
+//       playerId: 3,
+//       gameId: 1
+//     }
+//   ]
+// }
 
 const playerOnGame = {
   playerId: 1,
@@ -66,7 +66,6 @@ const gamesDb = {
 
 describe('GamesService', () => {
   let service: MatchService
-  let prisma: PrismaService
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -74,7 +73,6 @@ describe('GamesService', () => {
     }).compile()
 
     service = module.get<MatchService>(MatchService)
-    prisma = module.get<PrismaService>(PrismaService)
   })
 
   it('should be defined', () => {

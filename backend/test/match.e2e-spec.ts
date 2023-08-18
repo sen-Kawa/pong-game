@@ -4,7 +4,6 @@ import * as request from 'supertest'
 import { AppModule } from 'src/app.module'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { MockAuthGuard } from './mock-auth.guard'
-import { APP_GUARD } from '@nestjs/core'
 
 describe('MatchController (e2e)', () => {
   let app: INestApplication

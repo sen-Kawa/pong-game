@@ -1,6 +1,4 @@
 import {
-  BadRequestException,
-  Header,
   Controller,
   Post,
   Get,
@@ -11,16 +9,11 @@ import {
   UnauthorizedException
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { ApiBody, ApiCreatedResponse, ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger'
-import { AuthEntity } from './entities/auth.entity'
-import { PassEntity } from './entities/pass.entity'
-import { LoginDto } from './dto/login.dto'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { AuthGuard } from '@nestjs/passport'
-import { Response, response } from 'express'
+import { Response } from 'express'
 import { JwtService } from '@nestjs/jwt'
-import { UsersService } from 'src/users/users.service'
-import { TFAAuthGuard } from './guards/2fa-auth.guard'
-import { ConfigService, ConfigModule } from '@nestjs/config'
+
 //TODO token and cookie to much same code
 export interface JwtPayload {
   userId: number
@@ -32,7 +25,6 @@ export interface JwtPayload {
 @ApiTags('auth')
 export class AuthController {
   constructor(
-    private userService: UsersService,
     private jwtService: JwtService,
     private authService: AuthService
   ) {}
@@ -73,7 +65,7 @@ export class AuthController {
   @Get('activate2FA')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  async activate2FA(@Req() req, @Res({ passthrough: true }) res: Response) {
+  async activate2FA(@Req() req) {
     const { otpauthUrl } = await this.authService.generate2FASecret(req.user)
     return { url: await this.authService.generateQrCodeDataURL(otpauthUrl) }
   }
@@ -124,12 +116,12 @@ export class AuthController {
       httpOnly: true,
       expires: new Date(new Date().getTime() + 86409000)
     })
-    const jwtRefreshToken = this.authService.getRefreshToken(req.user.userId)
+    const jwtRefreshToken = this.authService.getRefreshToken(req.user.id)
     res.cookie('refresh-cookie', jwtRefreshToken, {
       httpOnly: true,
       expires: new Date(new Date().getTime() + 86409000)
     })
-    await this.authService.updateRefreshToken(req.user.userId, jwtRefreshToken)
+    await this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
     return {
       userId: req.user.id,
       twoFaEnabled: req.user.activated2FA
@@ -150,12 +142,12 @@ export class AuthController {
         httpOnly: true,
         expires: new Date(new Date().getTime() + 86409000)
       })
-      const jwtRefreshToken = this.authService.getRefreshToken(payload.userId)
-      res.cookie('refresh-cookie', jwtRefreshToken, {
-        httpOnly: true,
-        expires: new Date(new Date().getTime() + 86409000)
-      })
-      await this.authService.updateRefreshToken(payload.userId, jwtRefreshToken)
+      // const jwtRefreshToken = this.authService.getRefreshToken(payload.userId)
+      // res.cookie('refresh-cookie', jwtRefreshToken, {
+      //   httpOnly: true,
+      //   expires: new Date(new Date().getTime() + 86409000)
+      // })
+      // await this.authService.updateRefreshToken(payload.userId, jwtRefreshToken)
     } else {
       throw new UnauthorizedException()
     }

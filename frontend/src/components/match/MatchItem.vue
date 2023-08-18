@@ -27,9 +27,9 @@ const timeSinceEnd = computed(() => {
   return timeAgo.format(props.match.end)
 })
 
-const highscore = computed(() => {
-  return Math.max(props.match.players[0].score, props.match.players[1].score)
-})
+// const highscore = computed(() => {
+//   return Math.max(props.match.players[0].score, props.match.players[1].score)
+// })
 </script>
 
 <template>
