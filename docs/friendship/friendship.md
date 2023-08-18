@@ -2,15 +2,15 @@
 ## Friendship
 ### Components:
 
-- [Find User](friendship/FindUser.md)  
-- [Add Friend](friendship/AddFriend.md)  
-- [Friend Item](friendship/FriendItem.md)  
-- [Friends List](friendship/FriendsList.md)  
+- [Find User](FindUser.md)  
+- [Add Friend](AddFriend.md)  
+- [Friend Item](FriendItem.md)  
+- [Friends List](FriendsList.md)  
 
-[FindUser](../frontend/src/components/user/friends/FindUser.vue)  
-[AddFriend](../frontend/src/components/user/friends/AddFriend.vue)  
-[FriendItem](../frontend/src/components/user/friends/FriendItem.vue)  
-[FriendsList](../frontend/src/components/user/friends/FriendsList.vue)  
+[FindUser](../../frontend/src/components/user/friends/FindUser.vue)  
+[AddFriend](../../frontend/src/components/user/friends/AddFriend.vue)  
+[FriendItem](../../frontend/src/components/user/friends/FriendItem.vue)  
+[FriendsList](../../frontend/src/components/user/friends/FriendsList.vue)  
 
 ### Api:
-- [Friendship Api](../frontend/src/components/user/friends/api/friendship.api.ts)
+- [Friendship Api](../../frontend/src/components/user/friends/api/friendship.api.ts)
