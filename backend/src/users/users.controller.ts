@@ -55,9 +55,9 @@ export class UsersController {
       items: {
         type: 'object',
         properties: {
-          id: { type: 'number', example: 1 },
           userName: { type: 'string', example: 'UserName' },
-          displayName: { type: 'string', example: 'DisplayName' }
+          displayName: { type: 'string', example: 'DisplayName' },
+          currentStatus: { type: 'object', example: 'OFFLINE' }
         }
       }
     }
@@ -70,7 +70,7 @@ export class UsersController {
   }
 
   /**
-   * Returns a list of the user where the userName or DisplayName starts with the
+   * Returns a list of the user where the userName or DisplayName starts with the input Name
    */
   @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
   @ApiOkResponse({
@@ -82,7 +82,8 @@ export class UsersController {
         type: 'object',
         properties: {
           userName: { type: 'string', example: 'UserName' },
-          displayName: { type: 'string', example: 'DisplayName' }
+          displayName: { type: 'string', example: 'DisplayName' },
+          usersFriend: { type: 'boolean', example: 'true' }
         }
       }
     }
@@ -95,8 +96,8 @@ export class UsersController {
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JwtAuthGuard')
-  findUser(@Body() userName: FindUserDto) {
-    return this.usersService.findUser(userName.name)
+  findUser(@Req() req, @Body() userName: FindUserDto) {
+    return this.usersService.findUser(req.user.id, userName.name)
   }
 
   /**
