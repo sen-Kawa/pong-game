@@ -3,7 +3,7 @@
 ### Find User
 The [FindUser.vue](../../frontend/src/components/user/friends/FindUser.vue) component is designed to facilitate the process of searching for a user and displaying details. This component integrates with the [AddFriend.vue](../../frontend/src/components/user/friends/AddFriend.vue) component and relies on an [API](../../frontend/src/components/user/friends/api/friendship.api.ts) for user search functionality. 
 
-#### Usage
+### Usage
 To use the `FindUser` component, follow this steps:
 
 1. **Import the component:**  
@@ -29,7 +29,7 @@ Place the `FindUser` component within your template:
 </template>
 ```
 
-#### Component Structure
+### Component Structure
 The `FindUser` component consists of the following sections:  
 1. **User Search Form:**  
 The component displays an input field where users can enter the name or username of the user they want to find. Upon submitting the form, the component triggers a search operation.  
@@ -38,17 +38,17 @@ If the search return results, the component displays user details in a list. It 
 3. **Status Messages:**  
 The component provides status messages to inform users about the search outcome. Success and error messages are displayed based on the search result.
 
-#### Props
+### Props
 The `FindUser` component does not accept any props.
 
-#### Events
+### Events
 The `FindUser` component emits the following event:
 
 **onFriendAdded:**  
 - Triggered when a friend is succesfully added using the `AddFriend` component.  
 - Usage: `<FindUser @onFriendAdded="handleFriendAdded" />`
 
-#### Methods
+### Methods
 The `FindUser` component defines the following methods:
 
 **findUser:**
@@ -60,10 +60,10 @@ The `FindUser` component defines the following methods:
 - Emits the `onFriendAdded` event when a friend is succesfully added.  
 - Triggered when a friend is added using the `AddFriend` component.  
 
-#### Notes
+### Notes
 - If no name is entered before initiating a search, an alert is shown to prompt the user.  
 - Search results are displayed for a limited time. The message and results are cleared after a set time.  
 
-#### Dependencies
+### Dependencies
 - This component relies on the [AddFriend](../../frontend/src/components/user/friends/AddFriend.vue) component for adding friends.  
 - The user search functionality is provided by the `postFindUser` function from the [friendship API](../../frontend/src/components/user/friends/api/friendship.api.ts) module.  
