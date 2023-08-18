@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client'
 
 type Fof<T extends any[]> = (...args: T) => void;
+type Hack<T extends any[]> = T;
 
 class SockManager {
 	socket: Socket;
@@ -18,7 +19,7 @@ class SockManager {
 		this.socket.on(ev, cb);
 	}
 
-	emit(ev: string, args?: any[]) {
+	emit(ev: string, ...args: Hack<any[]>) {
 		this.socket.emit(ev, args);
 	}
 
