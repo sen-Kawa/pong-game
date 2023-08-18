@@ -21,6 +21,10 @@ class SockManager {
 	emit(ev: string, args?: any[]) {
 		this.socket.emit(ev, args);
 	}
+
+	off(ev: string, cb?: Fof<any[]>) {
+		this.socket.off(ev, cb);
+	}
 }
 
 export const socket = new SockManager();
