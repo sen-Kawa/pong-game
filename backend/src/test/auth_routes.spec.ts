@@ -14,7 +14,7 @@ import { TFAAuthGuard } from 'src/auth/guards/2fa-auth.guard'
 describe('Test for diffrent routes', () => {
   describe('Tests for the users routes', () => {
     let app: INestApplication
-    const frontUrl = 'http://localhost:8080'
+    const frontUrl = process.env.FRONTEND_URL
     beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule]
