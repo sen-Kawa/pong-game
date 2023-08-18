@@ -1,3 +1,3 @@
 # ft_transcendence
 ## User
-[Friendship](friendship.md)  
+[Friendship](friendship/friendship.md)  
