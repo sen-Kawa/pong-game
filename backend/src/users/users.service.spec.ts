@@ -21,6 +21,10 @@ describe('Unit test for UsersService', () => {
     service = module.get<UsersService>(UsersService)
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('should be defined', () => {
     expect(service).toBeDefined()
   })
@@ -31,14 +35,14 @@ describe('Unit test for UsersService', () => {
     const mockFriendList = [
       {
         following: [
-          { id: 1, name: 'test', displayName: 'displayTest', userName: 'test' },
-          { id: 2, name: 'test2', displayName: 'displayTest2', userName: 'test2' }
+          { displayName: 'displayTest', userName: 'test', currentStatus: 'OFLLINE' },
+          { displayName: 'displayTest2', userName: 'test2', currentStatus: 'ONLINE' }
         ]
       }
     ]
     const resultFriendList = [
-      { id: 1, name: 'test', displayName: 'displayTest', userName: 'test' },
-      { id: 2, name: 'test2', displayName: 'displayTest2', userName: 'test2' }
+      { displayName: 'displayTest', userName: 'test', currentStatus: 'OFLLINE' },
+      { displayName: 'displayTest2', userName: 'test2', currentStatus: 'ONLINE' }
     ]
     prisma.user.findMany.mockResolvedValue(mockFriendList as any)
     const frindlist = await service.findAllFriends(1)
@@ -51,9 +55,9 @@ describe('Unit test for UsersService', () => {
       select: {
         following: {
           select: {
-            id: true,
             userName: true,
-            displayName: true
+            displayName: true,
+            currentStatus: true
           }
         }
       }
@@ -76,9 +80,9 @@ describe('Unit test for UsersService', () => {
       select: {
         following: {
           select: {
-            id: true,
             userName: true,
-            displayName: true
+            displayName: true,
+            currentStatus: true
           }
         }
       }
@@ -347,8 +351,9 @@ describe('Unit test for UsersService', () => {
   })
 
   it('findUser should return a list of user', async () => {
+    // @ts-ignore
     const spy = jest.spyOn(prisma.user, 'findMany')
-    const resultUser = [
+    const findUser = [
       {
         displayName: 'displayTest',
         userName: 'test'
@@ -358,10 +363,33 @@ describe('Unit test for UsersService', () => {
         userName: 'test2'
       }
     ]
-    prisma.user.findMany.mockResolvedValue(resultUser as any)
-    const user = await service.findUser('displayT')
 
-    expect(spy).toBeCalledTimes(1)
+    const mockFriendList = [
+      {
+        following: [
+          { displayName: 'displayTest', userName: 'test', currentStatus: 'OFLLINE' },
+          { displayName: 'displayTest2', userName: 'nofriend', currentStatus: 'ONLINE' }
+        ]
+      }
+    ]
+
+    const resultUser = [
+      {
+        displayName: 'displayTest',
+        userName: 'test',
+        usersFriend: true
+      },
+      {
+        displayName: 'displayTest2',
+        userName: 'test2',
+        usersFriend: false
+      }
+    ]
+    prisma.user.findMany.mockResolvedValueOnce(findUser as any)
+    prisma.user.findMany.mockResolvedValueOnce(mockFriendList as any)
+    const user = await service.findUser(1, 'displayT')
+
+    expect(spy).toBeCalledTimes(2)
     expect(spy).toHaveBeenCalledWith({
       where: {
         OR: [
@@ -384,6 +412,101 @@ describe('Unit test for UsersService', () => {
     })
     expect(user).toStrictEqual(resultUser)
   })
+
+  it('findUser should return a list of user even with no friends', async () => {
+    const spy = jest.spyOn(prisma.user, 'findMany')
+    const findUser = [
+      {
+        displayName: 'displayTest',
+        userName: 'test'
+      },
+      {
+        displayName: 'displayTest2',
+        userName: 'test2'
+      }
+    ]
+    const resultUser = [
+      {
+        displayName: 'displayTest',
+        userName: 'test',
+        usersFriend: false
+      },
+      {
+        displayName: 'displayTest2',
+        userName: 'test2',
+        usersFriend: false
+      }
+    ]
+    const mockFriendList = [{ following: [] }]
+    prisma.user.findMany.mockResolvedValueOnce(findUser as any)
+    prisma.user.findMany.mockResolvedValueOnce(mockFriendList as any)
+    const user = await service.findUser(1, 'displayT')
+
+    expect(spy).toBeCalledTimes(2)
+    expect(spy).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          {
+            userName: {
+              startsWith: 'displayT'
+            }
+          },
+          {
+            displayName: {
+              startsWith: 'displayT'
+            }
+          }
+        ]
+      },
+      select: {
+        userName: true,
+        displayName: true
+      }
+    })
+    expect(user).toStrictEqual(resultUser)
+  })
+
+  it('findUser should return a empty list if no user is found', async () => {
+    const spy = jest.spyOn(prisma.user, 'findMany')
+    const resultUser = []
+
+    const mockFriendList = [
+      {
+        following: [
+          { displayName: 'displayTest', userName: 'test', currentStatus: 'OFLLINE' },
+          { displayName: 'displayTest2', userName: 'nofriend', currentStatus: 'ONLINE' }
+        ]
+      }
+    ]
+
+    prisma.user.findMany.mockResolvedValueOnce(resultUser as any)
+    prisma.user.findMany.mockResolvedValueOnce(mockFriendList as any)
+    const user = await service.findUser(1, 'displayT')
+
+    expect(spy).toBeCalledTimes(2)
+    expect(spy).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          {
+            userName: {
+              startsWith: 'displayT'
+            }
+          },
+          {
+            displayName: {
+              startsWith: 'displayT'
+            }
+          }
+        ]
+      },
+      select: {
+        userName: true,
+        displayName: true
+      }
+    })
+    expect(user).toStrictEqual([])
+  })
+
   it('getUserAvatarUrl should return an url', async () => {
     // @ts-ignore
     const spy = jest.spyOn(prisma.userAvatar, 'findUnique')
@@ -527,6 +650,7 @@ describe('Unit test for UsersService', () => {
       await service.updateAvatar(2, 'Test')
     }).rejects.toThrow('updateAvatar')
   })
+
   it('updateAvatar throws an error if update User fails', async () => {
     const resultAvatar = {
       id: 2,

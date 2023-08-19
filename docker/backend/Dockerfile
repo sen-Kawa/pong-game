@@ -12,7 +12,7 @@ COPY ./backend .
 
 EXPOSE 3000
 COPY	./backend/entrypoint.sh .
-COPY	./backend/.env .
+# COPY	./backend/.env .
 RUN		chmod 777 entrypoint.sh
 #CMD tail -f /dev/null
 ENTRYPOINT ["sh",  "entrypoint.sh" ]

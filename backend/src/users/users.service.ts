@@ -17,9 +17,9 @@ export class UsersService {
       select: {
         following: {
           select: {
-            id: true,
             userName: true,
-            displayName: true
+            displayName: true,
+            currentStatus: true
           }
         }
       }
@@ -98,7 +98,7 @@ export class UsersService {
     })
   }
 
-  async findUser(name: string) {
+  async findUser(id: number, name: string) {
     const result = await this.prisma.user.findMany({
       where: {
         OR: [
@@ -119,6 +119,12 @@ export class UsersService {
         displayName: true
       }
     })
+    const friendList = await this.findAllFriends(id)
+    if (result.length) {
+      result.forEach((user: any) => {
+        user.usersFriend = friendList.some((friend) => friend.userName == user.userName)
+      })
+    }
     return result
   }
   async getUserAvatarUrl(test: number) {

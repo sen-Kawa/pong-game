@@ -17,7 +17,6 @@ describe('Test for diffrent routes', () => {
         imports: [AppModule]
       })
         .overrideProvider(PrismaService)
-
         .useValue(prisma)
         .overrideGuard(JwtAuthGuard)
         .useClass(MockAuthGuard)
@@ -28,19 +27,24 @@ describe('Test for diffrent routes', () => {
       app.useGlobalGuards(new MockAuthGuard())
       await app.init()
     })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
     // [GET] /users/friends friends
     it('[GET] /users/friends valid request returns list', async () => {
       const mockFriendList = [
         {
           following: [
-            { id: 1, name: 'test', displayName: 'displayTest', userName: 'test' },
-            { id: 2, name: 'test2', displayName: 'displayTest2', userName: 'test2' }
+            { displayName: 'displayTest', userName: 'test', currentStatus: 'OFFLINE' },
+            { displayName: 'displayTest2', userName: 'test2', currentStatus: 'ONLINE' }
           ]
         }
       ]
       const resultFriendList = [
-        { id: 1, name: 'test', displayName: 'displayTest', userName: 'test' },
-        { id: 2, name: 'test2', displayName: 'displayTest2', userName: 'test2' }
+        { displayName: 'displayTest', userName: 'test', currentStatus: 'OFFLINE' },
+        { displayName: 'displayTest2', userName: 'test2', currentStatus: 'ONLINE' }
       ]
       // @ts-ignore
       prisma.user.findMany.mockResolvedValue(mockFriendList as any)
@@ -53,23 +57,33 @@ describe('Test for diffrent routes', () => {
       expect(status).toBe(200)
     })
     // [POST] /users/find tests
-    it('[GET] /users/find valid request returns list', async () => {
-      const mockUserList = [
+    it('[POST] /users/find valid request returns list', async () => {
+      const mockFriendList = [
         {
           following: [
-            { displayName: 'displayTest', userName: 'test' },
-            { displayName: 'displayTest2', userName: 'test2' }
+            { displayName: 'displayTest', userName: 'test', currentStatus: 'OFFLINE' },
+            { displayName: 'displayTest2', userName: 'nofriend', currentStatus: 'ONLINE' }
           ]
         }
       ]
-      prisma.user.findMany.mockResolvedValue(mockUserList as any)
+      const resultUserList = [
+        { displayName: 'displayTest', userName: 'test' },
+        { displayName: 'displayTest2', userName: 'test2' }
+      ]
+
+      const resultList = [
+        { displayName: 'displayTest', userName: 'test', usersFriend: true },
+        { displayName: 'displayTest2', userName: 'test2', usersFriend: false }
+      ]
+      prisma.user.findMany.mockResolvedValueOnce(resultUserList as any)
+      prisma.user.findMany.mockResolvedValueOnce(mockFriendList as any)
       const { status, body } = await request(app.getHttpServer())
         .post('/users/find')
         .set('Accept', 'application/json')
         .send({ name: 'nameBody' })
         .expect('Content-Type', /json/)
 
-      expect(body).toStrictEqual(mockUserList)
+      expect(body).toStrictEqual(resultList)
       expect(status).toBe(200)
     })
     it('[GET] /users/find short name returns an error', async () => {
@@ -540,6 +554,9 @@ describe('Test for diffrent routes', () => {
       app = moduleFixture.createNestApplication()
       app.useGlobalPipes(new ValidationPipe())
       await app.init()
+    })
+    afterEach(() => {
+      jest.clearAllMocks()
     })
 
     it('[GET] /users/friends guard test', async () => {

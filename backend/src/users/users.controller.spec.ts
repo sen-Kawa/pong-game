@@ -59,45 +59,45 @@ describe('UsersController Unit Tests', () => {
     twoFactorAuthenticationSecret: ''
   }
 
-  const friendResult = new UserEntity({ id: 1, userName: 'hrings', displayName: 'Ulli' })
-  const findUserResult = new UserEntity({ userName: 'hrings', displayName: 'Ulli' })
+  const friendResult = { userName: 'hrings', displayName: 'Ulli', currentStatus: 'OFFLINE' }
+  const findUserResult = { userName: 'hrings', displayName: 'Ulli', usersFriend: false }
 
   const mockUsersService = {
     findAllFriends: jest.fn().mockImplementation((userId: number) => {
-      friendResult.id = userId
+      mockUser.id = userId
       return friendResult
     }),
     findUser: jest.fn().mockImplementation((name: string) => {
-      findUserResult.name = name
+      mockUser.name = name
       return findUserResult
     }),
     addFriend: jest.fn().mockImplementation((UserId: number, name: string) => {
-      findUserResult.name = name
-      findUserResult.id = UserId
+      mockUser.name = name
+      mockUser.id = UserId
       return findUserResult
     }),
     removeFriend: jest.fn().mockImplementation((UserId: number, name: string) => {
-      findUserResult.name = name
-      findUserResult.id = UserId
+      mockUser.name = name
+      mockUser.id = UserId
       return findUserResult
     }),
     updateDisplayName: jest.fn().mockImplementation((UserId: number, update: UpdateUserDto) => {
-      findUserResult.id = UserId
+      mockUser.id = UserId
       mockUser.displayName = update.displayName!
       return mockUser
     }),
     updateAvatar: jest.fn().mockImplementation((UserId: number, filename: string) => {
-      findUserResult.id = UserId
+      mockUser.id = UserId
       file.fieldname = filename
       return mockUser
     }),
     getUserAvatarUrl: jest.fn().mockImplementation((avatarId: number) => {
-      findUserResult.avatarId = avatarId
+      mockUser.avatarId = avatarId
       return { filename: 'AvatarUrlString' }
     }),
     setUserStatus: jest.fn().mockImplementation((id: number, status: Status) => {
-      findUserResult.id = id
-      findUserResult.currentStatus = status
+      mockUser.id = id
+      mockUser.currentStatus = status
     }),
     getOtherAvatarUrl: jest.fn().mockImplementation((displayName: string) => {
       return { avatar: { filename: displayName } }
@@ -116,6 +116,10 @@ describe('UsersController Unit Tests', () => {
     userController = module.get<UsersController>(UsersController)
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('should be defined', () => {
     expect(userController).toBeDefined()
   })
@@ -129,9 +133,9 @@ describe('UsersController Unit Tests', () => {
 
   it('findUser should be called and called with the right value', () => {
     const spy = jest.spyOn(mockUsersService, 'findUser')
-    expect(userController.findUser(mockDtoFindUser)).toEqual(findUserResult)
+    expect(userController.findUser(mockRequest, mockDtoFindUser)).toStrictEqual(findUserResult)
     expect(spy).toBeCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith('FindUserTest')
+    expect(spy).toHaveBeenCalledWith(mockUser.id, 'FindUserTest')
   })
 
   it('addFriend should be called and called with the right value', async () => {

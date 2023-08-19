@@ -77,6 +77,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (response && response.status == 200) {
       setUserProfile(response.data)
     } else {
+      loginStatus.value = false
       router.push('/')
     }
   }
@@ -99,18 +100,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    //TODO delete cookie and redirect
-    const response = await jwtInterceptor
+    await jwtInterceptor
       .get(baseUrlauth + 'logout', {
         withCredentials: true
       })
       .catch((error) => {
         console.log(error)
       })
-    if (response && response.data) {
-      loginStatus.value = false
-      router.push('/')
-    }
+
+    loginStatus.value = false
+    router.push('/')
   }
   async function setDisplayName(displayName: string) {
     const body = { displayName: displayName }
