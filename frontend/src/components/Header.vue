@@ -4,7 +4,9 @@
     <div class="menu-item"><router-link to="/game">Game</router-link></div>
     <div class="menu-item"><router-link to="/leader">Leaderboard</router-link></div>
     <User title="User" />
-    <router-link @click="authStore.logout()" class="menu-item" to="/">Logout</router-link>
+    <div class="menu-item">
+      <router-link @click="authStore.logout()" to="/">Logout</router-link>
+    </div>
   </nav>
   <nav id="header" v-else>
     <div class="menu-item"><router-link to="/">Home</router-link></div>
