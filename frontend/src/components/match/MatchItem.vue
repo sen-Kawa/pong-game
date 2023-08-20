@@ -33,7 +33,7 @@ const timeSinceEnd = computed(() => {
 </script>
 
 <template>
-  <li>
+  <div class="card">
     <h3>Match #{{ match.id }}</h3>
     <p v-if="match.players">
       <!-- TODO: highlight the winner -->
@@ -47,5 +47,24 @@ const timeSinceEnd = computed(() => {
     <!-- TODO: watch to live update the duration for matches in progress -->
     <p>duration: {{ duration }}</p>
     <button v-if="!match.end">Join Game</button>
-  </li>
+  </div>
 </template>
+
+<style scoped>
+.card {
+  background-color: darkgray;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 300px;
+  box-sizing: border-box;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+</style>

@@ -49,19 +49,36 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="match-list">
-    <h2>{{ Scope[scope] }} Match List</h2>
+  <h2>{{ Scope[scope] }} Match List</h2>
 
-    <button @click="toggleScope" v-if="scope !== Scope.inProgress">Switch Scope</button>
+  <button @click="toggleScope" v-if="scope !== Scope.inProgress">Switch Scope</button>
 
-    <div v-if="loading" class="loading">Loading...</div>
+  <div v-if="loading" class="loading">Loading...</div>
 
-    <div v-if="error" class="error">
-      {{ error }}
-    </div>
+  <div v-if="error" class="error">
+    {{ error }}
+  </div>
 
-    <ul v-if="matches" class="content">
+  <div class="content">
+    <ul v-if="matches" class="match-list">
       <MatchItemVue v-for="match in matches" :key="match.id" :match="match" />
     </ul>
   </div>
 </template>
+
+<style scoped>
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.match-list {
+  list-style: none;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  padding: 0;
+  gap: 7px;
+}
+</style>
