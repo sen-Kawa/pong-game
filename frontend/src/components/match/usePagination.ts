@@ -2,7 +2,7 @@ import { ref, computed, type Ref, onMounted } from 'vue'
 import type { MatchResult } from '@/types/match'
 
 export default function usePagination(filteredSearchResults: Ref<MatchResult[]>) {
-  const pageSize = 2 // TODO: make this a setting the user can change
+  const pageSize = 5 // TODO: make this a setting the user can change
   const currentPage = ref(1)
 
   const nextPage = () => {

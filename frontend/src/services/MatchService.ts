@@ -50,10 +50,8 @@ export default class MatchService {
       case Scope.inProgress:
         throw new Error(`Scope ${Scope[scope]} not allowed in getMatchHistory`)
 
-        break
       default:
         throw new Error(`Scope ${scope} not defined`)
-        break
     }
     const data = await this.fetchData(path, params)
     return data.map(this.transformMatchDTOToResult)
@@ -68,6 +66,20 @@ export default class MatchService {
     params.append('completed', 'false')
 
     const data = await this.fetchData(undefined, params)
+    return data.map(this.transformMatchDTOToResult)
+  }
+
+  public async getMatches(filters: { [key: string]: boolean }): Promise<MatchResult[]> {
+    const searchParams = new URLSearchParams()
+
+    for (const key in filters) {
+      if (filters.hasOwnProperty(key)) {
+        const value = filters[key]
+        searchParams.append(key, value.toString())
+      }
+    }
+
+    const data = await this.fetchData(undefined, searchParams)
     return data.map(this.transformMatchDTOToResult)
   }
 

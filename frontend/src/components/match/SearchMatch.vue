@@ -6,13 +6,29 @@
 			<input placeholder="Enter Search Term" />
 		</div>
 		<div class="filters">
-			<!-- <button @click="applyFilters()">Filter #1</button>
-			<button @click="applyFilters()">Filter #2</button>
-			<div>Filters: {{ filters }}</div> -->
+			<label>
+				<input type="checkbox" v-model="filters.started" />
+				started
+			</label>
+			<label>
+				<input type="checkbox" v-model="filters.completed" />
+				completed
+			</label>
+			<label>
+				<input type="checkbox" v-model="filters.includeScores" />
+				includeScores
+			</label>
+			<label>
+				<input type="checkbox" v-model="filters.includePlayers" />
+				includePlayers
+			</label>
+			<div><button @click="clearFilters()">Clear Filters</button></div>
+			<div><button @click="applyFilters()">Apply Filters</button></div>
+			<div>Filters: {{ filters }}</div>
 		</div>
 	</div>
 	<div>
-		<ul>
+		<ul class="match-list">
 			<MatchItem v-for="match in pagedResults" :key="match.id" :match="match" />
 		</ul>
 	</div>
@@ -24,9 +40,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUpdated, ref } from 'vue'
 // import useSearch from './useSearch'
-// import useFilters from './useFilters'
+import useFilters from './useFilters'
 import usePagination from './usePagination'
 import MatchService, { Scope } from '@/services/MatchService';
 import type { MatchResult } from '@/types/match';
@@ -36,7 +52,9 @@ const props = defineProps(['searchTerm'])
 
 // const { searchResults, search } = useSearch(props.searchTerm)
 
-// const { filters, applyFilters, clearFilters, filteredResults } = useFilters(searchResults)
+// const { filters, applyFilters, clearFilters } = useFilters()
+const { filters, clearFilters } = useFilters()
+console.debug(filters.value)
 
 const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI
 const matchService: MatchService = new MatchService(baseUrl)
@@ -48,12 +66,27 @@ onMounted(async () => {
 	getMatches()
 })
 
+function applyFilters() {
+	getMatches()
+}
+
 async function getMatches() {
 	// TODO: add search function to match service
-	filteredResults.value = await matchService.getMatchHistory(Scope.global)
+	filteredResults.value = await matchService.getMatches(filters.value)
 }
 const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults } =
 	usePagination(filteredResults)
 
 const resultCount = computed(() => filteredResults.value.length)
 </script>
+
+<style scoped>
+.match-list {
+	list-style: none;
+	display: flex;
+	flex-flow: row;
+	justify-content: space-around;
+	padding: 0;
+	gap: 7px;
+}
+</style>
