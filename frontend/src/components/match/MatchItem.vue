@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { MatchResult } from '@/types/match'
-import TimeAgo from 'javascript-time-ago'
-import { type PropType } from 'vue'
-import { computed } from 'vue'
+import type { MatchResult } from '@/types/match';
+import TimeAgo from 'javascript-time-ago';
+import { computed, type PropType } from 'vue';
 
 const props = defineProps({
   match: {
@@ -35,14 +34,16 @@ const timeSinceEnd = computed(() => {
 <template>
   <div class="card">
     <h3>Match #{{ match.id }}</h3>
-    <p v-if="match.players">
+    <p v-if="match.players.length > 1">
       <!-- TODO: highlight the winner -->
       <span v-if="match.players[0]">{{ match.players[0].name }}</span>
+      <span v-else>???</span>
       vs
       <span v-if="match.players[1]">{{ match.players[1].name }}</span>
       <span v-else>???</span>
     </p>
-    <p v-if="match.end">{{ match.players[0].score }} : {{ match.players[1].score }}</p>
+    <p v-if="match.end && match.players[0] && match.players[1]">{{ match.players[0].score }} : {{ match.players[1].score
+    }}</p>
     <p id="match-time-since-end">{{ timeSinceEnd }}</p>
     <!-- TODO: watch to live update the duration for matches in progress -->
     <p>duration: {{ duration }}</p>

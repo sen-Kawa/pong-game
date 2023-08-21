@@ -1,7 +1,7 @@
-import { ref, onMounted, computed } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 
 export default function useFilters() {
-  const filters = ref({
+  const filters = reactive({
     started: true,
     completed: false,
     includePlayers: true,
@@ -11,8 +11,8 @@ export default function useFilters() {
   onMounted(() => console.log('Mounted: useFilters'))
 
   const clearFilters = () => {
-    for (const key in filters.value) {
-      filters.value[key as keyof typeof filters.value] = false // https://stackoverflow.com/a/69198602
+    for (const key in filters) {
+      filters[key as keyof typeof filters] = false // https://stackoverflow.com/a/69198602
     }
   }
 

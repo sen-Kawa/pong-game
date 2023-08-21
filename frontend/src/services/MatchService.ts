@@ -121,12 +121,13 @@ export default class MatchService {
       id: dto.id,
       start: new Date(dto.start),
       end: dto.end ? new Date(dto.end) : undefined,
-      players: dto.players?.map((player) => ({
-        id: player.player.id,
-        score: player.score,
-        name: player.player.name,
-        email: player.player.email
-      }))
+      players:
+        dto.players?.map((player) => ({
+          id: player.player.id,
+          score: player.score,
+          name: player.player.name,
+          email: player.player.email
+        })) || []
     }
 
     return result

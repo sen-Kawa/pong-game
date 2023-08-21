@@ -16,16 +16,18 @@ export interface MatchDTO {
   id: number
   start: string
   end: string
-  players: {
-    playerId: number
-    matchId: number
-    score: number
-    player: {
-      id: number
-      email: string
-      name: string
-    }
-  }[]
+  players:
+    | {
+        playerId: number
+        matchId: number
+        score: number
+        player: {
+          id: number
+          email: string
+          name: string
+        }
+      }[]
+    | undefined
 }
 
 export interface MatchMetaData {
