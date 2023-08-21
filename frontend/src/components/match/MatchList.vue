@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, type PropType, onMounted } from 'vue'
-import MatchItemVue from './MatchItem.vue'
 import type { MatchResult } from '@/types/match'
 import { AxiosError } from 'axios'
+import { onMounted, ref, type PropType } from 'vue'
+import MatchItemVue from './MatchItem.vue'
 
 import MatchService, { Scope } from '@/services/MatchService'
+import LoadingIndicator from './LoadingIndicator.vue'
 
 const props = defineProps({
   initialScope: {
@@ -50,20 +51,16 @@ onMounted(async () => {
 
 <template>
   <h2>{{ Scope[scope] }} Match List</h2>
+  <LoadingIndicator :is-loading="loading" :error="error">
 
-  <button @click="toggleScope" v-if="scope !== Scope.inProgress">Switch Scope</button>
+    <button @click="toggleScope" v-if="scope !== Scope.inProgress">Switch Scope</button>
 
-  <div v-if="loading" class="loading">Loading...</div>
-
-  <div v-if="error" class="error">
-    {{ error }}
-  </div>
-
-  <div class="content">
-    <ul v-if="matches" class="match-list">
-      <MatchItemVue v-for="match in matches" :key="match.id" :match="match" />
-    </ul>
-  </div>
+    <div class="content">
+      <ul v-if="matches" class="match-list">
+        <MatchItemVue v-for="match in matches" :key="match.id" :match="match" />
+      </ul>
+    </div>
+  </LoadingIndicator>
 </template>
 
 <style scoped>
