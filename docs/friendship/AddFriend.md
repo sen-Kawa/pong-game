@@ -32,8 +32,9 @@ Place the `AddFriend` component within your template and provide the `friendName
 ### Component Structure
 The `AddFriend` component consists of the following sections:  
 1. **Button:**  
+The component renders a button that allows users to add a friend. The button's text and colour change based on whether the friend has been added or not.
 2. **Status Messages:**  
-The component provides status messages to inform users about the  
+The component provides status messages to inform users about the outcome of the friend addition operation. Success and error messages are displayed based on the API response.  
 
 ### Props
 The `AddFriend` component accepts the following prop:  
@@ -50,13 +51,16 @@ The `AddFriend` component emits the following event:
 - Usage: `<AddFriend :friendName="friendName" @friendAdded="handleFriendAdded" />`
 
 ### Methods
-The `AddFriend` component defines the following methods:
+The `AddFriend` component defines the following method:
 
 **addFriend:**
 - Initiates the friend addition process.  
-- Triggered when .....  
+- Triggered when the "Add Friend" button is clicked.  
+- Side effects: Updates the `isAdded` status, displays appropriate status messages and emits the `friendAdded` event upon success.  
 
 ### Notes
+- The component uses the `ButtonC` component for rendering the button. The button text and color are determined by the `isAdded` status.  
+- Messages about the friend addition outcome are displayed temporarily and then cleared after a set time.  
 
 ### Dependencies
 - This component relies on the [ButtonC](../../frontend/src/components/Button.vue) component for rendering the button.  
