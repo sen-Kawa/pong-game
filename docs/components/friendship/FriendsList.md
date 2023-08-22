@@ -1,7 +1,7 @@
 # ft_transcendence
 ## Friendship
 ### Friends List
-The [FriendsList.vue](../../frontend/src/components/user/friends/FriendsList.vue) component is responsible for displaying a list of friends along with options for finding new friends. It utilizes child components such as [FriendItem](../../frontend/src/components/user/friends/FriendItem.vue) and [FindUser](../../frontend/src/components/user/friends/FindUser.vue) to manage friend interactions.  
+The [FriendsList.vue](../../../frontend/src/components/user/friends/FriendsList.vue) component is responsible for displaying a list of friends along with options for finding new friends. It utilizes child components such as [FriendItem](../../../frontend/src/components/user/friends/FriendItem.vue) and [FindUser](../../../frontend/src/components/user/friends/FindUser.vue) to manage friend interactions.  
 
 ### Usage
 To use the `FriendsList` component, follow these steps:
@@ -34,13 +34,13 @@ The `FriendsList` component consists of the following elements:
 1. **Friend List Header:**  
 Displays a header with the text "Friends".  
 2. **Friend Items:**  
-Renders a list of [FriendItem](../../frontend/src/components/user/friends/FriendItem.vue) components for each friend. The [FriendItem](../../frontend/src/components/user/friends/FriendItem.vue) components display friend details and allow friends to be removed.  
+Renders a list of [FriendItem](../../../frontend/src/components/user/friends/FriendItem.vue) components for each friend. The [FriendItem](../../../frontend/src/components/user/friends/FriendItem.vue) components display friend details and allow friends to be removed.  
 3. **No Friends Message:**  
 If the length of the `friend` array is zero it displays a message indicating that the user doesn't have friend's yet.  
 4. **Find User Button:**  
-Renders a [ButtonC](../../frontend/src/components/Button.vue) component with the label "Find User". Clicking this button toggles the display of the [FindUser](../../frontend/src/components/user/friends/FindUser.vue) component.  
+Renders a [ButtonC](../../../frontend/src/components/Button.vue) component with the label "Find User". Clicking this button toggles the display of the [FindUser](../../../frontend/src/components/user/friends/FindUser.vue) component.  
 5. **FindUser Component:**  
-Displays the [FindUser](../../frontend/src/components/user/friends/FindUser.vue) component when the "Find User" button is clicked. Allows the user to search for other existing users and add them as friends.  
+Displays the [FindUser](../../../frontend/src/components/user/friends/FindUser.vue) component when the "Find User" button is clicked. Allows the user to search for other existing users and add them as friends.  
 
 ### Data Properties
 The `FriendsList` component has the following data properties:  
@@ -83,5 +83,5 @@ Fetches the list of friends from the API.
 Usage: Called when the component is mounted or when friend-related actions are performed.  
 
 ### Dependencies
-- This component relies on child components such as [ButtonC](../../frontend/src/components/Button.vue), [FriendItem](../../frontend/src/components/user/friends/FriendItem.vue) and [FindUser](../../frontend/src/components/user/friends/FindUser.vue).  
-- Friend list retrieval is provided by the `getFriendList` function from the [friendship API](../../frontend/src/components/user/friends/api/friendship.api.ts) module.  
+- This component relies on child components such as [ButtonC](../../../frontend/src/components/Button.vue), [FriendItem](../../../frontend/src/components/user/friends/FriendItem.vue) and [FindUser](../../../frontend/src/components/user/friends/FindUser.vue).  
+- Friend list retrieval is provided by the `getFriendList` function from the [friendship API](../../../frontend/src/components/user/friends/api/friendship.api.ts) module.  

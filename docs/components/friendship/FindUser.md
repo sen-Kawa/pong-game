@@ -1,7 +1,7 @@
 # ft_transcendence
 ## Friendship
 ### Find User
-The [FindUser.vue](../../frontend/src/components/user/friends/FindUser.vue) component is designed to facilitate the process of searching for a user and displaying details. This component integrates with the [AddFriend.vue](../../frontend/src/components/user/friends/AddFriend.vue) component and relies on an [API](../../frontend/src/components/user/friends/api/friendship.api.ts) for user search functionality. 
+The [FindUser.vue](../../../frontend/src/components/user/friends/FindUser.vue) component is designed to facilitate the process of searching for a user and displaying details. This component integrates with the [AddFriend.vue](../../../frontend/src/components/user/friends/AddFriend.vue) component and relies on an [API](../../../frontend/src/components/user/friends/api/friendship.api.ts) for user search functionality. 
 
 ### Usage
 To use the `FindUser` component, follow this steps:
@@ -65,5 +65,5 @@ The `FindUser` component defines the following methods:
 - Search results are displayed for a limited time. The message and results are cleared after a set time.  
 
 ### Dependencies
-- This component relies on the [AddFriend](../../frontend/src/components/user/friends/AddFriend.vue) component for adding friends.  
-- The user search functionality is provided by the `postFindUser` function from the [friendship API](../../frontend/src/components/user/friends/api/friendship.api.ts) module.  
+- This component relies on the [AddFriend](../../../frontend/src/components/user/friends/AddFriend.vue) component for adding friends.  
+- The user search functionality is provided by the `postFindUser` function from the [friendship API](../../../frontend/src/components/user/friends/api/friendship.api.ts) module.  

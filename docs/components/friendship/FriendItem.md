@@ -1,7 +1,7 @@
 # ft_transcendence
 ## Friendship
 ### Friend Item
-The [FriendItem.vue](../../frontend/src/components/user/friends/FriendItem.vue) component represents an item displaying a friend's details and actions for managing such friend. This component is designed to render the friend's name along with buttons for checking the status and removing the friend. It integrates with an [API](../../frontend/src/components/user/friends/api/friendship.api.ts) for removing friends.  
+The [FriendItem.vue](../../../frontend/src/components/user/friends/FriendItem.vue) component represents an item displaying a friend's details and actions for managing such friend. This component is designed to render the friend's name along with buttons for checking the status and removing the friend. It integrates with an [API](../../../frontend/src/components/user/friends/api/friendship.api.ts) for removing friends.  
 
 ### Usage
 To use the `FriendItem` component, follow these steps:
@@ -61,4 +61,4 @@ The `FriendItem` component defines the following method:
 - Side effects: Calls the `deleteFriend` API function to remove the friend. Emits the `friendRemoved` event upon success.  
 
 ### Dependencies
-- Friend deletion functionality is provided by the `deleteFriend` function from the [friendship API](../../frontend/src/components/user/friends/api/friendship.api.ts) module.  
+- Friend deletion functionality is provided by the `deleteFriend` function from the [friendship API](../../../frontend/src/components/user/friends/api/friendship.api.ts) module.  

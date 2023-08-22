@@ -1,3 +1,5 @@
 # ft_transcendence
-## User
-[Friendship](friendship/friendship.md)  
+## Components
+[Button](components/button.md)  
+### User
+[Friendship](components/friendship/friendship.md)  

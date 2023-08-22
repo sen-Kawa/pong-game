@@ -1,7 +1,7 @@
 # ft_transcendence
 ## Friendship
 ### Add Friend
-The [AddFriend.vue](../../frontend/src/components/user/friends/AddFriend.vue) component is designed to provide a button interface for adding friends. This component uses the [ButtonC](../../frontend/src/components/Button.vue) component for the button display and integrates with an [API](../../frontend/src/components/user/friends/api/friendship.api.ts) for adding friends.  
+The [AddFriend.vue](../../../frontend/src/components/user/friends/AddFriend.vue) component is designed to provide a button interface for adding friends. This component uses the [ButtonC](../../../frontend/src/components/Button.vue) component for the button display and integrates with an [API](../../../frontend/src/components/user/friends/api/friendship.api.ts) for adding friends.  
 
 ### Usage
 To use the `AddFriend` component, follow these steps:
@@ -63,5 +63,5 @@ The `AddFriend` component defines the following method:
 - Messages about the friend addition outcome are displayed temporarily and then cleared after a set time.  
 
 ### Dependencies
-- This component relies on the [ButtonC](../../frontend/src/components/Button.vue) component for rendering the button.  
-- Friend addition functionality is provided by the `postAddFriend` function from the [friendship API](../../frontend/src/components/user/friends/api/friendship.api.ts) module.  
+- This component relies on the [ButtonC](../../../frontend/src/components/Button.vue) component for rendering the button.  
+- Friend addition functionality is provided by the `postAddFriend` function from the [friendship API](../../../frontend/src/components/user/friends/api/friendship.api.ts) module.  

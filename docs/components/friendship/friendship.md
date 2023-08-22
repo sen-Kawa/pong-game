@@ -8,4 +8,4 @@
 - [Friends List](FriendsList.md)  
 
 ### Api:
-- [Friendship Api](../../frontend/src/components/user/friends/api/friendship.api.ts)
+- [Friendship Api](../../../frontend/src/components/user/friends/api/friendship.api.ts)
