@@ -31,6 +31,7 @@ Place the `FriendItem` component within your template and provide the `friend` p
 
 ### Component Structure
 The `FriendItem` component consists of the following elements:  
+
 1. **Friend Details:**  
 Displays the friend's name within a `div` with the class `friend-item`.  
 

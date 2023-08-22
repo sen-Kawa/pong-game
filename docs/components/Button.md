@@ -1,7 +1,7 @@
 # ft_transcendence
 ## Components
 ### Button App
-The [Button.vue](../../frontend/src/components/Button.vue) component is a reusable button component that allows customization of text content and background colour. It emits an event when clicked, providing a simple way to handle user interactions.  
+The [ButtonApp.vue](../../frontend/src/components/ButtonApp.vue) component is a reusable button component that allows customization of text content and background colour. It emits an event when clicked, providing a simple way to handle user interactions.  
 
 ### Usage
 To use the `ButtonApp` component, follow these steps:
@@ -10,7 +10,7 @@ To use the `ButtonApp` component, follow these steps:
 Import the `ButtonApp` component in your Vue.js file:
 ```
 <script>
-import ButtonApp from './path-to/Button.vue';
+import ButtonApp from './path-to/ButtonApp.vue';
 
 export default {
   components: {

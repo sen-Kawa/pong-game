@@ -41,7 +41,7 @@ Renders a list of [FriendItem](../../../frontend/src/components/user/friends/Fri
 If the length of the `friend` array is zero it displays a message indicating that the user doesn't have friend's yet.  
 
 4. **Find User Button:**  
-Renders a [ButtonC](../../../frontend/src/components/Button.vue) component with the label "Find User". Clicking this button toggles the display of the [FindUser](../../../frontend/src/components/user/friends/FindUser.vue) component.  
+Renders a [ButtonApp](../../../frontend/src/components/ButtonApp.vue) component with the label "Find User". Clicking this button toggles the display of the [FindUser](../../../frontend/src/components/user/friends/FindUser.vue) component.  
 
 5. **FindUser Component:**  
 Displays the [FindUser](../../../frontend/src/components/user/friends/FindUser.vue) component when the "Find User" button is clicked. Allows the user to search for other existing users and add them as friends.  
@@ -67,7 +67,7 @@ The `FriendsList` component utilizes the following child components:
 - Description: Allows user to find other users and add them as friends.  
 - Usage: Displayed when the "Find User" button is clicked.  
 
-**ButtonC:**  
+**ButtonApp:**  
 - Description: A custom button component used for actions.  
 - Usage: Used for the "Find User" button, toggle functionality.  
 
@@ -90,5 +90,5 @@ Fetches the list of friends from the API.
 Usage: Called when the component is mounted or when friend-related actions are performed.  
 
 ### Dependencies
-- This component relies on child components such as [ButtonC](../../../frontend/src/components/Button.vue), [FriendItem](../../../frontend/src/components/user/friends/FriendItem.vue) and [FindUser](../../../frontend/src/components/user/friends/FindUser.vue).  
+- This component relies on child components such as [ButtonApp](../../../frontend/src/components/ButtonApp.vue), [FriendItem](../../../frontend/src/components/user/friends/FriendItem.vue) and [FindUser](../../../frontend/src/components/user/friends/FindUser.vue).  
 - Friend list retrieval is provided by the `getFriendList` function from the [friendship API](../../../frontend/src/components/user/friends/api/friendship.api.ts) module.  
