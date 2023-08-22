@@ -10,6 +10,7 @@
     <input type="text" v-model="code" />
     <button @click="verify2FA">Send code</button>
   </div>
+  <div v-if="error">{{ error }}</div>
 </template>
 
 <script setup lang="ts">
@@ -19,6 +20,7 @@ import { useAuthStore } from '@/stores/auth'
 import { ref } from 'vue'
 import axios from 'axios'
 
+const error = ref(null)
 const authStore = useAuthStore()
 
 const { activated2FA } = storeToRefs(authStore)
@@ -47,7 +49,6 @@ const change2fa = () => {
 const verify2FA = () => {
   if (code.value == '') return
   const body = { code: code.value }
-  console.log(body)
   axios
     .post('http://localhost:3000/auth/verifyactivate2fa', body, {
       headers: {
@@ -56,14 +57,14 @@ const verify2FA = () => {
       withCredentials: true
     })
     .then((response) => {
-      console.log(response)
-      if (response.status == 201) {
+      if (response.status == 200) {
         url.value = ''
         authStore.activate2FA()
+        error.value = null
       }
     })
     .catch((err) => {
-      console.log(err)
+      error.value = err.response?.data?.message
     })
 }
 </script>

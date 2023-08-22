@@ -8,7 +8,8 @@ import {
   UseGuards,
   UnauthorizedException,
   HttpException,
-  HttpStatus
+  HttpStatus,
+  HttpCode
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import {
@@ -175,6 +176,7 @@ export class AuthController {
       }
     }
   })
+  @HttpCode(200)
   @Post('verifyactivate2fa')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -193,20 +195,7 @@ export class AuthController {
    * @param res
    * @returns atm the user id and that 2fa is enabled
    */
-  @ApiOkResponse({
-    description: 'Log in with 2FA was successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        userId: {
-          type: 'number'
-        },
-        twoFaEnabled: {
-          type: 'boolean'
-        }
-      }
-    }
-  })
+  @ApiOkResponse({ description: 'Log in with 2FA was successfully' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized as User could not be verified' })
   @ApiForbiddenResponse({ description: 'The Code send could not be validated' })
   @ApiBody({
@@ -220,6 +209,7 @@ export class AuthController {
     }
   })
   @Post('verify2FA')
+  @HttpCode(200)
   @UseGuards(TFAAuthGuard)
   @ApiBearerAuth()
   async verify2FA(
@@ -242,10 +232,10 @@ export class AuthController {
       expires: new Date(new Date().getTime() + 86409000)
     })
     await this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
-    return {
-      userId: req.user.id,
-      twoFaEnabled: req.user.activated2FA
-    }
+    // return {
+    //   userId: req.user.id,
+    //   twoFaEnabled: req.user.activated2FA
+    // }
     //TODO cors and redirect o.O
     //res.redirect(this.config.get<string>('FRONTEND_URL') + '/user/Preference')
   }
