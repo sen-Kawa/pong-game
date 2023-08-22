@@ -48,6 +48,7 @@ Displays the [FindUser](../../../frontend/src/components/user/friends/FindUser.v
 
 ### Data Properties
 The `FriendsList` component has the following data properties:  
+
 **showFindUser:**
 - Type: Boolean  
 - Description: Tracks whether the FindUser component should be shown or hidden.  

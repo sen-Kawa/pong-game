@@ -39,6 +39,7 @@ The component provides status messages to inform users about the outcome of the 
 
 ### Props
 The `AddFriend` component accepts the following prop:  
+
 **friendName:**
 - Type: String  
 - Required: Yes  

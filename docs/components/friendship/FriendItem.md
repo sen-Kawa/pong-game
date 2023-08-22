@@ -43,6 +43,7 @@ Renders a button labeled "Remove Friend". When clicked, it triggers the removal 
 
 ### Props
 The `FriendItem` component accepts the following prop:  
+
 **friend:**
 - Type: Object  
 - Required: Yes  
