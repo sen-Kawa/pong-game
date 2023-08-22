@@ -70,10 +70,17 @@ The `FriendsList` component utilizes the following child components:
 ### Methods
 The `FriendsList` component defines the following methods:
 
-**toggleShowFindUser:**
-**onFriendAdded:**
-**onFriendRemoved:**
-**fetchFriendList:**
+**toggleShowFindUser:**  
+Toggles the visibility of the `FindUser` component.  
+**onFriendAdded:**  
+Called when a new friend is added.  
+Usage: Updates the friend list after a friend is added using the `FindUser` component.  
+**onFriendRemoved:**  
+Called when a friend is removed.  
+Usage: Updates the friend list after a friend is removed using the `FriendItem` component.  
+**fetchFriendList:**  
+Fetches the list of friends from the API.  
+Usage: Called when the component is mounted or when friend-related actions are performed.  
 
 ### Dependencies
 - This component relies on child components such as [ButtonC](../../frontend/src/components/Button.vue), [FriendItem](../../frontend/src/components/user/friends/FriendItem.vue) and [FindUser](../../frontend/src/components/user/friends/FindUser.vue).  
