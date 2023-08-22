@@ -97,7 +97,6 @@ describe('Test for diffrent routes', () => {
       expect(status).toBe(200)
     })
 
-    //TODO find out how to mock the validator
     // [POST] /auth/verifyactivate2fa
     it('[POST] /auth/verifyactivate2fa invalid request returns an error', async () => {
       const mockUser = { id: 1, twoFactorAuthenticationSecret: '123456' }
