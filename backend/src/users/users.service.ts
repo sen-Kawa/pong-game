@@ -1,26 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  HttpException,
-  HttpStatus,
-  InternalServerErrorException
-} from '@nestjs/common'
-import { UserDto } from './dto/user.dto'
+import { Injectable, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
-import * as bcrypt from 'bcrypt'
 import { Status } from '@prisma/client'
-export const roundsOfHashing = 10
 import * as https from 'https'
 import * as fs from 'fs'
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
-
-  findAll() {
-    return this.prisma.user.findMany({ take: 10 })
-  }
 
   async findAllFriends(id: number) {
     const result = await this.prisma.user.findMany({
@@ -30,9 +17,9 @@ export class UsersService {
       select: {
         following: {
           select: {
-            id: true,
             userName: true,
-            displayName: true
+            displayName: true,
+            currentStatus: true
           }
         }
       }
@@ -41,7 +28,7 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.prisma.user.findFirst({ where: { id } })
+    return this.prisma.user.findUnique({ where: { id } })
   }
 
   async updateDisplayName(id: number, updateUserDto: UpdateUserDto) {
@@ -58,15 +45,11 @@ export class UsersService {
       })
       return result
     } catch (error) {
-      console.log(error)
       throw new InternalServerErrorException('updateDisplayName')
     }
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete({ where: { id } })
-  }
-
+  //TODO error handling?
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
     await this.prisma.user.update({
       where: { id: userId },
@@ -76,7 +59,6 @@ export class UsersService {
     })
   }
 
-  //TODO check if already friend?
   async addFriend(userId: number, friendName: string) {
     const user = await this.prisma.user.findUnique({ where: { displayName: friendName } })
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
@@ -97,9 +79,10 @@ export class UsersService {
   }
 
   async removeFriend(userId: number, friendName: string) {
-    const user = await this.prisma.user.findFirst({ where: { displayName: friendName } })
+    const user = await this.prisma.user.findUnique({ where: { displayName: friendName } })
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
-    else if (user.id == userId) throw new HttpException("Can't add yourself!", HttpStatus.FORBIDDEN)
+    else if (user.id == userId)
+      throw new HttpException("Can't have yourself as friend!", HttpStatus.FORBIDDEN)
 
     await this.prisma.user.update({
       where: {
@@ -115,7 +98,7 @@ export class UsersService {
     })
   }
 
-  async findUser(name: string) {
+  async findUser(id: number, name: string) {
     const result = await this.prisma.user.findMany({
       where: {
         OR: [
@@ -136,6 +119,12 @@ export class UsersService {
         displayName: true
       }
     })
+    const friendList = await this.findAllFriends(id)
+    if (result.length) {
+      result.forEach((user: any) => {
+        user.usersFriend = friendList.some((friend) => friend.userName == user.userName)
+      })
+    }
     return result
   }
   async getUserAvatarUrl(test: number) {
@@ -160,12 +149,11 @@ export class UsersService {
         }
       })
     } catch (error) {
-      console.log(error)
       throw new InternalServerErrorException('updateUserStatus')
     }
   }
 
-  //TODO fail on download handle
+  //TODO fail on download handle / and tests?
   downloadProfil(url: string, fileName: string): boolean {
     const dest = './files/' + fileName + '.jpg'
     const file = fs.createWriteStream(dest)
@@ -176,7 +164,10 @@ export class UsersService {
           file.close()
         })
         .on('error', function () {
-          fs.unlink(dest, null)
+          fs.unlink(dest, (err) => {
+            if (err) throw err
+            console.log('path/file.txt was deleted')
+          })
         })
     })
     return true
@@ -185,26 +176,33 @@ export class UsersService {
   async createUser(profile: any): Promise<any> {
     let avatar: any
     if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
-      avatar = await this.prisma.userAvatar.create({
-        data: {
-          filename: profile.username + '.jpg'
-        }
-      })
+      try {
+        avatar = await this.prisma.userAvatar.create({
+          data: {
+            filename: profile.username + '.jpg'
+          }
+        })
+      } catch (error) {
+        avatar = { id: 1 }
+      }
     } else {
       avatar = { id: 1 }
     }
-
-    const user = await this.prisma.user.create({
-      data: {
-        displayName: profile.userName,
-        name: profile.displayName,
-        userName: profile.username,
-        email: profile.email,
-        activated2FA: false,
-        avatarId: avatar.id
-      }
-    })
-    return user
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          displayName: profile.userName,
+          name: profile.displayName,
+          userName: profile.username,
+          email: profile.email,
+          activated2FA: false,
+          avatarId: avatar.id
+        }
+      })
+      return user
+    } catch (error) {
+      throw new InternalServerErrorException('createUser')
+    }
   }
 
   async updateAvatar(id: number, fileName: string) {
@@ -223,8 +221,22 @@ export class UsersService {
         }
       })
     } catch (error) {
-      console.log(error)
       throw new InternalServerErrorException('updateAvatar')
     }
+  }
+
+  async getOtherAvatarUrl(name: string) {
+    return await this.prisma.user.findUnique({
+      where: {
+        displayName: name
+      },
+      select: {
+        avatar: {
+          select: {
+            filename: true
+          }
+        }
+      }
+    })
   }
 }

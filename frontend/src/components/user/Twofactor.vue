@@ -16,7 +16,7 @@
 //TODO find a way that the component rerenders after button click
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
 
 const authStore = useAuthStore()

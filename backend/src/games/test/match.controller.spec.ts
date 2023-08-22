@@ -96,14 +96,14 @@ describe('MatchController', () => {
 
   describe('update', () => {
     it('should add a second player to an existing match', async () => {
-      const match = await controller.update(1, { playerId: 2 })
+      await controller.update(1, { playerId: 2 })
 
       expect(service.addPlayer).toBeCalled()
       // expect(match).toEqual(matchWithTwoPlayers) // TODO: arrange test for that
     })
 
     it('should add the match result and mark the game as completed', async () => {
-      const match = await controller.update(1, {
+      await controller.update(1, {
         scores: [
           {
             playerId: 1,
@@ -117,7 +117,7 @@ describe('MatchController', () => {
     })
 
     it('should add a second player and report the match results', async () => {
-      const match = await controller.update(1, {
+      await controller.update(1, {
         playerId: 2,
         scores: [
           {

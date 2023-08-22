@@ -7,6 +7,7 @@ export class QueryPersonalMatchDTO extends QueryMatchDTO {
    * The id of a opponent user.
    * @example 1
    */
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   @IsInt()

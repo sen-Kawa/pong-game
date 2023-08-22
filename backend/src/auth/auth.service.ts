@@ -1,14 +1,11 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { PrismaService } from './../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
-import { AuthEntity } from './entities/auth.entity'
-import * as bcrypt from 'bcrypt'
-import { UserResponseModel } from 'src/auth/model/user.response.model'
 import { UserEntity } from '../users/entities/user.entity'
 import { authenticator } from 'otplib'
 import { UsersService } from '../users/users.service'
 import { toDataURL } from 'qrcode'
-import { ConfigService, ConfigModule } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 
 export interface JwtPayload {
   userId: number
@@ -42,12 +39,16 @@ export class AuthService {
     )
   }
   async updateRefreshToken(userid: number, Token: string) {
-    await this.prisma.user.update({
-      where: { id: userid },
-      data: {
-        refreshToken: Token
-      }
-    })
+    try {
+      await this.prisma.user.update({
+        where: { id: userid },
+        data: {
+          refreshToken: Token
+        }
+      })
+    } catch (error) {
+      throw new InternalServerErrorException('updateRefreshToken')
+    }
   }
 
   async deactivate2FA(num: number) {
@@ -59,7 +60,7 @@ export class AuthService {
         }
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('deactivate2FA')
     }
   }
   async activate2FA(num: number) {
@@ -71,15 +72,15 @@ export class AuthService {
         }
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('activate2FA')
     }
   }
+
   async generate2FASecret(user: UserEntity) {
     const secret = authenticator.generateSecret()
     const otpauthUrl = authenticator.keyuri(
       user.email,
-      //'AUTH_APP_NAME',
-      process.env.AUTH_APP_NAME,
+      this.config.get<string>('AUTH_APP_NAME'),
       secret
     )
     await this.usersServive.setTwoFactorAuthenticationSecret(secret, user.id)
@@ -101,19 +102,20 @@ export class AuthService {
         secret: user.twoFactorAuthenticationSecret
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('verify2FA')
     }
   }
 
   async verifyRefreshToken(userId: number, refreshToken: string) {
     try {
       const user = await this.usersServive.findOne(userId)
-      if (!user) return false
-      else if (!user.refreshToken && user.refreshToken != refreshToken) return false
+      if (!user) return { test: false, twoFactor: false }
+      else if (!user.refreshToken) return { test: false, twoFactor: false }
+      else if (user.refreshToken != refreshToken) return { test: false, twoFactor: false }
+      return { test: true, twoFactor: user.activated2FA }
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('verifyRefreshToken')
     }
-    return true
   }
 
   async resetRefreshToken(userId: number) {
@@ -125,7 +127,7 @@ export class AuthService {
         }
       })
     } catch (error) {
-      console.log(error)
+      throw new InternalServerErrorException('resetRefreshToken')
     }
   }
 }

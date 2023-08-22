@@ -46,36 +46,15 @@ export const useAuthStore = defineStore('auth', () => {
     userProfile.value.activated2FA = date.activated2FA
   }
 
-  // async function login(username: string, password: string) {
-  //   const body = { username: username, password: password }
-  //   try {
-  //     const response = await axios.post(baseUrlauth + 'login', body, {
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       withCredentials: true
-  //     })
-  //     if (response.data.twoFaEnabled) router.push('/user/2fa')
-  //     else {
-  //       loginStatus.value = true
-  //       router.push('/user/Preference')
-  //     }
-  //     //console.log(response.data);
-  //     //return "Succes";
-  //   } catch (error: any) {
-  //     //TODO improve error handling
-  //     console.log(error)
-  //     //return error.response.data.message;
-  //   }
-  // }
-  async function signInFortyTwo(params: string) {
+  async function signInFortyTwo() {
     loginStatus.value = true
     router.push('/user/Preference')
   }
   async function validate2fa(code: string) {
     const body = { code: code }
     try {
-      const response = await axios.post(baseUrlauth + 'verify2FA', body, {
+      //TODO error handling
+      await axios.post(baseUrlauth + 'verify2FA', body, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -98,6 +77,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (response && response.status == 200) {
       setUserProfile(response.data)
     } else {
+      loginStatus.value = false
       router.push('/')
     }
   }
@@ -120,18 +100,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    //TODO delete cookie and redirect
-    const response = await jwtInterceptor
+    await jwtInterceptor
       .get(baseUrlauth + 'logout', {
         withCredentials: true
       })
       .catch((error) => {
         console.log(error)
       })
-    if (response && response.data) {
-      loginStatus.value = false
-      router.push('/')
-    }
+
+    loginStatus.value = false
+    router.push('/')
   }
   async function setDisplayName(displayName: string) {
     const body = { displayName: displayName }

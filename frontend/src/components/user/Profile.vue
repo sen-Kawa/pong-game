@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 let displayName = ref('Test User')
 let userName = ref('test')
 let isTfa = ref('false')
 let email = ref('')
-let tfaMarker = ref('checked')
+//let tfaMarker = ref('checked')
 let listItems = []
 
 async function getData() {
