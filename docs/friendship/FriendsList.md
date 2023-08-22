@@ -46,11 +46,11 @@ Displays the [FindUser](../../frontend/src/components/user/friends/FindUser.vue)
 The `FriendsList` component has the following data properties:  
 **showFindUser:**
 - Type: Boolean  
-- Description: .  
+- Description: Tracks whether the FindUser component should be shown or hidden.  
 
 **friends:**
 - Type: Array  
-- Description: .  
+- Description: Stores the list of friends to be displayed.  
 
 ### Components
 The `FriendsList` component utilizes the following child components:
