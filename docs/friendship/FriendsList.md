@@ -56,16 +56,16 @@ The `FriendsList` component has the following data properties:
 The `FriendsList` component utilizes the following child components:
 
 **Friend:**  
-- Description: .  
-- Usage: 
+- Description: Displays friend details and options for managing friend.  
+- Usage: Rendered dynamically for each friend in the list.  
 
 **FindUser:**  
-- Description: .  
-- Usage: 
+- Description: Allows user to find other users and add them as friends.  
+- Usage: Displayed when the "Find User" button is clicked.  
 
 **ButtonC:**  
-- Description: .  
-- Usage: 
+- Description: A custom button component used for actions.  
+- Usage: Used for the "Find User" button, toggle functionality.  
 
 ### Methods
 The `FriendsList` component defines the following methods:
