@@ -32,10 +32,15 @@ Place the `FriendsList` component within your template and provide the `friendNa
 ### Component Structure
 The `FriendsList` component consists of the following elements:  
 1. **Friend List Header:**  
+Displays a header with the text "Friends".  
 2. **Friend Items:**  
+Renders a list of [FriendItem](../../frontend/src/components/user/friends/FriendItem.vue) components for each friend. The [FriendItem](../../frontend/src/components/user/friends/FriendItem.vue) components display friend details and allow friends to be removed.  
 3. **No Friends Message:**  
+If the length of the `friend` array is zero it displays a message indicating that the user doesn't have friend's yet.  
 4. **Find User Button:**  
+Renders a [ButtonC](../../frontend/src/components/Button.vue) component with the label "Find User". Clicking this button toggles the display of the [FindUser](../../frontend/src/components/user/friends/FindUser.vue) component.  
 5. **FindUser Component:**  
+Displays the [FindUser](../../frontend/src/components/user/friends/FindUser.vue) component when the "Find User" button is clicked. Allows the user to search for other existing users and add them as friends.  
 
 ### Data Properties
 The `FriendsList` component has the following data properties:  
