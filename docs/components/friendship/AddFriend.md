@@ -33,6 +33,7 @@ Place the `AddFriend` component within your template and provide the `friendName
 The `AddFriend` component consists of the following sections:  
 1. **Button:**  
 The component renders a button that allows users to add a friend. The button's text and colour change based on whether the friend has been added or not.
+
 2. **Status Messages:**  
 The component provides status messages to inform users about the outcome of the friend addition operation. Success and error messages are displayed based on the API response.  
 

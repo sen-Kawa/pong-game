@@ -33,8 +33,10 @@ Place the `FriendItem` component within your template and provide the `friend` p
 The `FriendItem` component consists of the following elements:  
 1. **Friend Details:**  
 Displays the friend's name within a `div` with the class `friend-item`.  
+
 2. **Status Button:**  
 Renders a button labeled "Status" for checking the friend's status.  
+
 3. **Remove Friend Button:**  
 Renders a button labeled "Remove Friend". When clicked, it triggers the removal of the friend from the friend list.  
 

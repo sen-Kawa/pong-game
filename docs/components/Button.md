@@ -34,6 +34,7 @@ The `ButtonApp` component consists of a single HTML button element that can be c
 
 ### Props
 The `ButtonApp` component accepts the following props:  
+
 **text:**
 - Type: String  
 - Description: The text content to be displayed on the button.  

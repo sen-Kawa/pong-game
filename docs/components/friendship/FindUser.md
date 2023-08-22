@@ -33,8 +33,10 @@ Place the `FindUser` component within your template:
 The `FindUser` component consists of the following sections:  
 1. **User Search Form:**  
 The component displays an input field where users can enter the name or username of the user they want to find. Upon submitting the form, the component triggers a search operation.  
+
 2. **Search Results:**  
 If the search return results, the component displays user details in a list. It also integrates the `AddFriend` component, allowing users to add the found user as a friend.  
+
 3. **Status Messages:**  
 The component provides status messages to inform users about the search outcome. Success and error messages are displayed based on the search result.
 
