@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
-import Twofactor from './Twofactor.vue'
+import Twofactor from './TwoFactor.vue'
 import FileUpload from './FileUpload.vue'
 const authStore = useAuthStore()
 const avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage`
