@@ -53,7 +53,6 @@ export const useAuthStore = defineStore('auth', () => {
   async function validate2fa(code: string) {
     const body = { code: code }
     try {
-      //TODO error handling
       await axios.post(baseUrlauth + 'verify2FA', body, {
         headers: {
           'Content-Type': 'application/json'
@@ -62,12 +61,15 @@ export const useAuthStore = defineStore('auth', () => {
       })
       loginStatus.value = true
       router.push('/user/Preference')
-      //console.log(response.data);
-      //return "Succes";
     } catch (error: any) {
-      //TODO improve error handling
-      console.log(error)
-      //return error.response.data.message;
+      if (error instanceof AxiosError) {
+        if (error.response?.status == 401) {
+          alert('Took to long restart login')
+          router.push('/')
+        } else return error.response?.data?.message
+      } else {
+        return error
+      }
     }
   }
   async function getuserProfile() {
