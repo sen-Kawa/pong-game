@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
 
 const matchWithScore = Prisma.validator<Prisma.MatchArgs>()({
@@ -41,20 +42,18 @@ export class MatchService {
    * @param options specifies what should be included and searched for
    * @param includeScores controls the inclusion of score information
    * @param includePlayers controls the inclusion of user information
-   * @param started if true searches for matches with a start date
-   * @param completed if true searches for matches with an end date
+   * @param status filter matches based on their current status {@link GameStatus}
    * @param players filter matches to only include matches with these players in it
    * @returns a list of all matches in detailed representation according to the query parameters
    */
   async findAll(options: {
     includeScores?: boolean
     includePlayers?: boolean
-    started?: boolean
-    completed?: boolean
+    gameStatus?: GameStatus
     players?: number[]
   }): Promise<MatchEntity | unknown> {
     // TODO: add sorting and limit
-    const { includeScores, includePlayers, started, completed, players } = options
+    const { includeScores, includePlayers, gameStatus, players } = options
     console.debug({ options })
 
     const playersOnMatchFilter =
@@ -68,13 +67,32 @@ export class MatchService {
       includes = { players: { include: { player: true } } }
     }
 
+    const filter: Prisma.MatchWhereInput = {
+      start: undefined,
+      end: undefined,
+      players: playersOnMatchFilter
+    }
+    switch (gameStatus) {
+      case GameStatus.CREATED:
+        break
+      case GameStatus.IN_PROGRESS:
+        filter.start = {
+          not: null
+        }
+        break
+      case GameStatus.COMPLETED:
+        filter.end = {
+          not: null
+        }
+        break
+      default:
+        if (gameStatus) console.debug(`GameStatus ${gameStatus} not valid!`)
+        break
+    }
+
     return this.prisma.match.findMany({
       include: includes,
-      where: {
-        start: started !== undefined ? (started ? { not: null } : null) : undefined,
-        end: completed !== undefined ? (completed ? { not: null } : null) : undefined,
-        players: playersOnMatchFilter
-      }
+      where: filter
     })
   }
 
