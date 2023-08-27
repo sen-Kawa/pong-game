@@ -3,12 +3,7 @@ export interface MatchResult {
   id: number
   start: Date
   end?: Date
-  players: {
-    id: number
-    score: number
-    name: string
-    email: string
-  }[]
+  players: PlayerOnMatch[]
 }
 
 // comes from the Prisma Client + the wire transfer (stringify)
@@ -21,11 +16,7 @@ export interface MatchDTO {
         playerId: number
         matchId: number
         score: number
-        player: {
-          id: number
-          email: string
-          name: string
-        }
+        player: PlayerOnMatch
       }[]
     | undefined
 }
@@ -34,4 +25,12 @@ export interface MatchMetaData {
   id: number
   start: Date
   end: Date
+}
+
+export interface PlayerOnMatch {
+  id: number
+  score: number
+  name: string
+  email: string
+  // avatar: number // FIXME
 }

@@ -2,74 +2,58 @@
 	<div>
 		<h2>Search a match</h2>
 		<div>
-			<!-- <input placeholder="Enter Search Term" @input="search($event.target.value)" /> -->
 			<input placeholder="Enter Search Term" />
 		</div>
 		<div class="filters">
 			<label>
-				<input type="checkbox" v-model="filters.started" />
+				<input type="checkbox" v-model="matchStore.filters.started" />
 				started
 			</label>
 			<label>
-				<input type="checkbox" v-model="filters.completed" />
+				<input type="checkbox" v-model="matchStore.filters.completed" />
 				completed
 			</label>
 			<label>
-				<input type="checkbox" v-model="filters.includePlayers" />
+				<input type="checkbox" v-model="matchStore.filters.includePlayers" />
 				includePlayers
 			</label>
 			<label>
-				<input type="checkbox" v-model="filters.includeScores" />
+				<input type="checkbox" v-model="matchStore.filters.includeScores" />
 				includeScores
 			</label>
-			<div><button @click="clearFilters()">Clear Filters</button></div>
+			<div><button @click="matchStore.clearFilters()">Clear Filters</button></div>
 			<div><button @click="applyFilters()">Apply Filters</button></div>
-			<div>Filters: {{ filters }}</div>
+			<div>Filters: {{ matchStore.filters }}</div>
 		</div>
 	</div>
-	<LoadingIndicator :is-loading="loading" :error="error">
-		<MatchList :matches="pagedResults" />
+	<LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
+		<MatchList :matches="pagedMatches" />
 	</LoadingIndicator>
 	<div>
 		<button @click="prevPage()" class="button-link">Previous Page</button>
-		Page {{ currentPage }} Showing {{ currentStartIndex }} to {{ currentEndIndex }} of {{ resultCount }} results
+		Page {{ currentPage }} Showing {{ currentStartIndex }} to {{ currentEndIndex }} of {{ matchStore.matchCount }} results
 		<button @click="nextPage()" class="button-link">Next Page</button>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from 'vue';
 // import useSearch from './useSearch'
-import MatchService from '@/services/MatchService';
-import type { MatchResult } from '@/types/match';
+import { useMatchStore } from '@/stores/match';
+import { onMounted, watchEffect } from 'vue';
 import LoadingIndicator from './LoadingIndicator.vue';
 import MatchList from './MatchList.vue';
-import useFilters from './useFilters';
-import usePagination from './usePagination';
 
-const props = defineProps(['searchTerm'])
-
-const loading = ref(false)
-const error = ref('')
-const matches = ref([] as MatchResult[])
-
-// const { searchResults, search } = useSearch(props.searchTerm)
-
-// const { filters, applyFilters, clearFilters } = useFilters()
-const { filters, clearFilters } = useFilters()
-console.debug(filters)
-
-const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI
-const matchService: MatchService = new MatchService(baseUrl)
+const matchStore = useMatchStore()
 
 onMounted(async () => {
 	console.debug('onMounted')
-	getMatches()
+	matchStore.getMatches()
 })
 
 // TODO: call when checkboxes changed
 function applyFilters() {
-	getMatches()
+	console.debug('applyFilters')
+	matchStore.getMatches()
 }
 
 /**
@@ -77,44 +61,29 @@ function applyFilters() {
  * this is important because a score are tight to a player
  */
 watchEffect(() => {
-	if (filters.includeScores)
-		filters.includePlayers = true
+	if (matchStore.filters.includeScores)
+		matchStore.filters.includePlayers = true
 })
 
 watchEffect(() => {
-	if (filters.completed)
-		filters.started = true
+	if (!matchStore.filters.includePlayers)
+		matchStore.filters.includeScores = false
 })
 
-async function getMatches() {
-	error.value = ''
-	loading.value = true
-	try {
-		matches.value = await matchService.getMatches(filters)
-		await new Promise(resolve => setTimeout(resolve, 1000)); // TODO: remove debug delay
-		if (matches.value.length === 0)
-			error.value = "No Matches found!"
-	} catch (e: any) {
-		console.debug(e)
-		// if (e instanceof AxiosError)
-		error.value = "Error while loading matches: " + e?.message + ' ' + e?.response?.statusText // TODO: provide nicer message
+watchEffect(() => {
+	if (matchStore.filters.completed)
+		matchStore.filters.started = true
+})
 
-	}
-	loading.value = false
-}
-const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults } =
-	usePagination(matches)
+watchEffect(() => {
+	if (!matchStore.filters.started)
+		matchStore.filters.completed = false
+})
 
-const resultCount = computed(() => matches.value.length)
+
+const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults: pagedMatches } =
+	matchStore.pagination
 </script>
 
 <style scoped>
-.match-list {
-	list-style: none;
-	display: flex;
-	flex-flow: row;
-	justify-content: space-around;
-	padding: 0;
-	gap: 7px;
-}
 </style>
