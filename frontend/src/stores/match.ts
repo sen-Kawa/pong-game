@@ -32,6 +32,35 @@ export const useMatchStore = defineStore('match', () => {
   const pagination = computed(() => usePagination(matches))
 
   // function becomes action
+  async function createMatch() {
+    const requestPath = baseUrlMatch + '/me'
+    try {
+      loading.value = true
+      const response = await jwtInterceptor.post(
+        requestPath,
+        {},
+        {
+          withCredentials: true
+        }
+      )
+      await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
+
+      error.value = ''
+      loading.value = false
+      console.debug(response)
+      if (response.status != 201) {
+        throw new Error(response.statusText)
+      }
+      console.debug(transformMatchDTOToResult(response.data))
+      matches.value.push(transformMatchDTOToResult(response.data))
+    } catch (e) {
+      const message = error instanceof Error ? error.message : 'Unknown Error'
+      error.value = message
+      console.error('Failed to create match for current player', e)
+      throw error
+    }
+  }
+
   async function getMatches(path?: string) {
     const requestPath = baseUrlMatch + (path ?? '')
     const searchParams = new URLSearchParams()
@@ -90,6 +119,16 @@ export const useMatchStore = defineStore('match', () => {
     getMatches()
   }
 
+  async function getMatchesToJoin() {
+    filters.value = {
+      started: true,
+      completed: false,
+      includePlayers: true,
+      includeScores: false
+    }
+    getMatches()
+  }
+
   function clearFilters() {
     for (const key in filters.value) {
       filters.value[key as keyof typeof filters.value] = false // https://stackoverflow.com/a/69198602
@@ -105,7 +144,9 @@ export const useMatchStore = defineStore('match', () => {
     clearFilters,
     matchCount,
     pagination,
+    createMatch,
     getMatches,
-    getMatchHistory
+    getMatchHistory,
+    getMatchesToJoin
   }
 })

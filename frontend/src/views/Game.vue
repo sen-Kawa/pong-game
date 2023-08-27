@@ -1,21 +1,29 @@
 <template>
   <div class="text-center">this is the game tap</div>
   <button @click="createNewGame">New Game</button>
-  <MatchList :initial-scope="Scope.inProgress" />
+  <LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
+    <MatchList :matches="matchStore.matches" />
+  </LoadingIndicator>
 </template>
 
 <script setup lang="ts">
-import MatchService, { Scope } from '@/services/MatchService'
-import MatchList from '@/components/match/MatchList.vue'
+import LoadingIndicator from '@/components/match/LoadingIndicator.vue';
+import MatchList from '@/components/match/MatchList.vue';
+import { useMatchStore } from '@/stores/match';
+import { onMounted } from 'vue';
 
-const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI
-const matchService: MatchService = new MatchService(baseUrl)
+const matchStore = useMatchStore()
+const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults: pagedMatches } =
+  matchStore.pagination
+
+onMounted(async () => {
+  console.debug('onMounted')
+  matchStore.getMatchesToJoin()
+})
+
 
 async function createNewGame() {
-  // TODO: indicate progress, error
-  const match = await matchService.createMatch()
-  console.debug(match)
-
-  await matchService.startMatch(match.data.id)
+  console.debug('create new game')
+  matchStore.createMatch()
 }
 </script>
