@@ -66,6 +66,9 @@ export const useAuthStore = defineStore('auth', () => {
         if (error.response?.status == 401) {
           alert('Took to long restart login')
           router.push('/')
+        } else if (error.response?.status == 500) {
+          alert('Something went wrong, contact an admin')
+          router.push('/')
         } else return error.response?.data?.message
       } else {
         return error

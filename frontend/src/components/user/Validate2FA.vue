@@ -1,24 +1,22 @@
 <template>
-  <div class="text-center">
-    <div>Validate yourself with your Auth App code</div>
-    <Form @submit="onSubmit" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
+  <div class="validation-form">
+    <p>Validate yourself with your Auth App code</p>
+    <Form id="twoFactor" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
       <div class="form-group">
         <label>Code:</label>
         <Field
+          id="inputField"
           name="codeValue"
           type="text"
           class="form-control"
           :class="{ 'is-invalid': errors.codeValue }"
         />
-        <div class="invalid-feedback">{{ errors.codeValue }}</div>
       </div>
       <div class="form-group">
-        <button class="btn btn-primary" :disabled="isSubmitting">
-          <span v-show="isSubmitting" class="spinner-border spinner-border-sm mr-1"></span>
-          Submit
-        </button>
+        <button>Submit</button>
       </div>
-      <div v-if="errors.apiError">{{ errors.apiError }}</div>
+      <p v-if="errors.codeValue" class="invalid-feedback">{{ errors.codeValue }}</p>
+      <p v-if="errors.apiError" class="invalid-api">{{ errors.apiError }}</p>
     </Form>
   </div>
 </template>
