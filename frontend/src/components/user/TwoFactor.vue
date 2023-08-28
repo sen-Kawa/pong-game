@@ -1,20 +1,19 @@
 <template>
-  <div v-if="!activated2FA" class="text-center">
-    <button type="button" class="logoutButton" @click="change2fa">activate 2fa</button>
+  <div v-if="!activated2FA">
+    <button type="button" class="change2fa" @click="change2fa">activate 2fa</button>
   </div>
-  <div v-if="activated2FA" class="text-center">
-    <button type="button" class="logoutButton" @click="change2fa">deactivate 2fa</button>
+  <div v-if="activated2FA">
+    <button type="button" class="change2fa" @click="change2fa">deactivate 2fa</button>
   </div>
   <div v-if="url != ''">
     <br /><img :src="url" /> <br />
     <input type="text" v-model="code" />
-    <button @click="verify2FA">Send code</button>
+    <button @click="verify2FA" class="codeSend">Send code</button>
   </div>
   <div v-if="error">{{ error }}</div>
 </template>
 
 <script setup lang="ts">
-//TODO find a way that the component rerenders after button click
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { ref } from 'vue'
@@ -27,12 +26,12 @@ const { activated2FA } = storeToRefs(authStore)
 
 const url = ref('')
 const code = ref('')
-authStore.getuserProfile()
+const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 
 const change2fa = () => {
   if (!activated2FA.value) {
     axios
-      .get('http://localhost:3000/auth/activate2FA', {
+      .get(baseUrlauth + 'activate2FA', {
         withCredentials: true
       })
       .then((response) => {
@@ -47,10 +46,11 @@ const change2fa = () => {
   }
 }
 const verify2FA = () => {
+  //TODO interceptor
   if (code.value == '') return
   const body = { code: code.value }
   axios
-    .post('http://localhost:3000/auth/verifyactivate2fa', body, {
+    .post(baseUrlauth + 'verifyactivate2fa', body, {
       headers: {
         'Content-Type': 'application/json'
       },
