@@ -13,6 +13,7 @@ import {
 	Post,
 	Query,
 	Req,
+	Session,
 	UseGuards
   } from '@nestjs/common'
   import {
@@ -32,12 +33,15 @@ import {
   import { UpdateMatchDto } from './dto/update-match.dto'
   import { MatchEntity } from './entities/match.entity'
   import { MatchService } from './match.service'
+  import { Request } from 'express'
 
   @Controller('match')
   @ApiTags('match')
   @UseGuards(JwtAuthGuard)
   export class MatchController {
-	constructor(private readonly matchService: MatchService) {}
+	constructor(private readonly matchService: MatchService) {
+	}
+
 
 	/**
 	 * Creates a match entity.
@@ -47,15 +51,17 @@ import {
 	@Post()
 	@ApiCreatedResponse({ type: MatchEntity }) // TODO: include players in response example
 	@ApiNotFoundResponse({ description: 'gets send if one of the specified users does not exist' })
-	async create(@Body() createMatchDto: CreateMatchDto) {
+	async create(@Req() request: Request, @Body() createMatchDto: CreateMatchDto) {
 	  try {
-		return await this.matchService.create({
-		  players: {
-			create: createMatchDto.playerIds.map((id) => ({
-			  playerId: id
-			}))
-		  }
-		})
+		const match = await this.matchService.create({
+			players: {
+			  create: createMatchDto.playerIds.map((id) => ({
+				playerId: id
+			  }))
+			}
+		  });
+
+		return match;
 	  } catch (error) {
 		if (error instanceof PrismaClientKnownRequestError && error.code === 'P2003')
 		  throw new NotFoundException('User not found') // TODO: maybe be more verbose: which user was not found?
@@ -63,18 +69,22 @@ import {
 	  }
 	}
 
+
 	/**
 	 * Creates a new match with the current user already in it.
 	 * @param request contains the user that send the request.
 	 * @returns a detailed representation of the created match.
 	 */
 	@Post('me')
-	async createMatchForCurrentUser(@Req() request) {
-	  return await this.matchService.create({
-		players: {
-		  create: { playerId: request.user.id }
-		}
-	  })
+	async createMatchForCurrentUser(@Req() request, @Session() session: Record<string, any>) {
+
+        const match = await this.matchService.create({
+            players: {
+              create: { playerId: request.user.id }
+            }
+        })
+
+	    return match
 	}
 
 	/**

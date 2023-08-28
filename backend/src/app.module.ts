@@ -6,7 +6,8 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { validate } from './config/env.validation'
 import { MulterModule } from '@nestjs/platform-express'
-import { SocketsModule } from './sockets/sockets.module'
+import { SocketModule } from './socket/socket.module'
+import { AppGateway } from './app.gateway'
 
 
 @Module({
@@ -24,7 +25,8 @@ import { SocketsModule } from './sockets/sockets.module'
     UsersModule,
     GamesModule,
     AuthModule,
-	SocketsModule
+	SocketModule,
+    AppGateway
   ],
   controllers: [],
   providers: []

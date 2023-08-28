@@ -1,7 +1,34 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { ConflictException, Injectable, UseGuards } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
 import { MatchEntity } from './entities/match.entity'
+import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets'
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { Server } from 'http'
+
+interface Player {
+	pos: number,
+	vector: number
+}
+
+export interface GameUpdate {
+	players: Player[],
+	tick: number,
+	gameid: number
+}
+
+interface Client {
+    id: number,
+    connection_id: string
+}
+
+interface Game {
+	players: {
+        pos:Player,
+        id: number,
+        session_id: string
+    }[]
+}
 
 const matchWithScore = Prisma.validator<Prisma.MatchArgs>()({
   include: { players: true }
@@ -24,8 +51,33 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
 export class MatchService {
   constructor(private prisma: PrismaService) {}
 
+  matches: Game[];
+
   async create(data: Prisma.MatchCreateInput) {
-    return this.prisma.match.create({ data, include: { players: { include: { player: true } } } })
+    const match = await this.prisma.match.create({ data, include: { players: { include: { player: true } } } })
+
+    this.matches[match.id] = {
+        players: [
+            {
+                pos: {
+                    pos: 0,
+                    vector: 0
+                },
+                id: 0,
+                session_id: ""
+            },
+            {
+                pos: {
+                    pos: 0,
+                    vector: 0
+                },
+                id: 0,
+                session_id: ""
+            }
+        ]
+    }
+
+    return match
   }
 
   /**
@@ -161,4 +213,21 @@ export class MatchService {
   async remove(id: number) {
     return this.prisma.match.delete({ where: { id } })
   }
+}
+
+/**
+ * Creates a random string of given length
+ * @param length the lenth of the string
+ * @returns The random string
+ */
+function makeid(length: number) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
 }
