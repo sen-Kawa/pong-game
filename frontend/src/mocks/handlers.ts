@@ -74,11 +74,11 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.post(`${backendURL}/users/addFriend`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(friends))
+    return res(ctx.status(200), ctx.json({}))
   }),
 
   rest.post(`${backendURL}/users/find`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(friends))
+    return res(ctx.status(200), ctx.json({}))
   }),
 
   rest.delete(`${backendURL}/users/removeFriend`, (req, res, ctx) => {
