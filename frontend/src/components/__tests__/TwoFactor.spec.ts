@@ -3,11 +3,13 @@ import { mount, shallowMount, flushPromises, type VueWrapper } from '@vue/test-u
 import TwoFactor from '@/components/user/TwoFactor.vue'
 import { createTestingPinia } from '@pinia/testing'
 import axios from 'axios'
+import jwtInterceptor from '../../interceptor/jwtInterceptor'
 import waitForExpect from 'wait-for-expect'
 import MockAdapter from 'axios-mock-adapter'
 import { useAuthStore } from '@/stores/auth'
 
-const mock = new MockAdapter(axios)
+const mock = new MockAdapter(jwtInterceptor)
+const mocka = new MockAdapter(axios)
 const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
 
@@ -62,7 +64,8 @@ describe('Unit test of the TwoFactor Component', () => {
 })
 describe('Integration Test of the Validation2FA Component', () => {
   let wrapper: VueWrapper
-
+  mock.onGet(baseUrlauth + 'refresh').reply(200)
+  mocka.onGet(baseUrlauth + 'refresh').reply(200)
   beforeEach(() => {
     wrapper = mount(TwoFactor, {
       plugins: [
@@ -83,6 +86,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     expect(wrapper.findAll('button').length).toEqual(1)
     expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
   })
+
   it('clicking the activate 2fa creates an qr image', async () => {
     mock.onGet(baseUrlauth + 'activate2FA').reply(200, { url: baseUrl + '/TestUrl' })
     await wrapper.find('.change2fa').trigger('click')
@@ -96,6 +100,61 @@ describe('Integration Test of the Validation2FA Component', () => {
     })
   })
 
+  it('clicking the deactivate 2fa deactivate the 2FA', async () => {
+    mock.onGet(baseUrlauth + 'deactivate2FA').reply(200)
+    // @ts-ignore
+    wrapper.vm.activated2FA = true
+    const authStore = useAuthStore()
+    authStore.$patch({ userProfile: { activated2FA: true } })
+    const spy = vi.spyOn(authStore, 'deactivate2FA')
+    await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
+    await waitForExpect(() => {
+      expect(spy).toBeCalledTimes(1)
+      expect(wrapper.findAll('button').length).toEqual(1)
+      // @ts-ignore
+      expect(wrapper.vm.url).toBe('')
+    })
+  })
+
+  it('error on receiving the QR-code url', async () => {
+    mock.onGet(baseUrlauth + 'activate2FA').reply(401)
+    mock.onGet(baseUrlauth + 'refresh').reply(401)
+    mocka.onGet(baseUrlauth + 'refresh').reply(401)
+    const authStore = useAuthStore()
+    authStore.$patch({ userProfile: { activated2FA: false } })
+    await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
+    await waitForExpect(() => {
+      expect(wrapper.findAll('button').length).toEqual(1)
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('img').length).toEqual(0)
+      // @ts-ignore
+      expect(wrapper.vm.error).toBe('Unauthorized, you need to log in')
+      // @ts-ignore
+      expect(wrapper.vm.url).toBe('')
+    })
+  })
+
+  it('unknown error on receiving the QR-code url', async () => {
+    mock.onGet(baseUrlauth + 'activate2FA').reply(500)
+    mock.onGet(baseUrlauth + 'refresh').reply(401)
+    mocka.onGet(baseUrlauth + 'refresh').reply(404)
+    const authStore = useAuthStore()
+    authStore.$patch({ userProfile: { activated2FA: false } })
+    await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
+    await waitForExpect(() => {
+      expect(wrapper.findAll('button').length).toEqual(1)
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('img').length).toEqual(0)
+      // @ts-ignore
+      expect(wrapper.vm.error).toBe('Unknown error, contact an admin')
+      // @ts-ignore
+      expect(wrapper.vm.url).toBe('')
+    })
+  })
+
   it('sending a valid code reset the url and error', async () => {
     mock.onGet(baseUrlauth + 'activate2FA').reply(200, { url: baseUrl + '/TestUrl' })
     mock.onPost(baseUrlauth + 'verifyactivate2fa').reply(200)
@@ -103,6 +162,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     authStore.$patch({ userProfile: { activated2FA: false } })
     const spy = vi.spyOn(authStore, 'activate2FA')
     await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
     await wrapper.find('input').setValue('123456')
     await wrapper.find('.codeSend').trigger('click')
     await flushPromises()
@@ -114,7 +174,7 @@ describe('Integration Test of the Validation2FA Component', () => {
       // @ts-ignore
       expect(wrapper.vm.url).toBe('')
       // @ts-ignore
-      expect(wrapper.vm.error).toBe(null)
+      expect(wrapper.vm.error).toBe('')
     })
   })
 
@@ -125,6 +185,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     authStore.$patch({ userProfile: { activated2FA: false } })
     const spy = vi.spyOn(authStore, 'activate2FA')
     await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
     await wrapper.find('input').setValue('123456')
     await wrapper.find('.codeSend').trigger('click')
     await flushPromises()
@@ -144,11 +205,13 @@ describe('Integration Test of the Validation2FA Component', () => {
   it('sending an empty code, does nothing', async () => {
     mock.onGet(baseUrlauth + 'activate2FA').reply(200, { url: baseUrl + '/TestUrl' })
     mock.onPost(baseUrlauth + 'verifyactivate2fa').reply(403, { message: 'the test works' })
+    mock.onGet(baseUrlauth + 'refresh').reply(200)
     const authStore = useAuthStore()
     authStore.$patch({ userProfile: { activated2FA: false } })
     const spy = vi.spyOn(authStore, 'activate2FA')
 
     await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
     await wrapper.find('.codeSend').trigger('click')
     await flushPromises()
     await waitForExpect(() => {
@@ -160,7 +223,7 @@ describe('Integration Test of the Validation2FA Component', () => {
       // @ts-ignore
       expect(wrapper.vm.url).toBe(baseUrl + '/TestUrl')
       // @ts-ignore
-      expect(wrapper.vm.error).toBe(null)
+      expect(wrapper.vm.error).toBe('')
     })
   })
 })

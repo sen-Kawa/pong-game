@@ -29,8 +29,8 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
-  const getUserName = computed(() => userProfile.value.name)
-
+  const getUserName = computed(() => userProfile.value.userName)
+  const getName = computed(() => userProfile.value.name)
   function setUserProfile(date: any) {
     // console.log(date.id);
     // console.log(date.name);
@@ -87,14 +87,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   async function deactivate2FA() {
-    const response = await axios
+    const response = await jwtInterceptor
       .get(baseUrlauth + 'deactivate2FA', {
         withCredentials: true
       })
       .catch((err) => {
         console.log(err)
       })
-
     if (response && response.status == 200) {
       userProfile.value.activated2FA = false
     }
@@ -119,7 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function setDisplayName(displayName: string) {
     const body = { displayName: displayName }
     try {
-      const response = await axios.patch(baseUrlUser + 'changeDisplay', body, {
+      const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -140,6 +139,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     getUserName,
+    getName,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,
