@@ -50,7 +50,15 @@ export async function getFriendList() {
     method: 'GET',
     credentials: 'include'
   }
-  const response = await fetch(`${BASE_URL}/friends/`, requestOptions)
-  const responseData = await response.json()
-  return responseData
+  try {
+  	const response = await fetch(`${BASE_URL}/friends/`, requestOptions)
+	if (!response.ok) {
+		throw new Error('Failed fetching friends list.');
+	}
+  	const responseData = await response.json();
+  	return responseData
+  } catch (error) {
+	  console.error('Error fetching friends list: ', error);
+	  throw error;
+  }
 }

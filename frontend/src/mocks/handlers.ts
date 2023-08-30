@@ -3,13 +3,6 @@ import { MockedRequest, RestHandler, rest, type DefaultBodyType } from 'msw'
 const backendURL = import.meta.env.VITE_BACKEND_SERVER_URI
 
 // Mock data
-export const friends = [
-	{ id: 1, name: 'Alice' },
-	{ id: 2, name: 'Bob' },
-	{ id: 3, name: 'Martin' },
-	{ id: 4, name: 'Berta' },
-];
-
 export const matches = [
   {
     id: 1,
@@ -76,8 +69,8 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
   
 //FRIENDSHIP REST HANDLERS
-  rest.get(`${backendURL}/users/friends`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(friends))
+  rest.get(`${backendURL}/users/friends/`, (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json({}))
   }),
 
   rest.post(`${backendURL}/users/addFriend`, (req, res, ctx) => {
@@ -89,7 +82,7 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.delete(`${backendURL}/users/removeFriend`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(friends))
+    return res(ctx.status(200))
   }),
 
 ]
