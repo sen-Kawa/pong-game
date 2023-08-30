@@ -13,7 +13,7 @@ const mock = new MockAdapter(jwtInterceptor)
 const mocka = new MockAdapter(axios)
 const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
-const fakeBaseUrl = 'http:://loclahost:3000'
+const fakeBaseUrl = 'http://localhost:3000'
 
 describe('Unit test of the TwoFactor Component', () => {
   let wrapper: any = null
