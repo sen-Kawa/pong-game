@@ -92,7 +92,12 @@ export const useAuthStore = defineStore('auth', () => {
         withCredentials: true
       })
       .catch((err) => {
-        console.log(err)
+        if (err.response?.status == 401) {
+          alert('Need to login to deactivate 2FA')
+          router.push('/')
+        } else {
+          alert('Something went wrong, contact an admin')
+        }
       })
     if (response && response.status == 200) {
       userProfile.value.activated2FA = false

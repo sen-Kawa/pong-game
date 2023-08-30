@@ -7,6 +7,7 @@ import jwtInterceptor from '../../interceptor/jwtInterceptor'
 import waitForExpect from 'wait-for-expect'
 import MockAdapter from 'axios-mock-adapter'
 import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
 const mock = new MockAdapter(jwtInterceptor)
 const mocka = new MockAdapter(axios)
@@ -117,6 +118,53 @@ describe('Integration Test of the Validation2FA Component', () => {
     })
   })
 
+  it('clicking the deactivate while not logged in', async () => {
+    mock.onGet(baseUrlauth + 'deactivate2FA').reply(401)
+    mock.onGet(baseUrlauth + 'refresh').reply(401)
+    mocka.onGet(baseUrlauth + 'refresh').reply(401)
+    const spy2 = vi.spyOn(router, 'push')
+    window.alert = vi.fn()
+    // @ts-ignore
+    wrapper.vm.activated2FA = true
+    const authStore = useAuthStore()
+    authStore.$patch({ userProfile: { activated2FA: true } })
+    const spy = vi.spyOn(authStore, 'deactivate2FA')
+    await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
+    await waitForExpect(() => {
+      expect(window.alert).toBeCalledTimes(1)
+      expect(window.alert).toBeCalledWith('Need to login to deactivate 2FA')
+      expect(spy).toBeCalledTimes(1)
+      expect(wrapper.findAll('button').length).toEqual(1)
+      // @ts-ignore
+      expect(wrapper.vm.url).toBe('')
+      expect(spy2).toBeCalledTimes(1)
+      expect(spy2).toBeCalledWith('/')
+    })
+  })
+
+  it('clicking the deactivate with an unknown error', async () => {
+    mock.onGet(baseUrlauth + 'deactivate2FA').reply(500)
+    mock.onGet(baseUrlauth + 'refresh').reply(401)
+    mocka.onGet(baseUrlauth + 'refresh').reply(401)
+    window.alert = vi.fn()
+    // @ts-ignore
+    wrapper.vm.activated2FA = true
+    const authStore = useAuthStore()
+    authStore.$patch({ userProfile: { activated2FA: true } })
+    const spy = vi.spyOn(authStore, 'deactivate2FA')
+    await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
+    await waitForExpect(() => {
+      expect(window.alert).toBeCalledTimes(1)
+      expect(window.alert).toBeCalledWith('Something went wrong, contact an admin')
+      expect(spy).toBeCalledTimes(1)
+      expect(wrapper.findAll('button').length).toEqual(1)
+      // @ts-ignore
+      expect(wrapper.vm.url).toBe('')
+    })
+  })
+
   it('error on receiving the QR-code url', async () => {
     mock.onGet(baseUrlauth + 'activate2FA').reply(401)
     mock.onGet(baseUrlauth + 'refresh').reply(401)
@@ -139,7 +187,7 @@ describe('Integration Test of the Validation2FA Component', () => {
   it('unknown error on receiving the QR-code url', async () => {
     mock.onGet(baseUrlauth + 'activate2FA').reply(500)
     mock.onGet(baseUrlauth + 'refresh').reply(401)
-    mocka.onGet(baseUrlauth + 'refresh').reply(404)
+    mocka.onGet(baseUrlauth + 'refresh').reply(401)
     const authStore = useAuthStore()
     authStore.$patch({ userProfile: { activated2FA: false } })
     await wrapper.find('.change2fa').trigger('click')
