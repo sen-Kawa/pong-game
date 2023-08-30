@@ -13,6 +13,7 @@ const mock = new MockAdapter(jwtInterceptor)
 const mocka = new MockAdapter(axios)
 const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
+const fakeBaseUrl = 'http:://loclahost:3000'
 
 describe('Unit test of the TwoFactor Component', () => {
   let wrapper: any = null
@@ -89,7 +90,7 @@ describe('Integration Test of the Validation2FA Component', () => {
   })
 
   it('clicking the activate 2fa creates an qr image', async () => {
-    mock.onGet(baseUrlauth + 'activate2FA').reply(200, { url: baseUrl + '/TestUrl' })
+    mock.onGet(baseUrlauth + 'activate2FA').reply(200, { url: fakeBaseUrl + '/TestUrl' })
     await wrapper.find('.change2fa').trigger('click')
     await flushPromises()
     await waitForExpect(() => {
@@ -97,7 +98,7 @@ describe('Integration Test of the Validation2FA Component', () => {
       expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
       expect(wrapper.findAll('button').at(1)?.text()).toBe('Send code')
       expect(wrapper.findAll('img').length).toEqual(1)
-      expect(wrapper.findAll('img').at(0)?.element.src).toBe(baseUrl + '/TestUrl')
+      expect(wrapper.findAll('img').at(0)?.element.src).toBe(fakeBaseUrl + '/TestUrl')
     })
   })
 
