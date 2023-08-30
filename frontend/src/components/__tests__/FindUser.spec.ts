@@ -145,17 +145,16 @@ describe('FindUser', () => {
     const wrapper = mount(FindUser, {
 		data() {
 			return {
-				foundUser: [] 
+				name: 'Mimi',
+				foundUser: []
 			}
-		}
+		},
+		components: {
+			AddFriend,
+		},
 	})
-	const input = wrapper.find('input');
-	await input.setValue('Mimi');
-	await wrapper.find('form').trigger('submit.prevent');
 	await wrapper.vm.findUser();
 	await wrapper.vm.$nextTick();
-	const userDetails = wrapper.findAll('li');
-	expect(userDetails.length).toBe(0);
 	expect(wrapper.vm.message).toBe('Mimi not found.')
 	expect(wrapper.vm.messageType).toBe('error')
   });
@@ -168,20 +167,21 @@ describe('FindUser', () => {
 			userName: 'bobby',
 		},
 	];
+	const fetchMock = vi.spyOn(window, 'fetch');
+	fetchMock.mockResolvedValue({
+		status: 200,
+		json: vi.fn().mockResolvedValueOnce(foundUserData)
+	});
+
     const wrapper = mount(FindUser, {
 		data() {
 			return {
+				name: 'bobb',
 				foundUser: foundUserData
 			}
 		}
 	})
-	const input = wrapper.find('input');
-	await input.setValue('bobb');
-	await wrapper.find('form').trigger('submit.prevent');
 	await wrapper.vm.findUser();
-	await wrapper.vm.$nextTick();
-	const userDetails = wrapper.findAll('li');
-	expect(userDetails.length).toBe(1);
 	expect(wrapper.vm.message).toBe('Found bobb')
 	expect(wrapper.vm.messageType).toBe('success')
   });

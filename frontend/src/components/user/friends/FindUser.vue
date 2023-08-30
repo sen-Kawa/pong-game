@@ -44,13 +44,11 @@ export default {
         alert('Add name to search')
         return
       }
-      const userData = await postFindUser(this.name)
-
-      if (userData.length === 0) {
+      this.foundUser = await postFindUser(this.name)
+      if (this.foundUser.length === 0 || this.foundUser.length === undefined) {
         this.message = `${this.name} not found.`
         this.messageType = 'error'
       } else {
-        this.foundUser = userData
         this.message = `Found ${this.name}`
         this.messageType = 'success'
       }

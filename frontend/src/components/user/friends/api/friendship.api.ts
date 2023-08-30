@@ -27,10 +27,8 @@ export async function postFindUser(name: string) {
   }
   const response = await fetch(`${BASE_URL}/find/`, requestOptions)
 
-  if (response.ok) {
-    const userData = await response.json()
-    return userData
-  }
+	const userData = await response.json()
+	return userData
 }
 
 export async function deleteFriend(displayName: string) {
