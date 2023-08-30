@@ -22,82 +22,72 @@ describe('FriendItem', () => {
     expect(displayName.text()).toBe('John Leet');
   });
 
-///////////////////////
-  it('updates message and messageType after succesfully adding friend', async () => { 
+
+  it('renders the "Status" button', () => {
+	const friend = { displayName: 'John Leet'};
+    const wrapper = mount(FriendItem, {
+		props: { friend }
+	});
+    const buttons = wrapper.findAll('button');
+    expect(buttons[0].text()).toBe('Status')
+  });
+
+
+  it('renders the "Remove Friend" button', () => {
+	const friend = { displayName: 'John Leet'};
+    const wrapper = mount(FriendItem, {
+		props: { friend }
+	});
+    const buttons = wrapper.findAll('button');
+    expect(buttons[1].text()).toBe('Remove Friend')
+  });
+
+
+  it('calls removeFriend() method when clicking on the "Remove Friend" button', async () => { 
+	const friend = { displayName: 'John Leet', id: 123 };
+    const wrapper = mount(FriendItem, {
+		props: { friend }
+	});
+	const removeFriendSpy = vi.spyOn(wrapper.vm, 'removeFriend');
+    const buttons = wrapper.findAll('button');
+	await buttons[1].trigger('click');
+	expect(removeFriendSpy).toHaveBeenCalled();
+  });
+
+
+  it('calls deleteFriend() method with the correct displayName, URL, method, api and credentials', async () => { 
 	const fetchMock = vi.spyOn(window, 'fetch');
 	fetchMock.mockResolvedValue({
 		status: 200,
 		json: vi.fn().mockResolvedValueOnce(undefined)
 	});
-	const wrapper = mount(FriendItem, {
-		components: {
-			ButtonApp
-		},
-		props: {
-			friendName: 'Nicole'
-		}
+	const friend = { displayName: 'John Leet', id: 123 };
+    const wrapper = mount(FriendItem, {
+		props: { friend }
 	});
-	await wrapper.vm.addFriend();
-    expect(wrapper.vm.message).toBe('Successfully added Nicole to your friend list!');
-    expect(wrapper.vm.messageType).toBe('success')
+	await wrapper.vm.removeFriend();
+	expect(fetchMock).toHaveBeenCalledWith('http://localhost:3000/users/removeFriend/', {
+		method: 'DELETE',
+		credentials: 'include',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ friendName: 'John Leet'})
+	});
   });
 
 
-  it('emits "friendAdded" event after succesfully adding friend', async () => { 
+  it('emits "friendRemoved" event after calling deleteFriend()', async () => { 
 	const fetchMock = vi.spyOn(window, 'fetch');
 	fetchMock.mockResolvedValue({
 		status: 200,
 		json: vi.fn().mockResolvedValueOnce(undefined)
 	});
-	const wrapper = mount(FriendItem, {
-		components: {
-			ButtonApp
-		},
-		props: {
-			friendName: 'Nicole'
-		}
+	const friend = { displayName: 'John Leet', id: 123 };
+    const wrapper = mount(FriendItem, {
+		props: { friend }
 	});
-	await wrapper.vm.addFriend();
-    expect(wrapper.emitted('friendAdded')).toBeTruthy();
+	await wrapper.vm.removeFriend();
+    expect(wrapper.emitted('friendRemoved')).toBeTruthy();
   });
 
 
-  it('updates message and messageType after friend not found', async () => { 
-	const fetchMock = vi.spyOn(window, 'fetch');
-	fetchMock.mockResolvedValue({
-		status: 404,
-		json: vi.fn().mockResolvedValueOnce({ data: 'User not found' })
-	});
-	const wrapper = mount(FriendItem, {
-		components: {
-			ButtonApp
-		},
-		props: {
-			friendName: 'Nicole'
-		}
-	});
-	await wrapper.vm.addFriend();
-    expect(wrapper.vm.message).toBe('Failed to add Nicole to your friend list.');
-    expect(wrapper.vm.messageType).toBe('error')
-  });
-
-
-  it('updates message and messageType after adding friend forbidden', async () => { 
-	const fetchMock = vi.spyOn(window, 'fetch');
-	fetchMock.mockResolvedValue({
-		status: 403,
-		json: vi.fn().mockResolvedValueOnce({ data: "Can't add yourself!" })
-	});
-	const wrapper = mount(FriendItem, {
-		components: {
-			ButtonApp
-		},
-		props: {
-			friendName: 'Nicole'
-		}
-	});
-	await wrapper.vm.addFriend();
-    expect(wrapper.vm.message).toBe('Failed to add Nicole to your friend list.');
-    expect(wrapper.vm.messageType).toBe('error')
-  });
 })
