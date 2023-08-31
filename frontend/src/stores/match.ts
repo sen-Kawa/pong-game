@@ -6,9 +6,14 @@ import { computed, ref } from 'vue'
 
 const baseUrlMatch = `${import.meta.env.VITE_BACKEND_SERVER_URI}/match`
 
+enum GameStatus {
+  CREATED = 'CREATED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED'
+}
+
 interface Filter {
-  started: boolean
-  completed: boolean
+  gameStatus: GameStatus
   includePlayers: boolean
   includeScores: boolean
 }
@@ -21,8 +26,7 @@ export const useMatchStore = defineStore('match', () => {
   const error = ref('')
 
   const filters = ref<Filter>({
-    started: true,
-    completed: false,
+    gameStatus: GameStatus.CREATED,
     includePlayers: true,
     includeScores: true
   })
@@ -30,6 +34,7 @@ export const useMatchStore = defineStore('match', () => {
   // computed becomes getter
   const matchCount = computed(() => matches.value.length)
   const pagination = computed(() => usePagination(matches))
+  const gameStates = computed(() => Object.values(GameStatus))
 
   // function becomes action
   async function createMatch() {
@@ -113,16 +118,13 @@ export const useMatchStore = defineStore('match', () => {
   }
 
   async function getMatchHistory() {
-    const matchFilter = filters.value
-
-    matchFilter.completed = true
+    filters.value.gameStatus = GameStatus.COMPLETED
     getMatches()
   }
 
   async function getMatchesToJoin() {
     filters.value = {
-      started: true,
-      completed: false,
+      gameStatus: GameStatus.CREATED,
       includePlayers: true,
       includeScores: false
     }
@@ -130,8 +132,10 @@ export const useMatchStore = defineStore('match', () => {
   }
 
   function clearFilters() {
-    for (const key in filters.value) {
-      filters.value[key as keyof typeof filters.value] = false // https://stackoverflow.com/a/69198602
+    filters.value = {
+      gameStatus: GameStatus.CREATED,
+      includePlayers: false,
+      includeScores: false
     }
   }
 
@@ -144,6 +148,7 @@ export const useMatchStore = defineStore('match', () => {
     clearFilters,
     matchCount,
     pagination,
+    gameStates,
     createMatch,
     getMatches,
     getMatchHistory,

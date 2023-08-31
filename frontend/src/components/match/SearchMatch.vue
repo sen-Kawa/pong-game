@@ -5,14 +5,8 @@
 			<input placeholder="Enter Search Term" />
 		</div>
 		<div class="filters">
-			<label>
-				<input type="checkbox" v-model="matchStore.filters.started" />
-				started
-			</label>
-			<label>
-				<input type="checkbox" v-model="matchStore.filters.completed" />
-				completed
-			</label>
+			<DropDown label="MatchStatus" :options="matchStore.gameStates"
+				@drop-down-value-change="val => matchStore.filters.gameStatus = val" />
 			<label>
 				<input type="checkbox" v-model="matchStore.filters.includePlayers" />
 				includePlayers
@@ -40,8 +34,10 @@
 // import useSearch from './useSearch'
 import { useMatchStore } from '@/stores/match';
 import { onMounted, watchEffect } from 'vue';
+import DropDown from './DropDown.vue';
 import LoadingIndicator from './LoadingIndicator.vue';
 import MatchList from './MatchList.vue';
+
 
 const matchStore = useMatchStore()
 
@@ -69,17 +65,6 @@ watchEffect(() => {
 	if (!matchStore.filters.includePlayers)
 		matchStore.filters.includeScores = false
 })
-
-watchEffect(() => {
-	if (matchStore.filters.completed)
-		matchStore.filters.started = true
-})
-
-watchEffect(() => {
-	if (!matchStore.filters.started)
-		matchStore.filters.completed = false
-})
-
 
 const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults: pagedMatches } =
 	matchStore.pagination
