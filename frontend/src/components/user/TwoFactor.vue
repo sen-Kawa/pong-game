@@ -39,8 +39,9 @@ const change2fa = () => {
       })
       .catch((err) => {
         url.value = ''
-        if (err.response?.status == 401) error.value = 'Unauthorized, you need to log in'
-        else error.value = 'Unknown error, contact an admin'
+        if (err.response?.status == 401) {
+          authStore.logout()
+        } else error.value = 'Unknown error, contact an admin'
       })
   } else {
     url.value = ''
@@ -66,7 +67,8 @@ const verify2FA = () => {
       }
     })
     .catch((err) => {
-      error.value = err.response?.data?.message
+      if (err.response?.status == 401) authStore.logout()
+      else error.value = err.response?.data?.message
     })
 }
 </script>

@@ -144,6 +144,32 @@ describe('Integration Test of the Validation2FA Component', () => {
     })
   })
 
+  it('clicking the activate while not logged in', async () => {
+    mock.onGet(baseUrlauth + 'activate2FA').reply(401)
+    mock.onGet(baseUrlauth + 'logout').reply(401)
+    mock.onGet(baseUrlauth + 'refresh').reply(401)
+    mocka.onGet(baseUrlauth + 'refresh').reply(401)
+    const spy2 = vi.spyOn(router, 'push')
+    window.alert = vi.fn()
+    // @ts-ignore
+    wrapper.vm.activated2FA = false
+    const authStore = useAuthStore()
+    authStore.$patch({ userProfile: { activated2FA: false } })
+    const spy = vi.spyOn(authStore, 'logout')
+    await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
+    await waitForExpect(() => {
+      expect(window.alert).toBeCalledTimes(1)
+      expect(window.alert).toBeCalledWith('Unauthorized, you need to log in')
+      expect(spy).toBeCalledTimes(1)
+      expect(wrapper.findAll('button').length).toEqual(1)
+      // @ts-ignore
+      expect(wrapper.vm.url).toBe('')
+      expect(spy2).toBeCalledTimes(1)
+      expect(spy2).toBeCalledWith('/')
+    })
+  })
+
   it('clicking the deactivate with an unknown error', async () => {
     mock.onGet(baseUrlauth + 'deactivate2FA').reply(500)
     mock.onGet(baseUrlauth + 'refresh').reply(401)
@@ -172,14 +198,16 @@ describe('Integration Test of the Validation2FA Component', () => {
     mocka.onGet(baseUrlauth + 'refresh').reply(401)
     const authStore = useAuthStore()
     authStore.$patch({ userProfile: { activated2FA: false } })
+    const spy = vi.spyOn(authStore, 'logout')
     await wrapper.find('.change2fa').trigger('click')
     await flushPromises()
     await waitForExpect(() => {
+      expect(spy).toBeCalledTimes(1)
       expect(wrapper.findAll('button').length).toEqual(1)
       expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
       expect(wrapper.findAll('img').length).toEqual(0)
       // @ts-ignore
-      expect(wrapper.vm.error).toBe('Unauthorized, you need to log in')
+      expect(wrapper.vm.error).toBe('')
       // @ts-ignore
       expect(wrapper.vm.url).toBe('')
     })
@@ -248,6 +276,41 @@ describe('Integration Test of the Validation2FA Component', () => {
       expect(wrapper.vm.url).toBe(baseUrl + '/TestUrl')
       // @ts-ignore
       expect(wrapper.vm.error).toBe('the test works')
+    })
+  })
+
+  it('sending a code, while no logged in', async () => {
+    mock.onGet(baseUrlauth + 'activate2FA').reply(200, { url: baseUrl + '/TestUrl' })
+    mock.onPost(baseUrlauth + 'verifyactivate2fa').reply(401)
+    mock.onGet(baseUrlauth + 'refresh').reply(401)
+    mocka.onGet(baseUrlauth + 'refresh').reply(401)
+    const authStore = useAuthStore()
+    const spy2 = vi.spyOn(router, 'push')
+    window.alert = vi.fn()
+    // @ts-ignore
+    wrapper.vm.activated2FA = false
+    const spy3 = vi.spyOn(authStore, 'logout')
+    authStore.$patch({ userProfile: { activated2FA: false } })
+    const spy = vi.spyOn(authStore, 'activate2FA')
+    await wrapper.find('.change2fa').trigger('click')
+    await flushPromises()
+    await wrapper.find('input').setValue('123456')
+    await wrapper.find('.codeSend').trigger('click')
+    await flushPromises()
+    await waitForExpect(() => {
+      expect(spy).toBeCalledTimes(0)
+      expect(spy2).toBeCalledTimes(1)
+      expect(spy3).toBeCalledTimes(1)
+      expect(window.alert).toBeCalledTimes(1)
+      expect(window.alert).toBeCalledWith('Unauthorized, you need to log in')
+      expect(wrapper.findAll('button').length).toEqual(2)
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(1)?.text()).toBe('Send code')
+      expect(wrapper.findAll('img').length).toEqual(1)
+      // @ts-ignore
+      expect(wrapper.vm.url).toBe(baseUrl + '/TestUrl')
+      // @ts-ignore
+      expect(wrapper.vm.error).toBe('')
     })
   })
 

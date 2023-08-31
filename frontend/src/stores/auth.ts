@@ -93,6 +93,7 @@ export const useAuthStore = defineStore('auth', () => {
       })
       .catch((err) => {
         if (err.response?.status == 401) {
+          loginStatus.value = false
           alert('Need to login to deactivate 2FA')
           router.push('/')
         } else {
@@ -114,7 +115,7 @@ export const useAuthStore = defineStore('auth', () => {
         withCredentials: true
       })
       .catch((error) => {
-        console.log(error)
+        if (error.response?.status == 401) alert('Unauthorized, you need to log in')
       })
 
     loginStatus.value = false
