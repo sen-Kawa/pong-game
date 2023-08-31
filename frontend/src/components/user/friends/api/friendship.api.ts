@@ -20,18 +20,21 @@ export async function postAddFriend(friendName: string) {
 }
 
 export async function postFindUser(name: string) {
-  const requestOptions: RequestInit = {
-    method: 'POST',
-    credentials: 'include',
+  const requestOptions = {
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ name: name })
   }
-  const response = await fetch(`${BASE_URL}/find/`, requestOptions)
-
-	const userData = await response.json()
-	return userData
+  const requestBody = JSON.stringify({ name: name })
+  try {
+  	const response = await jwtInterceptor.post(`${BASE_URL}/find/`, requestBody, requestOptions)
+	console.log('Request succesful', response.data);
+	return response
+  } catch (error) {
+	console.error('Error making the request', error);
+	throw error
+	}
 }
 
 export async function deleteFriend(displayName: string) {
@@ -42,7 +45,6 @@ export async function deleteFriend(displayName: string) {
     },
     data: JSON.stringify({ friendName: displayName })
   }
-  //await fetch(`${BASE_URL}/removeFriend/`, requestOptions)
   try {
   	const response = await jwtInterceptor.delete(`${BASE_URL}/removeFriend/`, requestOptions)
 	console.log('Request succesful', response.data);
