@@ -1,4 +1,5 @@
 import axios from 'axios'
+import jwtInterceptor from '@/interceptor/jwtInterceptor'
 //const BASE_URL = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users`
 const BASE_URL = 'http://localhost:3000/users'
 
@@ -43,7 +44,7 @@ export async function deleteFriend(displayName: string) {
   }
   //await fetch(`${BASE_URL}/removeFriend/`, requestOptions)
   try {
-  	const response = await axios.delete(`${BASE_URL}/removeFriend/`, requestOptions)
+  	const response = await jwtInterceptor.delete(`${BASE_URL}/removeFriend/`, requestOptions)
 	console.log('Request succesful', response.data);
   } catch (error) {
 	console.error('Error making the request', error);
