@@ -1,4 +1,5 @@
-const BASE_URL = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users`
+//const BASE_URL = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users`
+const BASE_URL = 'http://localhost:3000/users'
 
 export async function postAddFriend(friendName: string) {
   const requestOptions: RequestInit = {
