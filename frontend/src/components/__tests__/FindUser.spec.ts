@@ -112,6 +112,7 @@ describe('FindUser', () => {
   it('shows alert and prompts for a input value when user search is empty', async () => {
     const wrapper = mount(FindUser);
 	const alertSpy = vi.spyOn(window, 'alert');
+	window.alert = () => {};
 	await wrapper.find('form').trigger('submit.prevent');
 	expect(alertSpy).toHaveBeenCalledWith('Add name to search')
   });
