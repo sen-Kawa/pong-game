@@ -143,6 +143,11 @@ describe('FindUser', () => {
 
 
   it('gives an error message if user not found', async () => {
+	const fetchMock = vi.spyOn(window, 'fetch');
+	fetchMock.mockResolvedValue({
+		status: 200,
+		json: vi.fn().mockResolvedValueOnce({})
+	});
     const wrapper = mount(FindUser, {
 		data() {
 			return {
