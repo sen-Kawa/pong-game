@@ -3,18 +3,11 @@ import { ref } from 'vue'
 import usePagination from '../usePagination'
 
 describe('usePagination', () => {
-  const items = ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
-  // const {
-  //   currentPage,
-  //   nextPage,
-  //   prevPage,
-  //   currentStartIndex,
-  //   currentEndIndex,
-  //   pagedResults: pagedMatches
-  // } = usePagination<String>(ref(items))
+  const ITEMS = ['one', 'two', 'three', 'four', 'five', 'six', 'seven']
+  const PAGE_SIZE = 5
 
   it('should go to the next and previous pages', () => {
-    const { currentPage, nextPage, prevPage } = usePagination<String>(ref(items), 5)
+    const { currentPage, nextPage, prevPage } = usePagination<String>(ref(ITEMS), ref(PAGE_SIZE))
 
     expect(currentPage.value).toBe(1)
 
@@ -26,7 +19,7 @@ describe('usePagination', () => {
   })
 
   it('should not go to the previous page when on page 1', () => {
-    const { currentPage, prevPage } = usePagination<String>(ref(items), 5)
+    const { currentPage, prevPage } = usePagination<String>(ref(ITEMS), ref(PAGE_SIZE))
 
     expect(currentPage.value).toBe(1)
 
@@ -35,7 +28,7 @@ describe('usePagination', () => {
   })
 
   it('should not got to the next page when there is none', () => {
-    const { currentPage, nextPage } = usePagination<String>(ref(items), 5)
+    const { currentPage, nextPage } = usePagination<String>(ref(ITEMS), ref(PAGE_SIZE))
 
     currentPage.value = 2
 
@@ -44,7 +37,10 @@ describe('usePagination', () => {
   })
 
   it('should return the correct start and end indices', () => {
-    const { currentPage, currentStartIndex, currentEndIndex } = usePagination<String>(ref(items), 5)
+    const { currentPage, currentStartIndex, currentEndIndex } = usePagination<String>(
+      ref(ITEMS),
+      ref(PAGE_SIZE)
+    )
 
     currentPage.value = 1
 
@@ -57,26 +53,38 @@ describe('usePagination', () => {
   })
 
   test.each([2, 5, 10])('should split the list into pages of size %i', (pageSize: number) => {
-    const { pagedResults } = usePagination<String>(ref(items), pageSize)
+    const { pagedResults } = usePagination<String>(ref(ITEMS), ref(pageSize))
     expect(pagedResults.value.length).lessThanOrEqual(pageSize)
   })
 
   test.fails('should not accept a negative page size', () => {
-    usePagination<String>(ref(items), -5)
+    usePagination<String>(ref(ITEMS), ref(-5))
   })
 
   test.fails('should not accept zero as page size', () => {
-    usePagination<String>(ref(items), 0)
+    usePagination<String>(ref(ITEMS), ref(0))
   })
 
   test('empty list', () => {
-    // const empty: = []
-    const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults } =
-      usePagination(ref([]), 5)
+    const { currentPage, pageSize, currentStartIndex, currentEndIndex, pagedResults } =
+      usePagination(ref([]), ref(PAGE_SIZE))
 
     expect(currentPage.value).toBe(1)
     expect(pagedResults.value.length).toBe(0)
     expect(currentStartIndex.value).toBe(0)
     expect(currentEndIndex.value).toBe(0)
+    expect(pageSize.value).toBe(PAGE_SIZE)
+  })
+
+  it('should handle page size changes', () => {
+    const pageSize = ref(PAGE_SIZE)
+    const { currentStartIndex, currentEndIndex, pagedResults } = usePagination(ref(ITEMS), pageSize)
+
+    expect(pagedResults.value.length).toBe(PAGE_SIZE)
+
+    pageSize.value = 2
+    expect(pagedResults.value.length).toBe(2)
+    expect(currentStartIndex.value).toBe(1)
+    expect(currentEndIndex.value).toBe(2)
   })
 })
