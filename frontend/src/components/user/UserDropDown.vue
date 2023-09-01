@@ -33,7 +33,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   setup() {},
-  name: 'users',
+  name: 'usersDropDown',
   props: ['title'],
   data() {
     return {
