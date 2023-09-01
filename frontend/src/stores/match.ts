@@ -1,4 +1,4 @@
-import usePagination from '@/components/match/usePagination'
+import usePagination from '@/stores/usePagination'
 import jwtInterceptor from '@/interceptor/jwtInterceptor'
 import type { MatchDTO, MatchResult } from '@/types/match'
 import { defineStore } from 'pinia'
@@ -19,6 +19,8 @@ interface Filter {
 }
 
 export const useMatchStore = defineStore('match', () => {
+  const PAGE
+
   // ref becomes state
   const matches = ref<MatchResult[]>([]) // TODO: use MatchResult interface
   const currentMatch = ref(null)
