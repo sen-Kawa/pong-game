@@ -169,11 +169,13 @@ describe('FindUser', () => {
   it('succesfull message and message type', async () => {
 	const foundUserData = [
 		{
-			displayName: 'Bobu',
-			userName: 'bobby',
+			data: [{
+				displayName: 'Bobu',
+				userName: 'bobby',
+			}],
 		},
-	];
-	const fetchMock = vi.spyOn(window, 'fetch');
+	]
+	const fetchMock = vi.spyOn(window, 'jwtInterceptor.post');
 	fetchMock.mockResolvedValue({
 		status: 200,
 		json: vi.fn().mockResolvedValueOnce(foundUserData)
@@ -183,7 +185,6 @@ describe('FindUser', () => {
 		data() {
 			return {
 				name: 'bobb',
-				foundUser: foundUserData
 			}
 		}
 	})

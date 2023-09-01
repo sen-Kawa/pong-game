@@ -30,6 +30,7 @@ export async function postFindUser(name: string) {
   try {
   	const response = await jwtInterceptor.post(`${BASE_URL}/find/`, requestBody, requestOptions)
 	console.log('Request succesful', response.data);
+	console.log('Request response', response);
 	return response
   } catch (error) {
 	console.error('Error making the request', error);
