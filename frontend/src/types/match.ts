@@ -1,7 +1,7 @@
 // nicer format
-export interface MatchResult {
+export interface MatchMetaData {
   id: number
-  start: Date
+  start?: Date
   end?: Date
   players: PlayerOnMatch[]
 }
@@ -19,12 +19,6 @@ export interface MatchDTO {
         player: PlayerOnMatch
       }[]
     | undefined
-}
-
-export interface MatchMetaData {
-  id: number
-  start: Date
-  end: Date
 }
 
 export interface PlayerOnMatch {

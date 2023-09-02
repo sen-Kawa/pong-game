@@ -1,6 +1,6 @@
-import usePagination from '@/stores/usePagination'
 import jwtInterceptor from '@/interceptor/jwtInterceptor'
-import type { MatchDTO, MatchResult } from '@/types/match'
+import usePagination from '@/stores/usePagination'
+import type { MatchDTO, MatchMetaData } from '@/types/match'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
@@ -19,11 +19,10 @@ interface Filter {
 }
 
 export const useMatchStore = defineStore('match', () => {
-  const PAGE
-
   // ref becomes state
-  const matches = ref<MatchResult[]>([]) // TODO: use MatchResult interface
-  const currentMatch = ref(null)
+  const matches = ref<MatchMetaData[]>([])
+  const currentMatch = ref<MatchMetaData>()
+  const pageSize = ref(5)
   const loading = ref(false)
   const error = ref('')
 
@@ -35,12 +34,18 @@ export const useMatchStore = defineStore('match', () => {
 
   // computed becomes getter
   const matchCount = computed(() => matches.value.length)
-  const pagination = computed(() => usePagination(matches))
+  const pagination = computed(() => usePagination(matches, pageSize))
   const gameStates = computed(() => Object.values(GameStatus))
 
   // function becomes action
   async function createMatch() {
     const requestPath = baseUrlMatch + '/me'
+
+    if (currentMatch.value) {
+      const message = 'match is already created'
+      error.value = message
+      throw new Error(message)
+    }
     try {
       loading.value = true
       const response = await jwtInterceptor.post(
@@ -50,16 +55,16 @@ export const useMatchStore = defineStore('match', () => {
           withCredentials: true
         }
       )
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
+      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
 
       error.value = ''
       loading.value = false
-      console.debug(response)
       if (response.status != 201) {
         throw new Error(response.statusText)
       }
-      console.debug(transformMatchDTOToResult(response.data))
-      matches.value.push(transformMatchDTOToResult(response.data))
+      const newMatch = transformMatchDTO(response.data)
+      matches.value.push(newMatch)
+      currentMatch.value = newMatch
     } catch (e) {
       const message = error instanceof Error ? error.message : 'Unknown Error'
       error.value = message
@@ -85,14 +90,13 @@ export const useMatchStore = defineStore('match', () => {
         withCredentials: true,
         params: searchParams
       })
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
+      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
 
-      console.debug(response.status)
       error.value = ''
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
         const rawMatchData: MatchDTO[] = response.data
-        matches.value = response.data.map(transformMatchDTOToResult)
+        matches.value = response.data.map(transformMatchDTO)
       } else throw new Error(response.statusText)
       if (matches.value.length === 0) error.value = 'No Matches found!'
     } catch (e) {
@@ -102,10 +106,10 @@ export const useMatchStore = defineStore('match', () => {
     }
   }
 
-  function transformMatchDTOToResult(dto: MatchDTO): MatchResult {
-    const result: MatchResult = {
+  function transformMatchDTO(dto: MatchDTO): MatchMetaData {
+    const result: MatchMetaData = {
       id: dto.id,
-      start: new Date(dto.start),
+      start: dto.start ? new Date(dto.start) : undefined,
       end: dto.end ? new Date(dto.end) : undefined,
       players:
         dto.players?.map((player) => ({
@@ -121,7 +125,7 @@ export const useMatchStore = defineStore('match', () => {
 
   async function getMatchHistory() {
     filters.value.gameStatus = GameStatus.COMPLETED
-    getMatches()
+    await getMatches()
   }
 
   async function getMatchesToJoin() {
@@ -130,7 +134,16 @@ export const useMatchStore = defineStore('match', () => {
       includePlayers: true,
       includeScores: false
     }
-    getMatches()
+    await getMatches()
+  }
+
+  async function getMatchesToSpectate() {
+    filters.value = {
+      gameStatus: GameStatus.IN_PROGRESS,
+      includePlayers: true,
+      includeScores: true
+    }
+    await getMatches()
   }
 
   function clearFilters() {
@@ -139,6 +152,10 @@ export const useMatchStore = defineStore('match', () => {
       includePlayers: false,
       includeScores: false
     }
+  }
+
+  function removeCurrentMatch() {
+    currentMatch.value = undefined
   }
 
   return {
@@ -154,6 +171,8 @@ export const useMatchStore = defineStore('match', () => {
     createMatch,
     getMatches,
     getMatchHistory,
-    getMatchesToJoin
+    getMatchesToJoin,
+    getMatchesToSpectate,
+    removeCurrentMatch
   }
 })
