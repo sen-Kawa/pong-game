@@ -1,8 +1,7 @@
-import { Scope } from '@/services/MatchService'
 import type { MatchMetaData } from '@/types/match'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, test } from 'vitest'
-import { useMatchStore } from '../match'
+import { useMatchStore, Scope } from '../match'
 
 describe('Match Store', () => {
   let fakeMatch: MatchMetaData
