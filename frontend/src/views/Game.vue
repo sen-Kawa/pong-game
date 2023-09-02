@@ -18,7 +18,9 @@ const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pag
 
 onMounted(async () => {
   console.debug('onMounted')
-  matchStore.getMatchesToJoin()
+  // TODO: only await once
+  await matchStore.getMatchesToJoin()
+  await matchStore.getMatchesToSpectate()
 })
 
 

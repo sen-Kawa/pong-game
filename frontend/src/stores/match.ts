@@ -96,7 +96,7 @@ export const useMatchStore = defineStore('match', () => {
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
         const rawMatchData: MatchDTO[] = response.data
-        matches.value = response.data.map(transformMatchDTO)
+        matches.value.push(...response.data.map(transformMatchDTO))
       } else throw new Error(response.statusText)
       if (matches.value.length === 0) error.value = 'No Matches found!'
     } catch (e) {
