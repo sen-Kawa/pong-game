@@ -15,14 +15,12 @@ matchStore.init()
 matchStore.pagination.pageSize.value = 10
 
 onMounted(async () => {
-  console.debug('onMounted')
   // TODO: only await once
   await matchStore.getMatchesToJoin()
   await matchStore.getMatchesToSpectate()
 })
 
 async function createNewGame() {
-  console.debug('create new game')
   matchStore.createMatch()
 }
 </script>

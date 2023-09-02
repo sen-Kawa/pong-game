@@ -54,7 +54,6 @@ export class MatchService {
   }): Promise<MatchEntity | unknown> {
     // TODO: add sorting and limit
     const { includeScores, includePlayers, gameStatus, players } = options
-    console.debug({ options })
 
     const playersOnMatchFilter =
       players?.length > 1

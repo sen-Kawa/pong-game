@@ -25,7 +25,6 @@ function toggleScope() {
 }
 
 onMounted(() => {
-  console.debug('onMounted MatchHistory')
   matchStore.getMatchHistory(scope.value)
 })
 </script>
