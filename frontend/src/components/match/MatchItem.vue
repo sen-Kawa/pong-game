@@ -1,16 +1,44 @@
 <script setup lang="ts">
-import type { MatchResult } from '@/types/match';
+import type { MatchMetaData } from '@/types/match';
 import TimeAgo from 'javascript-time-ago';
 import { computed, type PropType } from 'vue';
 
 const props = defineProps({
   match: {
-    type: Object as PropType<MatchResult>,
+    type: Object as PropType<MatchMetaData>,
     required: true
   }
 })
 
+const inProgress = computed(() => {
+  if (props.match.end || !props.match.start) {
+    return false
+  }
+  return true
+})
+
+const isCompleted = computed(() => {
+  if (props.match.end) {
+    return true
+  }
+  return false
+})
+
+const canJoin = computed(() => {
+  if (inProgress.value || isCompleted.value)
+    return false
+  return true
+})
+
+const canSpectate = computed(() => {
+  if (isCompleted.value)
+    return false
+  return true
+})
+
 const duration = computed(() => {
+  if (!props.match.start)
+    return undefined
   const start = props.match.start
   const end = props.match.end ?? new Date(Date.now())
   const duration = end.getTime() - start.getTime()
@@ -34,7 +62,7 @@ const timeSinceEnd = computed(() => {
 <template>
   <div class="card">
     <h3>Match #{{ match.id }}</h3>
-    <p v-if="match.players.length > 1">
+    <p v-if="match.players.length >= 1">
       <!-- TODO: highlight the winner -->
       <span v-if="match.players[0]">{{ match.players[0].name }}</span>
       <span v-else>???</span>
@@ -42,12 +70,13 @@ const timeSinceEnd = computed(() => {
       <span v-if="match.players[1]">{{ match.players[1].name }}</span>
       <span v-else>???</span>
     </p>
-    <p v-if="match.end && match.players[0] && match.players[1]">{{ match.players[0].score }} : {{ match.players[1].score
+    <p v-if="inProgress || isCompleted">{{ match.players[0].score }} : {{ match.players[1].score
     }}</p>
     <p id="match-time-since-end">{{ timeSinceEnd }}</p>
     <!-- TODO: watch to live update the duration for matches in progress -->
-    <p>duration: {{ duration }}</p>
-    <button v-if="!match.end">Join Game</button>
+    <p v-if="inProgress || isCompleted">duration: {{ duration }}</p>
+    <button v-if="canJoin" class="button join">Join Game</button>
+    <button v-if="canSpectate" class="button spectate">Spectate</button>
   </div>
 </template>
 
