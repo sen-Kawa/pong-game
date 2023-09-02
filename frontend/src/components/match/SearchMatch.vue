@@ -49,6 +49,7 @@ onMounted(async () => {
 // TODO: call when checkboxes changed
 function applyFilters() {
 	console.debug('applyFilters')
+	matchStore.matches = []
 	matchStore.getMatches()
 }
 

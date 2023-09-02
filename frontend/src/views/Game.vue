@@ -1,20 +1,19 @@
 <template>
   <div class="text-center">this is the game tap</div>
   <button @click="createNewGame">New Game</button>
-  <LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
-    <MatchList :matches="matchStore.matches" />
-  </LoadingIndicator>
+  <SearchMatch />
 </template>
 
 <script setup lang="ts">
-import LoadingIndicator from '@/components/match/LoadingIndicator.vue';
-import MatchList from '@/components/match/MatchList.vue';
+import SearchMatch from '@/components/match/SearchMatch.vue';
 import { useMatchStore } from '@/stores/match';
 import { onMounted } from 'vue';
 
 const matchStore = useMatchStore()
 const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults: pagedMatches } =
   matchStore.pagination
+
+matchStore.pagination.pageSize.value = 10
 
 onMounted(async () => {
   console.debug('onMounted')
