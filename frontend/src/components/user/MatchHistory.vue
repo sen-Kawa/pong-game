@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Scope } from '@/services/MatchService';
-import { useMatchStore } from '@/stores/match';
+import { Scope, useMatchStore } from '@/stores/match';
 import { onMounted, ref } from 'vue';
 import LoadingIndicator from '../match/LoadingIndicator.vue';
 import MatchList from '../match/MatchList.vue';
@@ -16,6 +15,8 @@ const props = withDefaults(defineProps<Props>(),
 
 const scope = ref(props.initialScope)
 const matchStore = useMatchStore()
+
+matchStore.init();
 
 function toggleScope() {
   matchStore.matches = []

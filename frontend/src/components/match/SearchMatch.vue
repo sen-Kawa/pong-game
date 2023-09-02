@@ -33,18 +33,13 @@
 <script setup lang="ts">
 // import useSearch from './useSearch'
 import { useMatchStore } from '@/stores/match';
-import { onMounted, watchEffect } from 'vue';
+import { watchEffect } from 'vue';
 import DropDown from './DropDown.vue';
 import LoadingIndicator from './LoadingIndicator.vue';
 import MatchList from './MatchList.vue';
 
 
 const matchStore = useMatchStore()
-
-onMounted(async () => {
-	console.debug('onMounted')
-	matchStore.getMatches()
-})
 
 // TODO: call when checkboxes changed
 function applyFilters() {

@@ -13,6 +13,7 @@ const matchStore = useMatchStore()
 const { currentPage, nextPage, prevPage, currentStartIndex, currentEndIndex, pagedResults: pagedMatches } =
   matchStore.pagination
 
+matchStore.init();
 matchStore.pagination.pageSize.value = 10
 
 onMounted(async () => {

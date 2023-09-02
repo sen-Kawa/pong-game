@@ -1,11 +1,15 @@
 import jwtInterceptor from '@/interceptor/jwtInterceptor'
-import { Scope } from '@/services/MatchService'
 import usePagination from '@/stores/usePagination'
 import type { MatchDTO, MatchMetaData } from '@/types/match'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 const baseUrlMatch = `${import.meta.env.VITE_BACKEND_SERVER_URI}/match`
+
+export enum Scope {
+  global,
+  personal
+}
 
 enum GameStatus {
   CREATED = 'CREATED',
@@ -39,6 +43,14 @@ export const useMatchStore = defineStore('match', () => {
   const gameStates = computed(() => Object.values(GameStatus))
 
   // function becomes action
+  function init() {
+    matches.value = []
+    currentMatch.value = undefined
+    pageSize.value = 5
+    loading.value = false
+    error.value = ''
+  }
+
   async function createMatch() {
     const requestPath = baseUrlMatch + '/me'
 
@@ -169,6 +181,7 @@ export const useMatchStore = defineStore('match', () => {
   }
 
   return {
+    init,
     matches,
     currentMatch,
     loading,
