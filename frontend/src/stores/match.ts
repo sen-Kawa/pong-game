@@ -1,4 +1,5 @@
 import jwtInterceptor from '@/interceptor/jwtInterceptor'
+import { Scope } from '@/services/MatchService'
 import usePagination from '@/stores/usePagination'
 import type { MatchDTO, MatchMetaData } from '@/types/match'
 import { defineStore } from 'pinia'
@@ -123,9 +124,18 @@ export const useMatchStore = defineStore('match', () => {
     return result
   }
 
-  async function getMatchHistory() {
+  async function getMatchHistory(scope: Scope) {
     filters.value.gameStatus = GameStatus.COMPLETED
-    await getMatches()
+    switch (scope) {
+      case Scope.global:
+        await getMatches()
+        break
+      case Scope.personal:
+        await getMatches('/me')
+      default:
+        console.error(`unexpected scope ${scope}`)
+        break
+    }
   }
 
   async function getMatchesToJoin() {

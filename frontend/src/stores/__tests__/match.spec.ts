@@ -1,3 +1,4 @@
+import { Scope } from '@/services/MatchService'
 import type { MatchMetaData } from '@/types/match'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, test } from 'vitest'
@@ -39,7 +40,7 @@ describe('Match Store', () => {
   it('should get the match history', async () => {
     const store = useMatchStore()
 
-    await store.getMatchHistory()
+    await store.getMatchHistory(Scope.global)
     expect(store.loading).toBe(false)
     expect(store.filters.gameStatus).toEqual('COMPLETED')
     expect(store.matches.length).greaterThan(0)
