@@ -7,7 +7,8 @@ export class UserEntity implements User {
     Object.assign(this, partial)
   }
 
-  @ApiProperty()
+  @ApiHideProperty()
+  @Exclude()
   id: number
 
   @ApiProperty()

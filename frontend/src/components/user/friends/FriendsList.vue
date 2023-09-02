@@ -10,7 +10,7 @@
       />
     </ul>
     <div v-else>You dont have friends yet!</div>
-    <ButtonC
+    <ButtonApp
       @btn-click="toggleShowFindUser()"
       :text="showFindUser ? 'Close' : 'Find User'"
       color="LightGray"
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import ButtonC from '../../Button.vue'
+import ButtonApp from '../../ButtonApp.vue'
 import Friend from './FriendItem.vue'
 import FindUser from './FindUser.vue'
 import { getFriendList } from './api/friendship.api.js'
@@ -33,7 +33,7 @@ export default {
     }
   },
   components: {
-    ButtonC,
+    ButtonApp,
     Friend,
     FindUser
   },

@@ -9,28 +9,28 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: () => import('../views/Home.vue')
+      component: () => import('../views/HomeView.vue')
     },
     {
       path: '/game',
       name: 'game',
-      component: () => import('../views/Game.vue')
+      component: () => import('../views/GameView.vue')
     },
     {
       path: '/leader',
       name: 'leader',
-      component: () => import('../views/Leader.vue')
+      component: () => import('../views/LeaderView.vue')
     },
     {
       path: '/user/Preference',
       name: 'preference',
       meta: { requiredAuth: true },
-      component: () => import('../components/user/Preference.vue')
+      component: () => import('../components/user/PreferenceComp.vue')
     },
     {
       path: '/user/Profile',
       name: 'profile',
-      component: () => import('../components/user/Profile.vue')
+      component: () => import('../components/user/ProfileComp.vue')
     },
     {
       path: '/user/Matchhistory',
@@ -46,7 +46,7 @@ const router = createRouter({
     {
       path: '/user/2fa',
       name: '2fa',
-      component: () => import('../components/user/2fa.vue')
+      component: () => import('../components/user/Validate2FA.vue')
     },
     {
       path: '/user/firsttime',

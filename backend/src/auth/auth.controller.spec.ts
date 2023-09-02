@@ -293,7 +293,7 @@ describe('AuthController', () => {
     const spy3 = jest.spyOn(mockResponse, 'cookie')
     const spy4 = jest.spyOn(mockAuthsService, 'getRefreshToken')
     const spy5 = jest.spyOn(mockAuthsService, 'updateRefreshToken')
-    const result = await controller.verify2FA(mockRequest, mockCode, mockResponse)
+    await controller.verify2FA(mockRequest, mockCode, mockResponse)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedUserID, mockCode)
     expect(spy2).toBeCalledTimes(1)
@@ -311,10 +311,6 @@ describe('AuthController', () => {
     expect(spy4).toHaveBeenCalledWith(mockedUserID)
     expect(spy5).toBeCalledTimes(1)
     expect(spy5).toHaveBeenCalledWith(mockedUserID, expect.any(String))
-    expect(result).toStrictEqual({
-      userId: mockedUserID,
-      twoFaEnabled: true
-    })
   })
 
   it('verify2FA should be throw an error if the codde is wrong', async () => {

@@ -29,8 +29,8 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
-  const getUserName = computed(() => userProfile.value.name)
-
+  const getUserName = computed(() => userProfile.value.userName)
+  const getName = computed(() => userProfile.value.name)
   function setUserProfile(date: any) {
     // console.log(date.id);
     // console.log(date.name);
@@ -53,7 +53,6 @@ export const useAuthStore = defineStore('auth', () => {
   async function validate2fa(code: string) {
     const body = { code: code }
     try {
-      //TODO error handling
       await axios.post(baseUrlauth + 'verify2FA', body, {
         headers: {
           'Content-Type': 'application/json'
@@ -62,12 +61,18 @@ export const useAuthStore = defineStore('auth', () => {
       })
       loginStatus.value = true
       router.push('/user/Preference')
-      //console.log(response.data);
-      //return "Succes";
     } catch (error: any) {
-      //TODO improve error handling
-      console.log(error)
-      //return error.response.data.message;
+      if (error instanceof AxiosError) {
+        if (error.response?.status == 401) {
+          alert('Took to long restart login')
+          router.push('/')
+        } else if (error.response?.status == 500) {
+          alert('Something went wrong, contact an admin')
+          router.push('/')
+        } else return error.response?.data?.message
+      } else {
+        return error
+      }
     }
   }
   async function getuserProfile() {
@@ -82,14 +87,19 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   async function deactivate2FA() {
-    const response = await axios
+    const response = await jwtInterceptor
       .get(baseUrlauth + 'deactivate2FA', {
         withCredentials: true
       })
       .catch((err) => {
-        console.log(err)
+        if (err.response?.status == 401) {
+          loginStatus.value = false
+          alert('Need to login to deactivate 2FA')
+          router.push('/')
+        } else {
+          alert('Something went wrong, contact an admin')
+        }
       })
-
     if (response && response.status == 200) {
       userProfile.value.activated2FA = false
     }
@@ -105,7 +115,7 @@ export const useAuthStore = defineStore('auth', () => {
         withCredentials: true
       })
       .catch((error) => {
-        console.log(error)
+        if (error.response?.status == 401) alert('Unauthorized, you need to log in')
       })
 
     loginStatus.value = false
@@ -114,7 +124,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function setDisplayName(displayName: string) {
     const body = { displayName: displayName }
     try {
-      const response = await axios.patch(baseUrlUser + 'changeDisplay', body, {
+      const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -135,6 +145,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     getUserName,
+    getName,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,

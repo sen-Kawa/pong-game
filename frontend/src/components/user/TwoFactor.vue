@@ -1,69 +1,74 @@
 <template>
-  <div v-if="!activated2FA" class="text-center">
-    <button type="button" class="logoutButton" @click="change2fa">activate 2fa</button>
+  <div v-if="!activated2FA">
+    <button type="button" class="change2fa" @click="change2fa">activate 2fa</button>
   </div>
-  <div v-if="activated2FA" class="text-center">
-    <button type="button" class="logoutButton" @click="change2fa">deactivate 2fa</button>
+  <div v-if="activated2FA">
+    <button type="button" class="change2fa" @click="change2fa">deactivate 2fa</button>
   </div>
   <div v-if="url != ''">
     <br /><img :src="url" /> <br />
     <input type="text" v-model="code" />
-    <button @click="verify2FA">Send code</button>
+    <button @click="verify2FA" class="codeSend">Send code</button>
   </div>
+  <div v-if="error">{{ error }}</div>
 </template>
 
 <script setup lang="ts">
-//TODO find a way that the component rerenders after button click
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import { ref } from 'vue'
-import axios from 'axios'
+import jwtInterceptor from '../../interceptor/jwtInterceptor'
 
+const error = ref('')
 const authStore = useAuthStore()
 
 const { activated2FA } = storeToRefs(authStore)
 
 const url = ref('')
 const code = ref('')
-authStore.getuserProfile()
+const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 
 const change2fa = () => {
   if (!activated2FA.value) {
-    axios
-      .get('http://localhost:3000/auth/activate2FA', {
+    jwtInterceptor
+      .get(baseUrlauth + 'activate2FA', {
         withCredentials: true
       })
       .then((response) => {
         url.value = response.data.url
       })
       .catch((err) => {
-        console.log(err)
+        url.value = ''
+        if (err.response?.status == 401) {
+          authStore.logout()
+        } else error.value = 'Unknown error, contact an admin'
       })
   } else {
     url.value = ''
+    //TODO error handling on deactivate
     authStore.deactivate2FA()
   }
 }
 const verify2FA = () => {
   if (code.value == '') return
   const body = { code: code.value }
-  console.log(body)
-  axios
-    .post('http://localhost:3000/auth/verifyactivate2fa', body, {
+  jwtInterceptor
+    .post(baseUrlauth + 'verifyactivate2fa', body, {
       headers: {
         'Content-Type': 'application/json'
       },
       withCredentials: true
     })
     .then((response) => {
-      console.log(response)
-      if (response.status == 201) {
+      if (response.status == 200) {
         url.value = ''
         authStore.activate2FA()
+        error.value = ''
       }
     })
     .catch((err) => {
-      console.log(err)
+      if (err.response?.status == 401) authStore.logout()
+      else error.value = err.response?.data?.message
     })
 }
 </script>

@@ -8,13 +8,19 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { MockAuthGuard } from './mock-auth.guard'
 import { Mock42AuthGuard } from './mock-42-auth.guard'
 import { Mock2FAAuthGuard } from './mock-2fa-auth.guard'
+import { MockRefreshAuthGuard } from './mock-refresh-auth.guard'
 import { AuthGuard } from '@nestjs/passport'
+import { RefreshAuthGuard } from 'src/auth/guards/refresh.guard'
 import { TFAAuthGuard } from 'src/auth/guards/2fa-auth.guard'
+import { authenticator } from 'otplib'
+import * as cookieParser from 'cookie-parser'
+import { JwtService } from '@nestjs/jwt'
 
 describe('Test for diffrent routes', () => {
   describe('Tests for the users routes', () => {
     let app: INestApplication
     const frontUrl = process.env.FRONTEND_URL
+
     beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule]
@@ -25,6 +31,8 @@ describe('Test for diffrent routes', () => {
         .useClass(MockAuthGuard)
         .overrideGuard(TFAAuthGuard)
         .useClass(Mock2FAAuthGuard)
+        .overrideGuard(RefreshAuthGuard)
+        .useClass(MockRefreshAuthGuard)
         .overrideGuard(AuthGuard('42'))
         .useClass(Mock42AuthGuard)
         .compile()
@@ -32,7 +40,13 @@ describe('Test for diffrent routes', () => {
       app = moduleFixture.createNestApplication()
       app.useGlobalPipes(new ValidationPipe())
       app.useGlobalGuards(new MockAuthGuard())
-
+      app.use(cookieParser())
+      app.enableCors({
+        credentials: true,
+        origin: ['http://localhost:8080'],
+        methods: 'GET, PUT, POST, PATCH, DELETE',
+        allowedHeaders: 'Content-Type, Authorization'
+      })
       await app.init()
     })
 
@@ -83,7 +97,6 @@ describe('Test for diffrent routes', () => {
       expect(status).toBe(200)
     })
 
-    //TODO find out how to mock the validator
     // [POST] /auth/verifyactivate2fa
     it('[POST] /auth/verifyactivate2fa invalid request returns an error', async () => {
       const mockUser = { id: 1, twoFactorAuthenticationSecret: '123456' }
@@ -97,12 +110,27 @@ describe('Test for diffrent routes', () => {
       expect(status).toBe(403)
     })
 
-    //TODO find out how to mock the validator
+    it('[POST] /auth/verifyactivate2fa with a valid code works', async () => {
+      const mockUser = { id: 1, twoFactorAuthenticationSecret: '123456' }
+      // @ts-ignore
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const spy = jest.spyOn(authenticator, 'verify')
+      spy.mockReturnValue(true)
+      const { status, body } = await request(app.getHttpServer())
+        .post('/auth/verifyactivate2fa')
+        .set('Accept', 'application/json')
+        .send('123456')
+      expect(body).toStrictEqual({})
+      expect(status).toBe(200)
+    })
+
     // [POST] /auth/verify2FA
     it('[POST] /auth/verify2FA invalid request returns an error', async () => {
       const mockUser = { id: 1, twoFactorAuthenticationSecret: '123456' }
       // @ts-ignore
       prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const spy = jest.spyOn(authenticator, 'verify')
+      spy.mockReturnValue(false)
       const { status, body } = await request(app.getHttpServer())
         .post('/auth/verify2FA')
         .set('Accept', 'application/json')
@@ -111,16 +139,110 @@ describe('Test for diffrent routes', () => {
       expect(status).toBe(403)
     })
 
-    //TODO find out how to mock the validator and cookie
+    it('[POST] /auth/verify2FA valid request works', async () => {
+      const mockUser = { id: 1, activated2FA: true, twoFactorAuthenticationSecret: '123456' }
+      const spy = jest.spyOn(authenticator, 'verify')
+      spy.mockReturnValue(true)
+      // @ts-ignore
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .post('/auth/verify2FA')
+        .set('Accept', 'application/json')
+        .send('123456')
+      expect(body).toStrictEqual({})
+      expect(status).toBe(200)
+    })
+
     // [GET] /auth/refresh
-    it('[GET] /auth/refresh invalid request returns an error', async () => {
+    it('[GET] /auth/refresh valid request works', async () => {
+      const mockRefreshToken = 'fakeRefreshToken'
+      const mockUser = { id: 1, activated2FA: true, refreshToken: mockRefreshToken }
+      const spy = jest.spyOn(JwtService.prototype, 'decode')
+
+      spy.mockReturnValue({ userId: 1 })
+      // @ts-ignore
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .get('/auth/refresh')
+        .set('Accept', 'application/json')
+        .set('Cookie', ['refresh-cookie=fakeRefreshToken'])
+        .send()
+      expect(body).toStrictEqual({})
+      expect(status).toBe(200)
+    })
+
+    it('[GET] /auth/refresh request with no refresh token returns an error', async () => {
       const mockUser = { id: 1, twoFactorAuthenticationSecret: '123456' }
       // @ts-ignore
       prisma.user.findUnique.mockResolvedValue(mockUser as any)
       const { status, body } = await request(app.getHttpServer())
         .get('/auth/refresh')
         .set('Accept', 'application/json')
-      expect(body).toStrictEqual({ message: 'Unauthorized', statusCode: 401 })
+        .set('Cookie', ['random-cookie=fakeRefreshToken'])
+      expect(body).toStrictEqual({
+        error: 'Unauthorized',
+        message: 'No Valid RefreshToken',
+        statusCode: 401
+      })
+      expect(status).toBe(401)
+    })
+
+    it('[GET] /auth/refresh request with no valid user returns an error', async () => {
+      const spy = jest.spyOn(JwtService.prototype, 'decode')
+      spy.mockReturnValue({ userId: 1 })
+      // @ts-ignore
+      prisma.user.findUnique.mockResolvedValue(null)
+      const { status, body } = await request(app.getHttpServer())
+        .get('/auth/refresh')
+        .set('Accept', 'application/json')
+        .set('Cookie', ['refresh-cookie=fakeRefreshToken'])
+        .send()
+      expect(body).toStrictEqual({
+        error: 'Unauthorized',
+        message: 'No Valid RefreshToken',
+        statusCode: 401
+      })
+      expect(status).toBe(401)
+    })
+
+    it('[GET] /auth/refresh request with no refreshtoken on user returns an error', async () => {
+      const mockUser = { id: 1, activated2FA: true, refreshToken: null }
+      const spy = jest.spyOn(JwtService.prototype, 'decode')
+
+      spy.mockReturnValue({ userId: 1 })
+      // @ts-ignore
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .get('/auth/refresh')
+        .set('Accept', 'application/json')
+        .set('Cookie', ['refresh-cookie=fakeRefreshToken'])
+        .send()
+      expect(body).toStrictEqual({
+        error: 'Unauthorized',
+        message: 'No Valid RefreshToken',
+        statusCode: 401
+      })
+      expect(status).toBe(401)
+    })
+
+    it('[GET] /auth/refresh request with wrong refreshtoken returns an error', async () => {
+      const mockRefreshToken = 'wrongfakeRefreshToken'
+      const mockUser = { id: 1, activated2FA: true, refreshToken: mockRefreshToken }
+      const spy = jest.spyOn(JwtService.prototype, 'decode')
+
+      spy.mockReturnValue({ userId: 1 })
+      // @ts-ignore
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
+      const { status, body } = await request(app.getHttpServer())
+        .get('/auth/refresh')
+        .set('Accept', 'application/json')
+        .set('Cookie', ['refresh-cookie=fakeRefreshToken'])
+        .send()
+      expect(body).toStrictEqual({
+        error: 'Unauthorized',
+        message: 'No Valid RefreshToken',
+        statusCode: 401
+      })
       expect(status).toBe(401)
     })
   })

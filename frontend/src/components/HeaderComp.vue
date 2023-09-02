@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import User from '../components/user/User.vue'
+import User from '../components/user/UserDropDown.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()

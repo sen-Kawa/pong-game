@@ -1,5 +1,5 @@
 <template>
-  <ButtonC
+  <ButtonApp
     @btn-click="addFriend()"
     :text="isAdded ? 'Added' : 'Add Friend'"
     :color="isAdded ? 'Green' : 'LightGray'"
@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { postAddFriend } from './api/friendship.api'
-import ButtonC from '../../Button.vue'
+import ButtonApp from '../../ButtonApp.vue'
 
 export default {
   props: {
@@ -26,7 +26,7 @@ export default {
     }
   },
   components: {
-    ButtonC
+    ButtonApp
   },
   emits: ['friendAdded'],
   methods: {

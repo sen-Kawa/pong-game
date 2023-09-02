@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import SearchMatch from '@/components/match/SearchMatch.vue';
-import { useMatchStore } from '@/stores/match';
-import { onMounted } from 'vue';
+import SearchMatch from '@/components/match/SearchMatch.vue'
+import { useMatchStore } from '@/stores/match'
+import { onMounted } from 'vue'
 
 const matchStore = useMatchStore()
 
