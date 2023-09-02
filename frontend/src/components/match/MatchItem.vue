@@ -60,7 +60,7 @@ const timeSinceEnd = computed(() => {
 </script>
 
 <template>
-  <div class="card">
+  <li class="card">
     <h3>Match #{{ match.id }}</h3>
     <p v-if="match.players.length >= 1">
       <!-- TODO: highlight the winner -->
@@ -77,7 +77,7 @@ const timeSinceEnd = computed(() => {
     <p v-if="inProgress || isCompleted">duration: {{ duration }}</p>
     <button v-if="canJoin" class="button join">Join Game</button>
     <button v-if="canSpectate" class="button spectate">Spectate</button>
-  </div>
+  </li>
 </template>
 
 <style scoped>
