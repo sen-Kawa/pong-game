@@ -79,7 +79,7 @@ export const useMatchStore = defineStore('match', () => {
       matches.value.push(newMatch)
       currentMatch.value = newMatch
     } catch (e) {
-      const message = error instanceof Error ? error.message : 'Unknown Error'
+      const message = e instanceof Error ? e.message : 'Unknown Error'
       error.value = message
       console.error('Failed to create match for current player', e)
       throw error
@@ -94,7 +94,7 @@ export const useMatchStore = defineStore('match', () => {
       loading.value = true
 
       Object.entries(filters.value).forEach(([key, value]) => {
-        if (filters.value.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(filters.value, key)) {
           searchParams.append(key, value.toString())
         }
       })
@@ -108,12 +108,11 @@ export const useMatchStore = defineStore('match', () => {
       error.value = ''
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
-        const rawMatchData: MatchDTO[] = response.data
         matches.value.push(...response.data.map(transformMatchDTO))
       } else throw new Error(response.statusText)
       if (matches.value.length === 0) error.value = 'No Matches found!'
     } catch (e) {
-      const message = error instanceof Error ? error.message : 'Unknown Error'
+      const message = e instanceof Error ? e.message : 'Unknown Error'
       error.value = message
       console.error('Error fetching match data from the backend:', e)
     }
@@ -144,6 +143,7 @@ export const useMatchStore = defineStore('match', () => {
         break
       case Scope.personal:
         await getMatches('/me')
+        break
       default:
         console.error(`unexpected scope ${scope}`)
         break

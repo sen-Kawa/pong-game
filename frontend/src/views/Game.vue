@@ -5,19 +5,11 @@
 </template>
 
 <script setup lang="ts">
-import SearchMatch from '@/components/match/SearchMatch.vue'
-import { useMatchStore } from '@/stores/match'
-import { onMounted } from 'vue'
+import SearchMatch from '@/components/match/SearchMatch.vue';
+import { useMatchStore } from '@/stores/match';
+import { onMounted } from 'vue';
 
 const matchStore = useMatchStore()
-const {
-  currentPage,
-  nextPage,
-  prevPage,
-  currentStartIndex,
-  currentEndIndex,
-  pagedResults: pagedMatches
-} = matchStore.pagination
 
 matchStore.init()
 matchStore.pagination.pageSize.value = 10

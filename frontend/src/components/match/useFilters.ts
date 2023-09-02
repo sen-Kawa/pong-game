@@ -1,4 +1,4 @@
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive } from 'vue'
 
 export default function useFilters() {
   const filters = reactive({

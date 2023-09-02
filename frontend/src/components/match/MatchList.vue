@@ -3,7 +3,7 @@ import type { MatchMetaData } from '@/types/match'
 import { type PropType } from 'vue'
 import MatchItemVue from './MatchItem.vue'
 
-const props = defineProps({
+defineProps({
   matches: {
     type: Array as PropType<MatchMetaData[]>,
     required: true
