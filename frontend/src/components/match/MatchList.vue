@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { MatchMetaData } from '@/types/match';
-import { type PropType } from 'vue';
-import MatchItemVue from './MatchItem.vue';
+import type { MatchMetaData } from '@/types/match'
+import { type PropType } from 'vue'
+import MatchItemVue from './MatchItem.vue'
 
 const props = defineProps({
   matches: {

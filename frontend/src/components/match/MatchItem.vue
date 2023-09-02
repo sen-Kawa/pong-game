@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { MatchMetaData } from '@/types/match';
-import TimeAgo from 'javascript-time-ago';
-import { computed, type PropType } from 'vue';
+import type { MatchMetaData } from '@/types/match'
+import TimeAgo from 'javascript-time-ago'
+import { computed, type PropType } from 'vue'
 
 const props = defineProps({
   match: {
@@ -25,20 +25,17 @@ const isCompleted = computed(() => {
 })
 
 const canJoin = computed(() => {
-  if (inProgress.value || isCompleted.value)
-    return false
+  if (inProgress.value || isCompleted.value) return false
   return true
 })
 
 const canSpectate = computed(() => {
-  if (isCompleted.value)
-    return false
+  if (isCompleted.value) return false
   return true
 })
 
 const duration = computed(() => {
-  if (!props.match.start)
-    return undefined
+  if (!props.match.start) return undefined
   const start = props.match.start
   const end = props.match.end ?? new Date(Date.now())
   const duration = end.getTime() - start.getTime()
@@ -70,8 +67,9 @@ const timeSinceEnd = computed(() => {
       <span v-if="match.players[1]">{{ match.players[1].name }}</span>
       <span v-else>???</span>
     </p>
-    <p v-if="inProgress || isCompleted">{{ match.players[0].score }} : {{ match.players[1].score
-    }}</p>
+    <p v-if="inProgress || isCompleted">
+      {{ match.players[0].score }} : {{ match.players[1].score }}
+    </p>
     <p id="match-time-since-end">{{ timeSinceEnd }}</p>
     <!-- TODO: watch to live update the duration for matches in progress -->
     <p v-if="inProgress || isCompleted">duration: {{ duration }}</p>

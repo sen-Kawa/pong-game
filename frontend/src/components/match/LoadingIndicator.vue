@@ -1,23 +1,21 @@
 <template>
-	<div v-if="isLoading" class="loading">Loading...</div>
+  <div v-if="isLoading" class="loading">Loading...</div>
 
-	<div v-else-if="error" class="error">
-		{{ error }}
-	</div>
+  <div v-else-if="error" class="error">
+    {{ error }}
+  </div>
 
-	<slot v-else>
-		Default Value.
-	</slot>
+  <slot v-else> Default Value. </slot>
 </template>
 
 <script setup lang="ts">
 const props = defineProps({
-	isLoading: {
-		type: Boolean,
-		required: true
-	},
-	error: {
-		type: String
-	}
+  isLoading: {
+    type: Boolean,
+    required: true
+  },
+  error: {
+    type: String
+  }
 })
 </script>

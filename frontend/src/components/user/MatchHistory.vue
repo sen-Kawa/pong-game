@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { Scope, useMatchStore } from '@/stores/match';
-import { onMounted, ref } from 'vue';
-import LoadingIndicator from '../match/LoadingIndicator.vue';
-import MatchList from '../match/MatchList.vue';
+import { Scope, useMatchStore } from '@/stores/match'
+import { onMounted, ref } from 'vue'
+import LoadingIndicator from '../match/LoadingIndicator.vue'
+import MatchList from '../match/MatchList.vue'
 
 interface Props {
   initialScope: Scope
 }
 
-const props = withDefaults(defineProps<Props>(),
-  {
-    initialScope: Scope.global
-  })
+const props = withDefaults(defineProps<Props>(), {
+  initialScope: Scope.global
+})
 
 const scope = ref(props.initialScope)
 const matchStore = useMatchStore()
 
-matchStore.init();
+matchStore.init()
 
 function toggleScope() {
   matchStore.matches = []
