@@ -103,7 +103,7 @@ export class MatchService {
       includePlayers?: boolean
     }
   ) {
-    const { includeScores, includePlayers } = options
+    const { includeScores, includePlayers } = options || {}
     let includes = { players: undefined }
     if (includeScores) includes = { players: true }
     if (includePlayers) {
