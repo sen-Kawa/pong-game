@@ -74,13 +74,18 @@ export class MatchService {
     }
     switch (gameStatus) {
       case GameStatus.CREATED:
+        filter.start = null
         break
       case GameStatus.IN_PROGRESS:
         filter.start = {
           not: null
         }
+        filter.end = null
         break
       case GameStatus.COMPLETED:
+        filter.start = {
+          not: null
+        }
         filter.end = {
           not: null
         }
