@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { UsersController } from './users.controller'
 import { UsersService } from './users.service'
-import { UserEntity } from '../users/entities/user.entity'
+import { UserEntity } from './entities/user.entity'
 import httpMocks = require('node-mocks-http')
 import { FindUserDto } from './dto/find-user.dto'
 import { FriendDto } from './dto/friend.dto'

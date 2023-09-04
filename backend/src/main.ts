@@ -9,12 +9,13 @@ const cookieParser = require('cookie-parser')
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+  app.enableCors(); // ADDED IN ORDER TO ALLOW TESTING THE 'CHATS' PART
 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true }
+      // transform: true,
+      // transformOptions: { enableImplicitConversion: true } // WE HAD A TALK ABOUT THE PITFALLS OF THIS APPROACH
     })
   )
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
@@ -37,7 +38,7 @@ async function bootstrap() {
     origin: ['http://localhost:8080'],
     methods: 'GET, PUT, POST, PATCH, DELETE',
     allowedHeaders: 'Content-Type, Authorization'
-  })
+  }) 
   app.use(cookieParser())
   await app.listen(3000)
 }

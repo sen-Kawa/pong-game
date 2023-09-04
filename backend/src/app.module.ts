@@ -6,6 +6,13 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { validate } from './config/env.validation'
 import { MulterModule } from '@nestjs/platform-express'
+import { ChatConnectionsModule } from './khrov-chat/chat-connections/chat-connections.module';
+import { ChatHistoryModule } from './khrov-chat/chat-history/chat-history.module';
+import { ChatBlockingModule } from './khrov-chat/chat_blocking/chat-blocking.module';
+import { SearchUsersModule } from './khrov-chat/search-users/search-users.module';
+import { ChannelsModule } from './khrov-chat/channels/channels.module';
+import { ChannConnectionsModule } from './khrov-chat/chann-connections/chann-connections.module';
+import { ChannModerationModule } from './khrov-chat/chann-moderation/chann-moderation.module';
 
 @Module({
   imports: [
@@ -21,7 +28,14 @@ import { MulterModule } from '@nestjs/platform-express'
     PrismaModule,
     UsersModule,
     GamesModule,
-    AuthModule
+    AuthModule,
+    ChatConnectionsModule, 
+    ChatHistoryModule, 
+    ChatBlockingModule, 
+    SearchUsersModule,
+    ChannelsModule,
+    ChannConnectionsModule,
+    ChannModerationModule
   ],
   controllers: [],
   providers: []
