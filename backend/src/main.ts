@@ -3,11 +3,11 @@ import { AppModule } from './app.module'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter'
-import * as session from 'express-session'
+import { SessionAdapter } from './SessionAdapter'
+
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieParser = require('cookie-parser')
-const MemoryStore = require('memorystore')(session);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -41,14 +41,9 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization'
   })
   app.use(cookieParser())
-  app.use(session({
-    secret: 'my-super-secret',
-    store: new MemoryStore({
-        checkPeriod: 86400000
-    }),
-    resave: false,
-    saveUninitialized: false
-  }))
+
+  app.useWebSocketAdapter(new SessionAdapter(app));
+
   await app.listen(3000)
 }
 bootstrap()
