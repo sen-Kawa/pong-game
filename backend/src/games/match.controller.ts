@@ -69,6 +69,12 @@ import {
 	  }
 	}
 
+    @Post('join')
+    joinMatch(@Req() request: any, @Session() session: Record<string, any>) {
+        const match_id = session.current_match;
+
+        return this.matchService.join(match_id, request.user.id, request.user.refreshToken);
+    }
 
 	/**
 	 * Creates a new match with the current user already in it.
@@ -77,12 +83,13 @@ import {
 	 */
 	@Post('me')
 	async createMatchForCurrentUser(@Req() request, @Session() session: Record<string, any>) {
-
         const match = await this.matchService.create({
             players: {
               create: { playerId: request.user.id }
             }
         })
+
+        session.current_match = match.id;
 
 	    return match
 	}

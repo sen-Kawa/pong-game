@@ -8,7 +8,7 @@ class SockManager {
 	options: any;
 	constructor() {
 		// FIXME: Somehow get dynamically the url of the server.
-		this.socket = io('ws://localhost:3000', {
+		this.socket = io('http://localhost:3000', {
 			withCredentials: true
 		});
 	}

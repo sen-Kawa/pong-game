@@ -1,8 +1,9 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from "@nestjs/websockets";
 import { SocketService } from "../socket/socket.service";
-import { Server, Socket } from "socket.io"
-import { Logger } from "@nestjs/common";
+import { Server } from "socket.io"
+import { Body, Logger, Req, Session, UseGuards } from "@nestjs/common";
 import { GameUpdate, MatchService } from "./match.service";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 
 
 @WebSocketGateway({
@@ -12,21 +13,24 @@ import { GameUpdate, MatchService } from "./match.service";
 	},
 	transports: ['websocket', 'polling'],
   })
-export class AppGateway {
+@UseGuards(JwtAuthGuard)
+export class MatchGateway {
     constructor(private socketService: SocketService, private matchService: MatchService) {
-
     }
 
 
     @WebSocketServer() public server: Server;
-    private logger: Logger = new Logger('AppGateWay');
+    private logger: Logger = new Logger('MatchGateWay');
 
 	/**
 	 *
 	 * @param update
 	 */
 	@SubscribeMessage("move")
-	game_update(@MessageBody() update: GameUpdate) {
-        const match = this.matchService.matches[update.gameid];
+	game_update(@Req() request: any, @MessageBody() update: any) {
+        const match = this.matchService.makeMove(update, request.user.refreshToken);
+        console.log("Update in game_update:", update);
+        this.socketService.socket.emit("game_update", match);
+        console.log("Match is: " + match);
 	}
 }

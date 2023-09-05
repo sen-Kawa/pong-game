@@ -81,12 +81,14 @@ export default class MatchService {
           withCredentials: true
         }
       )
+
       return response
     } catch (error) {
       console.error('Failed to create match for current player', error)
       throw error
     }
   }
+
 
   public async startMatch(matchId: number) {
     const requestPath = this.baseUrl + MatchService.BASE_PATH + '/' + matchId + '/start'
@@ -98,9 +100,25 @@ export default class MatchService {
           withCredentials: true
         }
       )
-      console.debug(response)
     } catch (error) {
       // TODO: handle error
+    }
+  }
+
+  public async joinMatch() {
+    const requestPath = this.baseUrl + MatchService.BASE_PATH + '/join';
+    try {
+        const response = await jwtInterceptor.post(
+            requestPath,
+            {},
+            {
+                withCredentials: true
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        // TODO: handle error
     }
   }
 

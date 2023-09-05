@@ -1,7 +1,7 @@
 <template>
   <div class="text-center">this is the game tap</div>
   <button @click="createNewGame">New Game</button>
-  <GameComponent v-if="inGame"/>
+  <GameComponent v-if="inGame" :match="match" :player_number="player_number"/>
   <MatchList v-else :initial-scope="Scope.inProgress" />
 </template>
 
@@ -14,13 +14,19 @@ import GameComponent from '@/components/match/GameComponent.vue';
 const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI
 const matchService: MatchService = new MatchService(baseUrl)
 const inGame = ref(false);
+const tmp: any  = undefined;
+const match = ref(tmp);
+const player_number = ref(0);
 
 async function createNewGame() {
   // TODO: indicate progress, error
-  const match = await matchService.createMatch()
-  console.debug(match)
+  match.value = (await matchService.createMatch()).data
 
-  await matchService.startMatch(match.data.id)
-  inGame.value = true;
+  await matchService.startMatch(match.value.id);
+  const joinMatchReturn = await matchService.joinMatch()
+  if (joinMatchReturn !== undefined) {
+    inGame.value = true;
+    player_number.value = joinMatchReturn;
+  }
 }
 </script>
