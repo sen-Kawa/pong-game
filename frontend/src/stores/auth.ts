@@ -14,6 +14,7 @@ export interface User {
   name: string
   email: string
   activated2FA: boolean
+  displayName: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -23,14 +24,19 @@ export const useAuthStore = defineStore('auth', () => {
     userName: '',
     name: '',
     email: '',
-    activated2FA: false
+    activated2FA: false,
+    displayName: 'bbb'
   })
 
+  const playerName : string = ''
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
   const getUserName = computed(() => userProfile.value.userName)
   const getName = computed(() => userProfile.value.name)
+  const getEmail = computed(() => userProfile.value.email)
+  const getDisplayName = computed(() => userProfile.value.displayName)
+
   function setUserProfile(date: any) {
     // console.log(date.id);
     // console.log(date.name);
@@ -75,7 +81,9 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
+  
   async function getuserProfile() {
+    
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
@@ -85,7 +93,24 @@ export const useAuthStore = defineStore('auth', () => {
       loginStatus.value = false
       router.push('/')
     }
+    
   }
+
+  async function readDisplayName(): Promise<string> {
+    let res1: any = fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/displayName`,
+    {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+    //   headers: {
+    //       "Content-Type": "application/json"
+    //   },
+    })
+    let res2 = res1.json()
+    // console.log("zzzzzzz ", res1.json())
+    return 'abc'
+  }
+
   async function deactivate2FA() {
     const response = await jwtInterceptor
       .get(baseUrlauth + 'deactivate2FA', {
@@ -121,6 +146,7 @@ export const useAuthStore = defineStore('auth', () => {
     loginStatus.value = false
     router.push('/')
   }
+
   async function setDisplayName(displayName: string) {
     const body = { displayName: displayName }
     try {
@@ -146,6 +172,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     getUserName,
     getName,
+    getEmail,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,
@@ -154,6 +181,7 @@ export const useAuthStore = defineStore('auth', () => {
     deactivate2FA,
     activate2FA,
     logout,
-    setDisplayName
+    setDisplayName,
+    getDisplayName,
   }
 })
