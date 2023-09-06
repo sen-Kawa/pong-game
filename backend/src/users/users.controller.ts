@@ -284,7 +284,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JwtAuthGuard')
   async getDisplayName(@Req() req, @Res() res) {
+    
     const displayName = await this.usersService.getUserDisplayName(req.user.id)
-    return res.json({ displayName: displayName })
+    res.json(displayName)
   }
 }
