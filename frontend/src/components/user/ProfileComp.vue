@@ -3,7 +3,13 @@
         <h1>User Profile</h1>
         <p>Full name  : {{ authStore.getName }}</p>
         <p>42 User name  : {{ authStore.getUserName }}</p>
-        <p>Player name: {{ authStore.getDisplayName }}</p>
+        <p>
+            Player name: {{ authStore.getDisplayName }}
+        </p><p>
+            <input type="text" placeholder="new display name" v-model="nameInput" />
+            <button @click="handleDisplayNameChange">Change display name</button>
+
+        </p>
         <p>Email      : {{ authStore.getEmail }}</p>
         <p>Avatar     : <img src="http://localhost:3000/users/userImage" width="50" height="60"></p>
         <p>
@@ -24,9 +30,16 @@
     const authStore = useAuthStore()
     authStore.getuserProfile()
 
+    const nameInput =ref("")
     let isTfa = ref(false)
     let tfaButtonText = ref('Enable')
     const playerName = ref('abc')
+
+    async function handleDisplayNameChange() {
+        console.log("Change name to: ", nameInput.value)
+        await authStore.setDisplayName2(nameInput.value, '/user/Profile')
+        nameInput.value = ''  // clear text field
+    }
 
     // let res1: any = await fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/displayName`,
     //     {
@@ -70,60 +83,7 @@
             isTfa.value = true
             tfaButtonText.value = "Disable"
         }
-    }
-
-    // function getDisplayName(): string {
-    //     let res1: any = fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/displayName`,
-    //     {
-    //       method: 'GET',
-    //       mode: 'cors',
-    //       credentials: 'include',
-    //     //   headers: {
-    //     //       "Content-Type": "application/json"
-    //     //   },
-    //     })
-    //     let res2 = res1.json()
-    //     // console.log("zzzzzzz ", res1.json())
-    //     return 'abc'
-    // }
-    
-    // if (isTfa.value === true) {
-    //     tfaCheckbox.checked = true
-    // } else {
-    //     tfaCheckbox.checked = false
-    // }
-    
-    // async function getData() {
-    // //   const res: Response = await fetch(
-    // //     `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/user-profile/`,
-    // //     {
-    // //       method: 'GET',
-    // //       mode: 'cors',
-    // //       credentials: 'include'
-    // //       // headers: {
-    // //       //     "Content-Type": "application/json"
-    // //       // },
-    // //     }
-    // //   )
-    // //   // console.log(res.text())
-    // //   const finalRes = await res.json()
-    // //   listItems = finalRes
-    // //   // console.log(listItems)
-    // //   displayName.value = listItems.name
-    // //   // userName.value = listItems.login
-    // //   userName.value = listItems.userName
-    // //   isTfa.value = listItems.tfa
-    // //   email.value = listItems.email
-    // //   isTfa.value = authStore.activated2FA
-    // //   let tfaCheckbox: any = document.querySelector('#tfa')
-    // //   if (Boolean(isTfa.value) == true) {
-    // //     tfaCheckbox.checked = true
-    // //   } else {
-    // //     tfaCheckbox.checked = false
-    // //   }
-    // }
-    // getData()
-    playerName.value = getDisplayName()
+    }  
 </script>
 
 

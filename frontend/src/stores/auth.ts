@@ -25,17 +25,16 @@ export const useAuthStore = defineStore('auth', () => {
     name: '',
     email: '',
     activated2FA: false,
-    displayName: 'bbb'
+    displayName: ''
   })
 
-  const playerName : string = ''
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
   const getUserName = computed(() => userProfile.value.userName)
+  const getDisplayName = computed(() => userProfile.value.displayName)
   const getName = computed(() => userProfile.value.name)
   const getEmail = computed(() => userProfile.value.email)
-  const getDisplayName = computed(() => userProfile.value.displayName)
 
   function setUserProfile(date: any) {
     // console.log(date.id);
@@ -47,6 +46,7 @@ export const useAuthStore = defineStore('auth', () => {
     loginStatus.value = true
     userProfile.value.id = date.id
     userProfile.value.name = date.name
+    userProfile.value.displayName = date.displayName
     userProfile.value.userName = date.userName
     userProfile.value.email = date.email
     userProfile.value.activated2FA = date.activated2FA
@@ -93,22 +93,6 @@ export const useAuthStore = defineStore('auth', () => {
       loginStatus.value = false
       router.push('/')
     }
-    
-  }
-
-  async function readDisplayName(): Promise<string> {
-    let res1: any = fetch(`${import.meta.env.VITE_BACKEND_SERVER_URI}/users/displayName`,
-    {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'include',
-    //   headers: {
-    //       "Content-Type": "application/json"
-    //   },
-    })
-    let res2 = res1.json()
-    // console.log("zzzzzzz ", res1.json())
-    return 'abc'
   }
 
   async function deactivate2FA() {
@@ -168,6 +152,29 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
+  async function setDisplayName2(displayName: string, returnRoute: string) {
+    const body = { displayName: displayName }
+    console.log("disp2", body)
+    try {
+      const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      })
+      if (response && response.data) {
+        userProfile.value.displayName = displayName
+        loginStatus.value = true
+        router.push(returnRoute)
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return error.response?.data?.message
+      } else {
+        return error
+      }
+    }
+  }
 
   return {
     getUserName,
@@ -182,6 +189,7 @@ export const useAuthStore = defineStore('auth', () => {
     activate2FA,
     logout,
     setDisplayName,
-    getDisplayName,
+    setDisplayName2,
+    getDisplayName
   }
 })
