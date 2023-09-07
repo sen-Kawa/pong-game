@@ -149,7 +149,7 @@
   border-radius: 10px;
   overflow-y: scroll;
 
-  -ms-overflow-style: none;
+  -ms-overflow-style: none; 
   scrollbar-width: none;
 }
 .Output-box::-webkit-scrollbar {

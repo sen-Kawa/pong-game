@@ -11,6 +11,7 @@
   } >()
 
   const $HOST = inject('$HOST');
+
   const ciItem: ChatInviteItem = reactive({
     ciiBlockPanelHeight: '0px',
     ciiMsgPanelHeight: '0px',
@@ -28,7 +29,7 @@
       'msg': ciItem.ciiMsgInput,
     }
 
-    fetch(`${$HOST}/chat-history`, {
+    fetch(`${$HOST}/chats`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,7 +56,7 @@
       'blockedId': blocked,
     }
 
-    fetch(`${$HOST}/chat-blocking/true`, {
+    fetch(`${$HOST}/chats/block/user`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -116,7 +117,6 @@
 #Chat-invite-item {
   position: relative;
 }
-
 .User-preview {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr 1fr;
@@ -125,13 +125,15 @@
   height: 50px;
   padding: 5px;
   position: relative;
+  background-color: rgb(245, 245, 245);
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
 }
 .User-preview > * {
   padding: 5px;
-
 }
 .User-preview:hover {
-  background-color: rgb(245, 245, 245);
+  background-color: #F5F5DC;
 }
 .User-preview >:nth-child(1) {
   position: relative;
@@ -171,7 +173,7 @@
   height: v-bind('ciItem.ciiMsgPanelHeight');
   overflow: hidden;
   position: absolute;
-  bottom: -10px;
+  bottom: -5px;
   right: 60px;
 
   -webkit-transition: all 0.5s;
@@ -196,7 +198,7 @@
   height: v-bind('ciItem.ciiBlockPanelHeight');
   overflow: hidden;
   position: absolute;
-  bottom: -8px;
+  bottom: -1px;
   right: 0;
   -webkit-transition: all 0.5s;
   transition: all 0.5s;

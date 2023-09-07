@@ -78,6 +78,4 @@
 .Cli-pendings > img:nth-child(3):focus {
   padding: 0;
 }
-
-
 </style>

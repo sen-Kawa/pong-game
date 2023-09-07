@@ -3,11 +3,6 @@
   import ChannelNewItem from '@/components/khrov-chat/ChannelNewItem.vue';
   import { layer } from '@layui/layer-vue';
 
-  // ********************************************************************
-  // Component for rendering the portion displayed under the 'Channel+' *
-  // Tab of app.                                                        *
-  // ********************************************************************
-
   const props =  defineProps< {
     sTemp: number,
   } >()

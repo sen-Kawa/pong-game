@@ -21,7 +21,7 @@
       'blockedId': blocked,
     }
 
-    fetch(`${$HOST}/chat-blocking`, {
+    fetch(`${$HOST}/chats/block/user/unblock`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +45,7 @@
       <img :src="profileDp" alt="Avatar" />
       <span>{{displayName}}</span>
       <img src="/khrov-chat-media/blocked.png" alt="Unblock" @click="{
-
+                                              // Now toggle
                                               if (cbItem.cbiBlockPanelHeight==='0px') {
                                                 cbItem.cbiBlockPanelHeight='25px';
                                               } else {
@@ -79,7 +79,7 @@
 }
 .Blocked-user-preview > * {
   padding: 5px;
-
+  
 }
 .Blocked-user-preview:hover {
   background-color: rgb(245, 245, 245);
@@ -121,7 +121,7 @@
   height: v-bind('cbItem.cbiBlockPanelHeight');
   overflow: hidden;
   position: absolute;
-  bottom: -8px;
+  bottom: -2px;
   right: 0;
   -webkit-transition: all 0.5s;
   transition: all 0.5s;

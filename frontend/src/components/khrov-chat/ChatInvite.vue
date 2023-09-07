@@ -5,11 +5,6 @@
   import ChatBlocked from '@/components/khrov-chat/ChatBlocked.vue';
   import type { ChatInvite, UserTb } from '@/components/khrov-chat/interface/khrov-chat';
 
-  // ********************************************************************
-  // Component for rendering the portion displayed under the 'Chat+'    *
-  // Tab of app.                                                        *
-  // ********************************************************************
-
   const props =  defineProps< {
     sTemp: number,
   } >()
@@ -18,7 +13,7 @@
   const $_: number = props.sTemp;
   const cInvite: ChatInvite = reactive({
     civContentOrNot: false,
-    civSearchLoading: false,
+    civSearchLoading: false, 
     civSearchInput: '',
     civLiFirstIsActive: true,
   });
@@ -26,25 +21,21 @@
   let datas: UserTb[];
 
   const searchUsers = (myId: number, key: string) => {
+
     cInvite.civContentOrNot = false;
+
     cInvite.civSearchLoading = true;
     if (key.length < 1) {
       cInvite.civSearchLoading = false;
       return ;
     }
 
-    const tmp = {
-      'searcherId': myId,
-      'key': key,
-    }
-
-    fetch(`${$HOST}/search-users`, {
-      method: 'POST',
+    fetch(`${$HOST}/chats/get/search/user?searcherId=${myId}&key=${key}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
-      body: JSON.stringify(tmp),
     })
     .then(response => {
       cInvite.civSearchLoading = false;
@@ -55,6 +46,7 @@
     })
     .then(data => {
       datas = data;
+
       if ( data.length > 0) {
         cInvite.civContentOrNot = true; 
       }             

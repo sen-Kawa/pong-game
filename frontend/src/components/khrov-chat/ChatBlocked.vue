@@ -17,7 +17,7 @@
   let output: Chat_unionTb[];
 
   const searchBlocked = () => {
-    fetch(`${$HOST}/chat-blocking/${$}`, {
+    fetch(`${$HOST}/chats/blocked/${$}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

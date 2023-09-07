@@ -6,11 +6,6 @@
   import ChatListItemMsg from '@/components/khrov-chat/ChatListItemMsg.vue'
   import { layer } from '@layui/layer-vue';
 
-  // ********************************************************************
-  // Component for rendering the portion displayed under the 'Chats' *
-  // Tab of app.                                                        *
-  // ********************************************************************
-
   const props =  defineProps< {
     sTemp: number,
   } >()
@@ -35,7 +30,7 @@
       'unionId': unionId,
     }
 
-    fetch(`${$HOST}/chat-history`, {
+    fetch(`${$HOST}/chats`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -57,11 +52,13 @@
     }
     let msg: string = `You have unblocked ${partner} successfully!` ;
 
-    let route: string = `${$HOST}/chat-blocking`;
+    let route: string = `${$HOST}/chats`;
     if (flag === true) {
-      route += '/true';
+      route += '/block/user';
 
       msg = msg.substr(0, 9) + msg.substr(11, msg.length);
+    } else {
+      route += '/block/user/unblock';
     }
     fetch(route, {
       method: 'PUT',
@@ -85,7 +82,7 @@
       'theySender': theySender
     }
 
-    fetch(`${$HOST}/chat-history/set-seen`, {
+    fetch(`${$HOST}/chats/seen`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -118,7 +115,7 @@
     tmp.unionIdOther = cList.chiUnionIdOther;
 
     offlineCache.push(tmp);
-    fetch(`${$HOST}/chat-history`, {
+    fetch(`${$HOST}/chats`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -136,8 +133,8 @@
 
   const getConversationPreviews = () => {
 
-    fetch(`${$HOST}/chat-connections/${$_}`, {
-        method: 'POST',
+    fetch(`${$HOST}/chats/${$_}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept':'application/json'
@@ -157,7 +154,7 @@
   }
 
   const getOneConversation = () => {
-    fetch(`${$HOST}/chat-history/${cList.chiUnionUnderFocus}`, {
+    fetch(`${$HOST}/chats?unionId=${cList.chiUnionUnderFocus}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -433,7 +430,8 @@
   height: 100%;
   background-image: url(/khrov-chat-media/awaitingApi.gif);
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 30%;
+  background-position: center;
 
 }
 

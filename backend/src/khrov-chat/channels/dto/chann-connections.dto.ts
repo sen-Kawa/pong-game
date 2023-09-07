@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsNotEmpty, IsPositive } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class SuggestedChannelsDto {
+export class ChannConnectionsDto {
   @Transform(({ value }) => {
     return Number(value);
   })
@@ -16,13 +16,7 @@ export class SuggestedChannelsDto {
   readonly userId: number;
 }
 
-export class SuggestedChannelsResultDto {
-  @ApiProperty({
-    description: 'ID of the channel',
-    example: 1,
-  })
-  readonly id: number;
-
+class ChType {
   @ApiProperty({
     description: 'Name of the channel',
     example: 'EarthChannel',
@@ -40,10 +34,39 @@ export class SuggestedChannelsResultDto {
     example: 'public',
   })
   readonly visibility: string;
+}
+export class ChannConnectionsResultDto {
+  @ApiProperty({
+    description: 'ID of a channel where {userId} is a member',
+    example: 1,
+  })
+  readonly chId: number;
 
   @ApiProperty({
-    description: 'Role of {userId} in this Channel. Could be "user","admin","owner" or "not"(if they are not a member of this channel)',
+    description: 'Role of {userId} in this Channel. Could be "user","admin","owner"',
     example: 'user',
   })
   readonly role: string;
+
+  @ApiProperty({
+    description: 'Current status of {userId} in this Channel. Could be "good", "muted" or "banned"',
+    example: 'good',
+  })
+  readonly linkStatus: string;
+
+  @ApiProperty({
+    description: 'Expiry Time of most recent mute of {userId} in Channel chId',
+    example: '2023-09-04T18:47:50.490Z',
+  })
+  readonly mutedUntil: Date;
+
+  @ApiProperty({
+    description: 'Number of unread messages since {userId} last visited Channel chId',
+    example: 15,
+  })
+  readonly unreadCount: number;
+
+  @ApiProperty()
+  ch: ChType;
 }
+

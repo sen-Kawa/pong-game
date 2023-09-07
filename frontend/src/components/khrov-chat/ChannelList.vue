@@ -6,10 +6,6 @@
   import ChannelListItemPendings from '@/components/khrov-chat/ChannelListItemPendings.vue';
   import type { ChnListOfflineCache } from '@/components/khrov-chat/interface/khrov-chat'
 
-  // ********************************************************************
-  // Component for rendering the portion displayed under the 'Channels' *
-  // Tab of app.                                                        *
-  // ********************************************************************
   const props =  defineProps< {
     sTemp: number,
   } >()
@@ -64,9 +60,9 @@
     modPendingRequestsBoxDisplayToggle: string; 
     modGetUserIdInput: string;  
     notifMsg: string; 
-    modModerMemberId: number;   
+    modModerMemberId: string;   
     modModerSelectAction: string; 
-    modModerMuteMins: number; 
+    modModerMuteMins: string; 
     notifModerMsg: string; 
     modModifySelectVisi: string;  
     modModifyPwd: string;   
@@ -100,9 +96,9 @@
     modPendingRequestsBoxDisplayToggle: '0px',
     modGetUserIdInput: '',
     notifMsg: '',
-    modModerMemberId: 0,
+    modModerMemberId: '',
     modModerSelectAction: '',
-    modModerMuteMins: 0,
+    modModerMuteMins: '',
     notifModerMsg: '',
     modModifySelectVisi: '',
     modModifyPwd: '',
@@ -114,7 +110,7 @@
 
   const getChannelPreviews = () => {
 
-    fetch(`${$HOST}/chann-connections/${$_}`, {
+    fetch(`${$HOST}/channels/get/connections/${$_}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +136,7 @@
   }
 
   const getFocusedChannelHistory = () => {
-    fetch(`${$HOST}/chann-connections/${$_}/${chList.chlIdOfFocus}`, {
+    fetch(`${$HOST}/channels/get/connections/${$_}/${chList.chlIdOfFocus}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -192,7 +188,7 @@
 
     chList.chlMsgInput = '';
 
-    fetch(`${$HOST}/chann-connections`, {
+    fetch(`${$HOST}/channels/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +210,7 @@
       'userId': userId,
       'chId': chId
     }
-    fetch(`${$HOST}/chann-connections/set-seen`, {
+    fetch(`${$HOST}/channels/put/set-seen`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -265,7 +261,7 @@
       return ;
     }
 
-    fetch(`${$HOST}/chann-moderation?adminId=${$_}&chId=${chList.chlIdOfFocus}&userName=${userNameInput}`, {
+    fetch(`${$HOST}/channels/?adminId=${$_}&chId=${chList.chlIdOfFocus}&userName=${userNameInput}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -287,7 +283,7 @@
 
     chList.notifModerMsg = '';
 
-    if (!chList.modModerMemberId || chList.modModerMemberId < 1) {
+    if (!parseInt(chList.modModerMemberId) || parseInt(chList.modModerMemberId) < 1) {
       chList.notifModerMsg = 'Input in "member Id" must be greater than 0'
       return ;
     }
@@ -302,19 +298,19 @@
       return ;
     }
 
-    const muteTime = (chList.modModerMuteMins) ? chList.modModerMuteMins : 0;
+    const muteTime = (parseInt(chList.modModerMuteMins)) ? parseInt(chList.modModerMuteMins) : 0;
     const currentTime = new Date() 
     const mutedUntil = new Date(currentTime.getTime() + 1000*60*muteTime);
 
     const tmp = {
       'adminId': $_,
       'chId': chList.chlIdOfFocus,
-      'userId': chList.modModerMemberId,
+      'userId': parseInt(chList.modModerMemberId),
       'action': chList.modModerSelectAction,
       'mutedUntil': mutedUntil.toISOString()
     }
 
-    fetch(`${$HOST}/chann-moderation`, {
+    fetch(`${$HOST}/channels/put/channel/moderate`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -325,9 +321,9 @@
     .then(response => {
       if (response.ok) {
 
-        chList.modModerMemberId = 0;
+        chList.modModerMemberId = '';
         chList.modModerSelectAction = '';
-        chList.modModerMuteMins = 0;
+        chList.modModerMuteMins = '';
         return response.json();
       }
     })
@@ -358,7 +354,7 @@
       'password': passTmp,
     }
 
-    fetch(`${$HOST}/chann-moderation/x/x`, {
+    fetch(`${$HOST}/channels/put/channel/moderate/modify`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -382,7 +378,7 @@
 
     chList.getPendingsObj.length = 0;
 
-    fetch(`${$HOST}/chann-moderation/${$_}/${chList.chlIdOfFocus}`, {
+    fetch(`${$HOST}/channels/get/channel/moderate/${$_}/${chList.chlIdOfFocus}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -409,7 +405,7 @@
       'memberId': memberId,
       'action': choice,
     }
-    fetch(`${$HOST}/chann-moderation/x`, {
+    fetch(`${$HOST}/channels/put/channel/moderate/pending/decide`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -575,7 +571,7 @@
             <p class="Chn-mod-moder-msg" v-if="chList.notifModerMsg">{{chList.notifModerMsg}}</p>
           </div>
 
-          <button @click="{
+          <button v-show="chList.chlRoleOfFocus==='owner'" @click="{
 
                             if (chList.modModifyChannelArrowRotate==='rotate(0deg)') {
                               chList.modModifyChannelBoxDisplayToggle = '160px';
@@ -591,7 +587,7 @@
               </path>
             </svg> Modify Channel
           </button>
-          <div>
+          <div v-show="chList.chlRoleOfFocus==='owner'">
             <select v-model="chList.modModifySelectVisi" class="Chn-mod-modify-select-visi">
               <option disabled selected :value="''">Select Visibility</option>
               <option :value="'public'">Public</option>

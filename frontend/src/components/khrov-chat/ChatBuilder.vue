@@ -42,7 +42,7 @@
       return ;
     }
 
-    fetch(`${$HOST}/chat-connections/${initialTest.cbdUserInput}`, {
+    fetch(`${$HOST}/chats/get/temp/login/${initialTest.cbdUserInput}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
