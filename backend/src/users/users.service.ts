@@ -240,15 +240,4 @@ export class UsersService {
       }
     })
   }
-
-  async getUserDisplayName(userId: number) {
-    return await this.prisma.user.findUnique({
-      where: {
-        id: userId
-      },
-      select: {
-        displayName: true
-      }
-    })
-  }
 }

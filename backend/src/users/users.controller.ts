@@ -268,24 +268,4 @@ export class UsersController {
     if (!image) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     return res.sendFile(image.avatar.filename, { root: './files' })
   }
-
-
-  /**
-   * Returns the DisplayName of a User
-   * @param req UserID
-   * @param res
-   * @returns the DisplayName of the User
-   */
-  @ApiOkResponse({
-    description: 'Returns the DisplayName (player name) of the user'
-  })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized if user is not logged in' })
-  @Get('displayName')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JwtAuthGuard')
-  async getDisplayName(@Req() req, @Res() res) {
-    
-    const displayName = await this.usersService.getUserDisplayName(req.user.id)
-    res.json(displayName)
-  }
 }
