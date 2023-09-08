@@ -40,28 +40,24 @@ a,
   text-align: center;
   color: #2c3e50;
   background-color: aqua;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 
 body {
   background-color: #fff;
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-
-  justify-content: center;
-  align-content: center;
   margin: 0;
-  overflow: hidden;
+}
+
+main {
+  overflow-y: auto;
+  max-height: calc(100vh - 10vh - 5vh); /* header and footer height */
+  height: 100vh;
 }
 
 #footer {
-  height: 40px;
-  position: fixed;
+  height: 5vh;
+  position: absolute;
   bottom: 0%;
   width: 100%;
 }

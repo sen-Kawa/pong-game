@@ -1,5 +1,11 @@
-import { IsBoolean, IsOptional } from 'class-validator'
+import { IsBoolean, IsEnum, IsOptional } from 'class-validator'
 import { ToBoolean } from 'src/custom-validators/ToBoolean'
+
+export enum GameStatus {
+  CREATED = 'CREATED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED'
+}
 
 export class QueryMatchDTO {
   /**
@@ -19,19 +25,7 @@ export class QueryMatchDTO {
   @ToBoolean()
   readonly includePlayers: boolean
 
-  /**
-   * If true searches for matches with a start date.
-   */
+  @IsEnum(GameStatus)
   @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  readonly started?: boolean
-
-  /**
-   * If true searches for matches with an end date.
-   */
-  @IsOptional()
-  @IsBoolean()
-  @ToBoolean()
-  readonly completed?: boolean
+  readonly gameStatus?: GameStatus
 }

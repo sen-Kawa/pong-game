@@ -1,6 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { MatchController } from '../match.controller'
-import { MatchService } from '../match.service'
 import {
   matchWithScore,
   matchWithScoreArray,
@@ -8,6 +6,9 @@ import {
   maximalMatchArray,
   minimalMatchArray
 } from '../../../prisma/match.test-data'
+import { GameStatus } from '../dto/query-match.dto'
+import { MatchController } from '../match.controller'
+import { MatchService } from '../match.service'
 
 const mockMatchService = {
   create: jest.fn().mockResolvedValue(matchWithScore),
@@ -67,7 +68,7 @@ describe('MatchController', () => {
       const matches = await controller.findAll({
         includeScores: true,
         includePlayers: false,
-        completed: true
+        gameStatus: GameStatus.COMPLETED
       })
 
       expect(matches).toEqual(matchWithScoreArray)
@@ -79,7 +80,7 @@ describe('MatchController', () => {
       const matches = await controller.findAll({
         includeScores: true,
         includePlayers: true,
-        completed: true
+        gameStatus: GameStatus.COMPLETED
       })
 
       expect(matches).toEqual(maximalMatchArray)

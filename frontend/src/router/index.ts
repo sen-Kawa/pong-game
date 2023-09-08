@@ -1,4 +1,5 @@
-import { createWebHistory, createRouter } from 'vue-router'
+import { Scope } from '@/stores/match'
+import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -34,7 +35,8 @@ const router = createRouter({
     {
       path: '/user/Matchhistory',
       name: 'matchhistory',
-      component: () => import('../components/user/MatchHistory.vue')
+      component: () => import('../components/user/MatchHistory.vue'),
+      props: { initialScope: Scope.personal }
     },
     {
       path: '/user/Friends',
