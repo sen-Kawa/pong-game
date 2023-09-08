@@ -5,11 +5,11 @@
         <p>42 User name  : {{ authStore.getUserName }}</p>
         <p>
             Player name: {{ authStore.getDisplayName }}
-        </p><p>
+        </p>
+        <!-- <p>
             <input type="text" placeholder="new display name" v-model="nameInput" />
             <button @click="handleDisplayNameChange">Change display name</button>
-
-        </p>
+        </p> -->
         <p>Email      : {{ authStore.getEmail }}</p>
         <p>Avatar     : <img src="http://localhost:3000/users/userImage" width="50" height="60"><br>
             <FileUpload></FileUpload>
@@ -28,11 +28,11 @@
 
     const authStore = useAuthStore()
     authStore.getuserProfile()
-    const nameInput =ref("")
+    // const nameInput =ref("")
 
-    async function handleDisplayNameChange() {
-        console.log("Change name to: ", nameInput.value)
-        await authStore.setDisplayName2(nameInput.value, '/user/Profile')
-        nameInput.value = ''  // clear text field
-    }  
+    // async function handleDisplayNameChange() {
+    //     console.log("Change name to: ", nameInput.value)
+    //     await authStore.setDisplayName2(nameInput.value, '/user/Profile')
+    //     nameInput.value = ''  // clear text field
+    // }  
 </script>
