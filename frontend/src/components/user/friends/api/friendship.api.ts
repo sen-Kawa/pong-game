@@ -48,9 +48,10 @@ export async function deleteFriend(displayName: string) {
   }
   try {
   	const response = await jwtInterceptor.delete(`${BASE_URL}/removeFriend/`, requestOptions)
-	console.log('Request succesful', response.data);
+	console.log('in delete api', displayName);
+	console.log('Request succesful in deleteFriend api', response.data);
   } catch (error) {
-	console.error('Error making the request', error);
+	console.error('Error making the request in deleteFriend api', error);
   }
 }
 

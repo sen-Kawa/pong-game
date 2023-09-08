@@ -82,6 +82,7 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.delete(`${backendURL}/users/removeFriend`, (req, res, ctx) => {
+	  console.log('perhaps here?');
     return res(ctx.status(200))
   }),
 

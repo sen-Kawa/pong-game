@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { deleteFriend } from './api/friendship.api.js'
+import { deleteFriend } from './api/friendship.api'
 
 export default {
   props: {
