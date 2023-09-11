@@ -33,7 +33,6 @@ import { QuerySingleMatchDTO } from './dto/query-single-match.dto'
 import { UpdateMatchDto } from './dto/update-match.dto'
 import { MatchEntity } from './entities/match.entity'
 import { MatchService } from './match.service'
-import { Request } from 'express'
 
 @Controller('match')
 @ApiTags('match')

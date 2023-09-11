@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             try {
               data = parseCookie(request['handshake']['headers']['cookie'])
             } catch {
-              data = null;
+              data = null
             }
           }
 
