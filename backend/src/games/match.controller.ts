@@ -49,7 +49,7 @@ export class MatchController {
   @Post()
   @ApiCreatedResponse({ type: MatchEntity }) // TODO: include players in response example
   @ApiNotFoundResponse({ description: 'gets send if one of the specified users does not exist' })
-  async create(@Req() request: Request, @Body() createMatchDto: CreateMatchDto) {
+  async create(@Body() createMatchDto: CreateMatchDto) {
     try {
       const match = await this.matchService.create({
         players: {
