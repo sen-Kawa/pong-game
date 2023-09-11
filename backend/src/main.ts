@@ -5,7 +5,6 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter'
 import { SessionAdapter } from './SessionAdapter'
 
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieParser = require('cookie-parser')
 
@@ -42,7 +41,7 @@ async function bootstrap() {
   })
   app.use(cookieParser())
 
-  app.useWebSocketAdapter(new SessionAdapter(app));
+  app.useWebSocketAdapter(new SessionAdapter(app))
 
   await app.listen(3000)
 }

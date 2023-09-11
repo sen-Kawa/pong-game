@@ -3,16 +3,16 @@ import { ApiProperty, ApiHideProperty } from '@nestjs/swagger'
 import { Exclude } from 'class-transformer'
 
 export class UserEntity implements User {
-	constructor(partial: Partial<UserEntity>) {
-		Object.assign(this, partial);
-	}
+  constructor(partial: Partial<UserEntity>) {
+    Object.assign(this, partial)
+  }
 
   @ApiHideProperty()
   @Exclude()
   id: number
 
-	@ApiProperty()
-	displayName: string
+  @ApiProperty()
+  displayName: string
 
   @ApiProperty()
   name: string

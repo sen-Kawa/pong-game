@@ -9,7 +9,6 @@ import { MulterModule } from '@nestjs/platform-express'
 import { SocketModule } from './socket/socket.module'
 import { AppGateway } from './app.gateway'
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,7 +24,7 @@ import { AppGateway } from './app.gateway'
     UsersModule,
     GamesModule,
     AuthModule,
-	SocketModule,
+    SocketModule,
     AppGateway
   ],
   controllers: [],
