@@ -14,7 +14,7 @@
     </div>
     <div class="form-group">
       <button class="btn btn-primary" :disabled="isSubmitting">
-        <span v-show="isSubmitting" class="spinner-border spinner-border-sm mr-1"></span>
+        <span v-show="isSubmitting"></span>
         Login
       </button>
     </div>

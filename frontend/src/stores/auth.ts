@@ -14,6 +14,7 @@ export interface User {
   name: string
   email: string
   activated2FA: boolean
+  displayName: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -23,13 +24,17 @@ export const useAuthStore = defineStore('auth', () => {
     userName: '',
     name: '',
     email: '',
-    activated2FA: false
+    activated2FA: false,
+    displayName: ''
   })
 
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
-  const getUserName = computed(() => userProfile.value.name)
+  const getUserName = computed(() => userProfile.value.userName)
+  const getDisplayName = computed(() => userProfile.value.displayName)
+  const getName = computed(() => userProfile.value.name)
+  const getEmail = computed(() => userProfile.value.email)
 
   function setUserProfile(date: any) {
     // console.log(date.id);
@@ -41,41 +46,20 @@ export const useAuthStore = defineStore('auth', () => {
     loginStatus.value = true
     userProfile.value.id = date.id
     userProfile.value.name = date.name
+    userProfile.value.displayName = date.displayName
     userProfile.value.userName = date.userName
     userProfile.value.email = date.email
     userProfile.value.activated2FA = date.activated2FA
   }
 
-  // async function login(username: string, password: string) {
-  //   const body = { username: username, password: password }
-  //   try {
-  //     const response = await axios.post(baseUrlauth + 'login', body, {
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       withCredentials: true
-  //     })
-  //     if (response.data.twoFaEnabled) router.push('/user/2fa')
-  //     else {
-  //       loginStatus.value = true
-  //       router.push('/user/Preference')
-  //     }
-  //     //console.log(response.data);
-  //     //return "Succes";
-  //   } catch (error: any) {
-  //     //TODO improve error handling
-  //     console.log(error)
-  //     //return error.response.data.message;
-  //   }
-  // }
-  async function signInFortyTwo(params: string) {
+  async function signInFortyTwo() {
     loginStatus.value = true
     router.push('/user/Preference')
   }
   async function validate2fa(code: string) {
     const body = { code: code }
     try {
-      const response = await axios.post(baseUrlauth + 'verify2FA', body, {
+      await axios.post(baseUrlauth + 'verify2FA', body, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -83,33 +67,48 @@ export const useAuthStore = defineStore('auth', () => {
       })
       loginStatus.value = true
       router.push('/user/Preference')
-      //console.log(response.data);
-      //return "Succes";
     } catch (error: any) {
-      //TODO improve error handling
-      console.log(error)
-      //return error.response.data.message;
+      if (error instanceof AxiosError) {
+        if (error.response?.status == 401) {
+          alert('Took to long restart login')
+          router.push('/')
+        } else if (error.response?.status == 500) {
+          alert('Something went wrong, contact an admin')
+          router.push('/')
+        } else return error.response?.data?.message
+      } else {
+        return error
+      }
     }
   }
+  
   async function getuserProfile() {
+    
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
     if (response && response.status == 200) {
       setUserProfile(response.data)
     } else {
+      loginStatus.value = false
       router.push('/')
     }
   }
+
   async function deactivate2FA() {
-    const response = await axios
+    const response = await jwtInterceptor
       .get(baseUrlauth + 'deactivate2FA', {
         withCredentials: true
       })
       .catch((err) => {
-        console.log(err)
+        if (err.response?.status == 401) {
+          loginStatus.value = false
+          alert('Need to login to deactivate 2FA')
+          router.push('/')
+        } else {
+          alert('Something went wrong, contact an admin')
+        }
       })
-
     if (response && response.status == 200) {
       userProfile.value.activated2FA = false
     }
@@ -120,23 +119,22 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    //TODO delete cookie and redirect
-    const response = await jwtInterceptor
+    await jwtInterceptor
       .get(baseUrlauth + 'logout', {
         withCredentials: true
       })
       .catch((error) => {
-        console.log(error)
+        if (error.response?.status == 401) alert('Unauthorized, you need to log in')
       })
-    if (response && response.data) {
-      loginStatus.value = false
-      router.push('/')
-    }
+
+    loginStatus.value = false
+    router.push('/')
   }
+
   async function setDisplayName(displayName: string) {
     const body = { displayName: displayName }
     try {
-      const response = await axios.patch(baseUrlUser + 'changeDisplay', body, {
+      const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -154,9 +152,34 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
+  async function setDisplayName2(displayName: string, returnRoute: string) {
+    const body = { displayName: displayName }
+    console.log("disp2", body)
+    try {
+      const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      })
+      if (response && response.data) {
+        userProfile.value.displayName = displayName
+        loginStatus.value = true
+        router.push(returnRoute)
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return error.response?.data?.message
+      } else {
+        return error
+      }
+    }
+  }
 
   return {
     getUserName,
+    getName,
+    getEmail,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,
@@ -165,6 +188,8 @@ export const useAuthStore = defineStore('auth', () => {
     deactivate2FA,
     activate2FA,
     logout,
-    setDisplayName
+    setDisplayName,
+    setDisplayName2,
+    getDisplayName
   }
 })

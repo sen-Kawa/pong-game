@@ -14,7 +14,7 @@ import { AppGateway } from './app.gateway'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env', 'env-sample'],
       validate
     }),
     MulterModule.register({

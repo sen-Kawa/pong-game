@@ -170,46 +170,48 @@ import {
 	  await this.matchService.start(id)
 	}
 
-	/**
-	 * Updates the match.
-	 * Useful for adding new players or reporting the result.
-	 * @param id
-	 * @param updateGameDto
-	 * @returns
-	 */
-	@Patch(':id')
-	@ApiOkResponse({ type: MatchEntity, description: 'returns the modified entity' })
-	@ApiNoContentResponse({ description: 'not modified' })
-	@ApiNotFoundResponse({ description: 'match does not exist' })
-	@ApiConflictResponse({
-	  description:
-		'A conflict arises when the match already has two players an another one should be added.'
-	})
-	async update(@Param('id', ParseIntPipe) id: number, @Body() updateGameDto: UpdateMatchDto) {
-	  if (updateGameDto.playerId === undefined && updateGameDto.scores === undefined)
-		throw new HttpException('not modified', HttpStatus.NO_CONTENT) // TODO: NOT MODIFIED is 304
+  /**
+   * Updates the match.
+   * Useful for adding new players or reporting the result.
+   * @param id
+   * @param updateGameDto
+   * @returns
+   */
+  @Patch(':id')
+  @ApiOkResponse({ type: MatchEntity, description: 'returns the modified entity' })
+  @ApiNoContentResponse({ description: 'not modified' })
+  @ApiNotFoundResponse({ description: 'match does not exist' })
+  @ApiConflictResponse({
+    description:
+      'A conflict arises when the match already has two players an another one should be added.'
+  })
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateGameDto: UpdateMatchDto) {
+    // console.debug(`update match with id ${id} with`, { updateGameDto })
+    if (updateGameDto.playerId === undefined && updateGameDto.scores === undefined)
+      throw new HttpException('not modified', HttpStatus.NO_CONTENT) // TODO: NOT MODIFIED is 304
 
-	  try {
-		await this.matchService.findOne(id)
-	  } catch (error) {
-		throw new NotFoundException('match does not exist')
-	  }
-	  let entity = null
-	  if (updateGameDto.playerId !== undefined) {
-		try {
-		  entity = await this.matchService.addPlayer(id, updateGameDto.playerId)
-		} catch (error) {
-		  if (error instanceof ConflictException) throw error
-		  throw new NotFoundException(
-			'Error while trying to add player. Check if the player exits you are trying to add.'
-		  )
-		}
-	  }
-	  if (updateGameDto.scores !== undefined) {
-		entity = this.matchService.addMatchResult(id, updateGameDto.scores)
-	  }
-	  return entity
-	}
+    try {
+      await this.matchService.findOne(id)
+    } catch (error) {
+      console.error(error)
+      throw new NotFoundException('match does not exist')
+    }
+    let entity = null
+    if (updateGameDto.playerId !== undefined) {
+      try {
+        entity = await this.matchService.addPlayer(id, updateGameDto.playerId)
+      } catch (error) {
+        if (error instanceof ConflictException) throw error
+        throw new NotFoundException(
+          'Error while trying to add player. Check if the player exits you are trying to add.'
+        )
+      }
+    }
+    if (updateGameDto.scores !== undefined) {
+      entity = this.matchService.addMatchResult(id, updateGameDto.scores)
+    }
+    return entity
+  }
 
 	/**
 	 * Deletes the match.

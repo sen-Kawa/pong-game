@@ -1,0 +1,26 @@
+<template>
+  <div class="text-center">this is the game tap</div>
+  <button @click="createNewGame">New Game</button>
+  <SearchMatch />
+</template>
+
+<script setup lang="ts">
+import SearchMatch from '@/components/match/SearchMatch.vue'
+import { useMatchStore } from '@/stores/match'
+import { onMounted } from 'vue'
+
+const matchStore = useMatchStore()
+
+matchStore.init()
+matchStore.pagination.pageSize.value = 10
+
+onMounted(async () => {
+  // TODO: only await once
+  await matchStore.getMatchesToJoin()
+  await matchStore.getMatchesToSpectate()
+})
+
+async function createNewGame() {
+  matchStore.createMatch()
+}
+</script>
