@@ -81,7 +81,7 @@ document.addEventListener('keyup', (event) => {
 setInterval(drawGame, 33);
 
 function drawGame() {
-	const c = <HTMLCanvasElement> document.getElementById("game-canvas");
+	const c = document.getElementById("game-canvas") as HTMLCanvasElement;
 	if (c === null) {
 		console.log("cant get canvas");
 		return;
