@@ -59,17 +59,13 @@ export async function deleteFriend(displayName: string) {
 }
 
 export async function getFriendList() {
-  const requestOptions: RequestInit = {
-    method: 'GET',
-    credentials: 'include'
+  const requestOptions = {
+    withCredentials: true,
   }
   try {
-  	const response = await fetch(`${BASE_URL}/friends/`, requestOptions)
-	if (!response.ok) {
-		throw new Error('Failed fetching friends list.');
-	}
-  	const responseData = await response.json();
-  	return responseData
+  	const response = await jwtInterceptor.get(`${BASE_URL}/friends/`, requestOptions)
+	console.log('Request succesful in friends list', response.data);
+	return response.data
   } catch (error) {
 	  console.error('Error fetching friends list: ', error);
 	  throw error;
