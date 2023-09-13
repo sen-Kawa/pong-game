@@ -36,6 +36,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
     })
     .then(response => {
       cInvite.civSearchLoading = false;

@@ -35,18 +35,19 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
       if (!response.ok) {
-        layer.msg('Message could not be sent');
+        layer.msg('Message could not be sent', {time:5000});
         throw response;
       }
 
       ciItem.ciiMsgInput = '';
 
       ciItem.ciiMsgPanelHeight='0px';
-      layer.msg('Message sent Successfully');
+      layer.msg('Message sent Successfully', {time:5000});
     })
   }
 
@@ -62,13 +63,14 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
       if (response.ok) {
-        layer.msg(`You have blocked ${partner} successfully!`);
+        layer.msg(`You have blocked ${partner} successfully!`, {time:5000});
       } else {
-        layer.msg(`Could not block ${partner}!`);
+        layer.msg(`Could not block ${partner}!`, {time:5000});
       }
     });
   }

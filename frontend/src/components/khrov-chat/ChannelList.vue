@@ -116,6 +116,7 @@
           'Content-Type': 'application/json',
           'Accept':'application/json'
         },
+      credentials: "include",
       })
     .then( (response) => { 
       if (!response.ok) {
@@ -137,12 +138,13 @@
 
   const getFocusedChannelHistory = () => {
     fetch(`${$HOST}/channels/get/connections/${$_}/${chList.chlIdOfFocus}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept':'application/json'
-          },
-        })
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept':'application/json'
+      },
+      credentials: "include",
+    })
     .then(  (response) => { 
       if (!response.ok) {
 
@@ -194,6 +196,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(offlineCache),
     })
     .then( (responseMsg) => {
@@ -216,6 +219,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
         },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
   }
@@ -267,6 +271,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
     })
     .then(response => {
       if (response.ok) {
@@ -316,6 +321,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
@@ -360,6 +366,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
@@ -384,6 +391,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
     })
     .then(response => {
       if (response.ok) {
@@ -411,6 +419,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {

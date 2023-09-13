@@ -48,6 +48,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
     })
     .then(response => {
       if (!response.ok) {
@@ -55,14 +56,14 @@
         return response.json();
       }
       else {
-        layer.msg('Success. Chat Interface Now Ready!');
+        layer.msg('Success. Chat Interface Now Ready!', {time:5000});
         initialTest.cbdFakeLogin = 'none';
       }
     })
     .then(errorJson => {
 
       if (errorJson) {
-        layer.msg(errorJson.message);
+        layer.msg(errorJson.message, {time:5000});
         console.log(errorJson.message);
       }
     })

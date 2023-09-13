@@ -9,7 +9,6 @@ const cookieParser = require('cookie-parser')
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  app.enableCors(); // ADDED IN ORDER TO ALLOW TESTING THE 'CHATS' PART
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -35,7 +34,7 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:8080'],
+    origin: ['http://localhost:8080/'],
     methods: 'GET, PUT, POST, PATCH, DELETE',
     allowedHeaders: 'Content-Type, Authorization'
   }) 

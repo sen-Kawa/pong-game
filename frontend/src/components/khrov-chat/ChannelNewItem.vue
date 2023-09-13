@@ -42,7 +42,7 @@
   const changeMembership = (joinOrExit : boolean) => {
 
     if (!String(cnItem.cniPwdInput).match(/^[a-zA-Z\d]*$/) ){
-      layer.msg('Password Contains Unsupported Characters');
+      layer.msg('Password Contains Unsupported Characters', {time:5000});
       return ; 
     }
 
@@ -61,6 +61,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {return response.json();})
@@ -68,7 +69,7 @@
 
       emit('joinOrExitComplete');
 
-      layer.msg(data.message);
+      layer.msg(data.message, {time:5000});
     })
     .catch(error => {});
 

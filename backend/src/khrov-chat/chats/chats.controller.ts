@@ -6,6 +6,7 @@ import {
   Body, 
   Param, 
   Query,
+  UseGuards,
   ParseArrayPipe, 
   HttpException, 
   HttpStatus, 
@@ -17,6 +18,7 @@ import {
   ApiResponse,
   ApiBody,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ChatsService } from './chats.service';
 import { Chat_union } from '@prisma/client'; 
 import { ChatHistoryDto, ChatHistoryResultDto} from './dto/chat-history.dto';
@@ -43,7 +45,8 @@ export class ChatsController {
   @ApiResponse({ status: 200, type: ChatHistoryResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 404, description: 'No Conversations found for the given unionId' })
-  @Get()   
+  @UseGuards(JwtAuthGuard)
+  @Get()
   async getChatHistory(@Query() chatUnion: ChatHistoryDto){
     const response: ChatHistoryResultDto | boolean = await this.chatsService.getChatHistory(chatUnion.unionId);
     if (response === false) {
@@ -57,6 +60,7 @@ export class ChatsController {
   @ApiResponse({ status: 200, type: UpdateChatResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 404, description: 'A user in one of the chat conversations could not be found' })
+  @UseGuards(JwtAuthGuard)
   @Put()
   async updateChats( @Body(new ParseArrayPipe({ items: UpdateChatDto })) chatPayload : UpdateChatDto[] ){
     const response: boolean = await this.chatsService.updateChats(chatPayload);
@@ -71,6 +75,7 @@ export class ChatsController {
   @ApiResponse({ status: 200, type: SetSeenResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 417, description: 'Request to set Messages as Seen Failed!' })
+  @UseGuards(JwtAuthGuard)
   @Put('/seen')
   async setSeen( @Body() chatDetails : SetSeenDto ){
     const response: boolean = await this.chatsService.setSeen(chatDetails);
@@ -85,6 +90,7 @@ export class ChatsController {
   @ApiResponse({ status: 200, type: NewChatResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 417, description: 'Request to start a new chat conversation failed!' })
+  @UseGuards(JwtAuthGuard)
   @Post()
   async newChat( @Body() newChat : NewChatDto ){
     const response: boolean = await this.chatsService.newChat(newChat);
@@ -99,6 +105,7 @@ export class ChatsController {
   @ApiResponse({ status: 200, type: DeleteHistoryResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 417, description: 'Delete Request Failed' })
+  @UseGuards(JwtAuthGuard)
   @Delete()
   async deleteChatHistory(@Body() deleteHistory : DeleteHistoryDto) {
     const response: boolean = await this.chatsService.deleteChatHistory(deleteHistory.unionId);
@@ -112,6 +119,7 @@ export class ChatsController {
   @ApiOperation({ summary: "Endpoint For fetching a preview of all existing conversations that this {userId} has" })
   @ApiResponse({ status: 200, type: [ChatConnectionsResultDto] })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Get('/:userId')   
   async chatConnections(@Param() user: ChatConnectionsDto){
     const response: ChatConnectionsResultDto[] = await this.chatsService.chatConnections(user.userId);
@@ -121,6 +129,7 @@ export class ChatsController {
   @ApiOperation({ summary: "Endpoint For fetching a preview of all blocked users list" })
   @ApiResponse({ status: 200, type: [GetBlockedResultDto] })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Get('/blocked/:userId')
   async getBlocked(@Param() id: GetBlockedDto){
     const response: GetBlockedResultDto[] = await this.chatsService.getBlocked(id.userId);
@@ -131,6 +140,7 @@ export class ChatsController {
   @ApiResponse({ status: 200, type: BlockingResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 417, description: 'Block Request Failed' })
+  @UseGuards(JwtAuthGuard)
   @Put('/block/user')
   async blockUser(@Body() blockDetails: BlockingDto){
     const response: boolean = await this.chatsService.blockUser(blockDetails);
@@ -145,6 +155,7 @@ export class ChatsController {
   @ApiResponse({ status: 200, type: BlockingResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 417, description: 'Unblock Request Failed' })
+  @UseGuards(JwtAuthGuard)
   @Put('/block/user/unblock')
   async unblockUser ( @Body() blockDetails : BlockingDto ){
     const response: boolean = await this.chatsService.unblockUser(blockDetails);
@@ -158,6 +169,7 @@ export class ChatsController {
   @ApiOperation({ summary: "Endpoint For fetching user search result using search key" })
   @ApiResponse({ status: 200, type: [SearchUsersResultDto] })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Get('/get/search/user')   
   async searchUsers(@Query() details: SearchUsersDto){
     const response: SearchUsersResultDto[] = await this.chatsService.searchUsers(details);
@@ -167,6 +179,7 @@ export class ChatsController {
   
   // just a test api // will be removed
   @ApiOperation({ summary: "Just a test API for testing purposes. will be deleted in due time" })
+  @UseGuards(JwtAuthGuard)
   @Get('/get/temp/login/:userId')
   async apiTest( @Param() userId: ChatConnectionsDto ){
     try {

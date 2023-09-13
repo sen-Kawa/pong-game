@@ -36,11 +36,12 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
       if (response.ok) {
-        layer.msg('Conversation Deleted Successfully!');
+        layer.msg('Conversation Deleted Successfully!', {time:5000});
       }
     });
   }
@@ -66,11 +67,12 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
       if (response.ok) {
-        layer.msg(msg);
+        layer.msg(msg, {time:5000});
       }
     });
   }
@@ -88,6 +90,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
         },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
   }
@@ -121,6 +124,7 @@
             'Content-Type': 'application/json',
             'Accept':'application/json'
           },
+          credentials: "include",
           body: JSON.stringify(offlineCache),
         })
       .then( (responseMsg) => {
@@ -139,6 +143,7 @@
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept':'application/json'
         },
+      credentials: "include",
       })
     .then( (response) => { 
       if (!response.ok) {
@@ -160,6 +165,7 @@
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept':'application/json'
           },
+          credentials: "include",
         })
     .then(  (response) => { 
       if (!response.ok) {

@@ -27,13 +27,14 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
       if (response.ok) {
-        layer.msg(`You have unblocked ${partner} successfully!`);
+        layer.msg(`You have unblocked ${partner} successfully!`, {time:5000});
       } else {
-        layer.msg(`Could not unblock ${partner}!`);
+        layer.msg(`Could not unblock ${partner}!`, {time:5000});
       }
     });
   }

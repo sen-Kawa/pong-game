@@ -143,6 +143,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
       body: JSON.stringify(tmp),
     })
     .then(response => {
@@ -152,7 +153,7 @@
       }
       else {
 
-        layer.msg(`Success. Channel ${chNew.chnNameInput} Created Successfully!`);
+        layer.msg(`Success. Channel ${chNew.chnNameInput} Created Successfully!`, {time:5000});
         chNew.chnNameInput = '';
         chNew.chnVisiSelect = '';
         chNew.chnPassInput = '';
@@ -194,6 +195,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
     })
     .then(response => {
 
@@ -223,6 +225,7 @@
         'Content-Type': 'application/json',
         'Accept':'application/json'
       },
+      credentials: "include",
     })
     .then(response => {
       chNew.chnSearchLoading = false;

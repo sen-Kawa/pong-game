@@ -5,7 +5,8 @@ import {
   Post, 
   Put, 
   Get,
-  Query, 
+  Query,
+  UseGuards, 
   ParseArrayPipe,
   HttpException, 
   HttpStatus 
@@ -15,7 +16,9 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBody,
+
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ChannelsService } from './channels.service';
 import { AddChannelDto, AddChannelResultDto } from './dto/add-channel.dto';
 import { SuggestedChannelsDto, SuggestedChannelsResultDto } from './dto/suggested-channels.dto';
@@ -42,6 +45,7 @@ export class ChannelsController {
   @ApiResponse({ status: 200, type: [SuggestedChannelsResultDto] })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 404, description: 'Unable To Find User ID!' })
+  @UseGuards(JwtAuthGuard)
   @Get('/:userId')
   async suggestedChannels(@Param() user: SuggestedChannelsDto){
     const response: SuggestedChannelsResultDto[] | ErrorValue = await this.channelsService.suggestedChannels(user.userId);
@@ -54,6 +58,7 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Endpoint Making {userId} Join or Exit a Channel' })
   @ApiResponse({ status: 200, type: JoinOrExitChannelResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Put('/:userId')
   async joinOrExitChannel( @Body() requestProps: JoinOrExitChannelDto ){
     const response: string = await this.channelsService.joinOrExitChannel(requestProps);
@@ -64,6 +69,7 @@ export class ChannelsController {
   @ApiResponse({ status: 200, type: [SearchChannelsResultDto] })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 404, description: 'Unable To Find {UserId}!' })
+  @UseGuards(JwtAuthGuard)
   @Get('/:userId/:key') 
   async searchChannels( @Param() details: SearchChannelsDto ){
     const response: SearchChannelsResultDto[] | ErrorValue = await this.channelsService.searchChannels(details);
@@ -79,6 +85,7 @@ export class ChannelsController {
   @ApiResponse({ status: 404, description: 'Unable To Find {userId}!' })
   @ApiResponse({ status: 406, description: 'Channel Name Already Taken!' })
   @ApiResponse({ status: 417, description: 'Unable To Create Channel!' })
+  @UseGuards(JwtAuthGuard)
   @Post()
   async addChannel(@Body() addChannelDto: AddChannelDto){
     const response: ErrorValue = await this.channelsService.addChannel(addChannelDto);
@@ -99,6 +106,7 @@ export class ChannelsController {
   @ApiResponse({ status: 200, type: [ChannConnectionsResultDto]})
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 404, description: 'Unable To Find {userId}!'})
+  @UseGuards(JwtAuthGuard)
   @Get('/get/connections/:userId')
   async channConnections(@Param() user: ChannConnectionsDto ){
     const response: ChannConnectionsResultDto[] | ErrorValue  = await this.channelsService.channConnections(user.userId);
@@ -111,6 +119,7 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Endpoint Fetching All Conversations of the Channel {chId} for the {userId}' })
   @ApiResponse({ status: 200, type: [ChannHistoryResultDto]})
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Get('/get/connections/:userId/:chId')
   async channHistory(@Param() channel: ChannHistoryDto){
     const response: ChannHistoryResultDto[] | boolean = await this.channelsService.channHistory(channel);
@@ -124,6 +133,7 @@ export class ChannelsController {
   @ApiResponse({ status: 200, description: 'Simply adds all messages to their respective channels and returns nothing' })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiBody({ type: [UpdateChannDto] })
+  @UseGuards(JwtAuthGuard)
   @Put()
   async updateChanns(@Body(new ParseArrayPipe({ items: UpdateChannDto })) channPayload: UpdateChannDto[]){
     await this.channelsService.updateChanns(channPayload);
@@ -132,6 +142,7 @@ export class ChannelsController {
   @ApiOperation({ summary: "Endpoint resets unreadCount to 0 where userId is a member of Channel chId" })
   @ApiResponse({ status: 200, description: 'Simply resets unreadCount to 0, where userId is a member of Channel chId, and returns nothing' })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Put('/put/set-seen')
   async setSeen ( @Body() channDetails : SetSeenDto ) {
     await this.channelsService.setSeen(channDetails);
@@ -140,6 +151,7 @@ export class ChannelsController {
   @ApiOperation({ summary: "Endpoint for getting user id with their userName as Query" })
   @ApiResponse({ status: 200, type: GetMemberIdResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getMemberId(@Query() getMemberId: GetMemberIdDto, ){
     const response: string = await this.channelsService.getMemberId(getMemberId);
@@ -150,6 +162,7 @@ export class ChannelsController {
   @ApiResponse({ status: 200, type: [PendingApprovalsResultDto] })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
   @ApiResponse({ status: 412, description: 'Only The channel Admin or Owner can Request this Data' })
+  @UseGuards(JwtAuthGuard)
   @Get('/get/channel/moderate/:adminId/:chId')
   async pendingApprovals(@Param() pendingProp: PendingApprovalsDto ){
     const response: PendingApprovalsResultDto[] | null = await this.channelsService.pendingApprovals(pendingProp);
@@ -162,6 +175,7 @@ export class ChannelsController {
   @ApiOperation({ summary: "Endpoint for moderating users in terms of kick, ban, mute, setAdmin" })
   @ApiResponse({ status: 200, type: ModerateUsersResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Put('/put/channel/moderate')
   async moderateUsers(@Body() moderateProp: ModerateUsersDto){
     const response: string = await this.channelsService.moderateUsers(moderateProp);
@@ -171,6 +185,7 @@ export class ChannelsController {
   @ApiOperation({ summary: "Endpoint for changing channel visibility and setting password as well" })
   @ApiResponse({ status: 200, type: ModifyChannelResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Put('/put/channel/moderate/modify')
   async modifyChannel(@Body() newChannelProp: ModifyChannelDto, ){
     const response: string = await this.channelsService.modifyChannel(newChannelProp);
@@ -180,6 +195,7 @@ export class ChannelsController {
   @ApiOperation({ summary: "Endpoint for approving/rejecting a pending channel join request" })
   @ApiResponse({ status: 200, type: ApproveOrRejectResultDto })
   @ApiResponse({ status: 400, description: 'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!' })
+  @UseGuards(JwtAuthGuard)
   @Put('/put/channel/moderate/pending/decide')
   async approveOrReject(@Body() moderateProp: ApproveOrRejectDto){
     const response: string = await this.channelsService.approveOrReject(moderateProp);
