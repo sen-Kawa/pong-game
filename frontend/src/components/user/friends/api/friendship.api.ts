@@ -4,19 +4,22 @@ import jwtInterceptor from '@/interceptor/jwtInterceptor'
 const BASE_URL = 'http://localhost:3000/users'
 
 export async function postAddFriend(friendName: string) {
-  const requestOptions: RequestInit = {
-    method: 'POST',
-    credentials: 'include',
+  const requestOptions = {
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ friendName: friendName })
   }
-  const response = await fetch(`${BASE_URL}/addFriend/`, requestOptions)
-  if (!response.ok) {
-    const responseData = await response.json()
-    return responseData
-  }
+  const requestBody = JSON.stringify({ friendName: friendName })
+  try {
+  	const response = await jwtInterceptor.post(`${BASE_URL}/addFriend/`, requestBody, requestOptions)
+	console.log('Request succesful', response.data);
+	console.log('Request response', response);
+	return response.data
+  } catch (error) {
+	console.error('Error making the request', error);
+	throw error
+	}
 }
 
 export async function postFindUser(name: string) {
