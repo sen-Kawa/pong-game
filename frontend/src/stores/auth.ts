@@ -14,6 +14,7 @@ export interface User {
   name: string
   email: string
   activated2FA: boolean
+  displayName: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -23,14 +24,18 @@ export const useAuthStore = defineStore('auth', () => {
     userName: '',
     name: '',
     email: '',
-    activated2FA: false
+    activated2FA: false,
+    displayName: ''
   })
 
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
   const getUserName = computed(() => userProfile.value.userName)
+  const getDisplayName = computed(() => userProfile.value.displayName)
   const getName = computed(() => userProfile.value.name)
+  const getEmail = computed(() => userProfile.value.email)
+
   function setUserProfile(date: any) {
     // console.log(date.id);
     // console.log(date.name);
@@ -41,6 +46,7 @@ export const useAuthStore = defineStore('auth', () => {
     loginStatus.value = true
     userProfile.value.id = date.id
     userProfile.value.name = date.name
+    userProfile.value.displayName = date.displayName
     userProfile.value.userName = date.userName
     userProfile.value.email = date.email
     userProfile.value.activated2FA = date.activated2FA
@@ -75,7 +81,9 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
+  
   async function getuserProfile() {
+    
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
@@ -86,6 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
       router.push('/')
     }
   }
+
   async function deactivate2FA() {
     const response = await jwtInterceptor
       .get(baseUrlauth + 'deactivate2FA', {
@@ -121,6 +130,7 @@ export const useAuthStore = defineStore('auth', () => {
     loginStatus.value = false
     router.push('/')
   }
+
   async function setDisplayName(displayName: string) {
     const body = { displayName: displayName }
     try {
@@ -142,10 +152,34 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
+  async function setDisplayName2(displayName: string, returnRoute: string) {
+    const body = { displayName: displayName }
+    console.log("disp2", body)
+    try {
+      const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      })
+      if (response && response.data) {
+        userProfile.value.displayName = displayName
+        loginStatus.value = true
+        router.push(returnRoute)
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return error.response?.data?.message
+      } else {
+        return error
+      }
+    }
+  }
 
   return {
     getUserName,
     getName,
+    getEmail,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,
@@ -154,6 +188,8 @@ export const useAuthStore = defineStore('auth', () => {
     deactivate2FA,
     activate2FA,
     logout,
-    setDisplayName
+    setDisplayName,
+    setDisplayName2,
+    getDisplayName
   }
 })

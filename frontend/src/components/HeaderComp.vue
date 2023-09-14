@@ -1,18 +1,16 @@
 <template>
-  <div v-if="authStore.isLoggedIn">
-    <nav id="header">
-      <div class="menu-item"><router-link to="/">Home</router-link></div>
-      <div class="menu-item"><router-link to="/game">Game</router-link></div>
-      <div class="menu-item"><router-link to="/leader">Leaderboard</router-link></div>
-      <User title="User" />
-      <router-link @click="authStore.logout()" class="menu-item" to="/">Logout</router-link>
-    </nav>
-  </div>
-  <div v-if="!authStore.isLoggedIn">
-    <nav id="header">
-      <div class="menu-item"><router-link to="/">Home</router-link></div>
-    </nav>
-  </div>
+  <nav id="header" v-if="authStore.isLoggedIn">
+    <div class="menu-item"><router-link to="/">Home</router-link></div>
+    <div class="menu-item"><router-link to="/game">Game</router-link></div>
+    <div class="menu-item"><router-link to="/leader">Leaderboard</router-link></div>
+    <User title="User" />
+    <div class="menu-item">
+      <router-link @click="authStore.logout()" to="/">Logout</router-link>
+    </div>
+  </nav>
+  <nav id="header" v-else>
+    <div class="menu-item"><router-link to="/">Home</router-link></div>
+  </nav>
 </template>
 
 <script setup lang="ts">

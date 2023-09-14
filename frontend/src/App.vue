@@ -2,7 +2,9 @@
   <div>
     <ChatBuilder />
     <Header />
-    <router-view />
+    <main>
+      <router-view />
+    </main>
     <Footer />
   </div>
 </template>
