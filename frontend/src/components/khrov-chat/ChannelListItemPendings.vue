@@ -1,19 +1,18 @@
 <script setup lang="ts">
-
-  const props = defineProps< {
-    userId: number,
-    userName: string,
-    chId: number,
-  } >()
-  
+defineProps<{
+  userId: number
+  userName: string
+  chId: number
+}>()
 </script>
 <template>
   <div class="Cli-pendings">
-    <p>{{userName}}</p>
-    <img src="/khrov-chat-media/approve.png" alt="Approve"
-        @click="$emit('toApprove', true)"
-    />
-    <img class="Cli-pendings-reject" src="/khrov-chat-media/reject.png" alt="Reject" 
+    <p>{{ userName }}</p>
+    <img src="/khrov-chat-media/approve.png" alt="Approve" @click="$emit('toApprove', true)" />
+    <img
+      class="Cli-pendings-reject"
+      src="/khrov-chat-media/reject.png"
+      alt="Reject"
       @click="$emit('toApprove', false)"
     />
   </div>
@@ -29,12 +28,12 @@
   margin: 1px;
   padding: 0 5px;
   border-radius: 5px;
-  background-color: #90EE90;
+  background-color: #90ee90;
   -webkit-transition: 0.5s;
   transition: 0.5s;
 }
 .Cli-pendings:hover {
-  background-color: #ECFFDC;
+  background-color: #ecffdc;
 }
 
 .Cli-pendings > p:nth-child(1) {
@@ -56,7 +55,7 @@
   -webkit-transition: 1s;
   transition: 1s;
 }
-.Cli-pendings > img:nth-child(2):hover, 
+.Cli-pendings > img:nth-child(2):hover,
 .Cli-pendings > img:nth-child(2):focus {
   padding: 0;
 }
@@ -74,7 +73,7 @@
   -webkit-transition: 1s;
   transition: 1s;
 }
-.Cli-pendings > img:nth-child(3):hover, 
+.Cli-pendings > img:nth-child(3):hover,
 .Cli-pendings > img:nth-child(3):focus {
   padding: 0;
 }

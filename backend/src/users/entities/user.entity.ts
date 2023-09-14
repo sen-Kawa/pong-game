@@ -42,8 +42,8 @@ export class UserEntity implements User {
   twoFactorAuthenticationSecret: string
 
   @Exclude()
-  createdAt: Date;
+  createdAt: Date
 
   @Exclude()
-  updatedAt: Date;
+  updatedAt: Date
 }

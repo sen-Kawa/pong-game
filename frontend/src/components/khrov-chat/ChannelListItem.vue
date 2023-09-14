@@ -1,25 +1,22 @@
 <script setup lang="ts">
-  import { ref, reactive } from 'vue'
-  import { layer } from '@layui/layer-vue'
-
-  const props =  defineProps< {
-    channelId: number,
-    channelName: string,
-    desc: string,
-    visibility: string,
-    role: string,
-    unread: number
-  } >()
+defineProps<{
+  channelId: number
+  channelName: string
+  desc: string
+  visibility: string
+  role: string
+  unread: number
+}>()
 </script>
 <template>
   <div class="Channel-preview">
     <img class="Visibility" :src="visibility" alt="Visibility" />
     <div class="Chan-texts">
-      <span class="Chan-name">{{channelName}}</span>
-      <span class="Channel-desc">{{desc}}</span>
-      <span class="Channel-notif" v-if="unread">{{unread}}</span>
+      <span class="Chan-name">{{ channelName }}</span>
+      <span class="Channel-desc">{{ desc }}</span>
+      <span class="Channel-notif" v-if="unread">{{ unread }}</span>
     </div>
-  </div>   
+  </div>
 </template>
 <style scoped>
 .Channel-preview {
@@ -38,11 +35,11 @@
   cursor: pointer;
 }
 .Channel-preview > * {
-  padding: 2px;  
+  padding: 2px;
   overflow: hidden;
 }
 .Channel-preview:hover {
-  background-color: #F5F5DC;
+  background-color: #f5f5dc;
 }
 
 .Visibility {
@@ -94,5 +91,4 @@
   text-align: center;
   padding: 1px 2px 2px 1px;
 }
-
 </style>

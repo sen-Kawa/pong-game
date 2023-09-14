@@ -1,37 +1,31 @@
 <script setup lang="ts">
-  import { ref, reactive } from 'vue'
-  import type { PropType } from 'vue'
-  import type { MessageItem } from '@/components/khrov-chat/interface/khrov-chat';
+import { reactive } from 'vue'
+import type { MessageItem } from '@/components/khrov-chat/interface/khrov-chat'
 
-  const props =  defineProps< {
-    incoming: string | null,
-    outgoing: string | null,
-    time: string,
-    status: string,
-  } >()
+const props = defineProps<{
+  incoming: string | null
+  outgoing: string | null
+  time: string
+  status: string
+}>()
 
-  const msgItem: MessageItem = reactive({});
-  
-  msgItem.msiTimeAlign = props.outgoing==null ? false : true;
-  msgItem.msiSentOrRcvd = props.outgoing==null ? 'Received' : 'Sent';
-  msgItem.msiMsg = props.outgoing==null ? props.incoming : props.outgoing;
-  msgItem.msiClearFloat = props.outgoing==null ? 'Clear-left' : 'Clear-right';
-  msgItem.msiTime = props.time;
-  if ( props.status==='pending' )
-    msgItem.msiStatusOut = '◷';
-  else if ( props.status==='sent' )
-    msgItem.msiStatusOut = '✓';
-  else if ( props.status==='delivered' )
-    msgItem.msiStatusOut = '✓✓';
-  else if ( props.status==='seen' )
-    msgItem.msiStatusOut = '👁';
+const msgItem: MessageItem = reactive({})
+
+msgItem.msiTimeAlign = props.outgoing == null ? false : true
+msgItem.msiSentOrRcvd = props.outgoing == null ? 'Received' : 'Sent'
+msgItem.msiMsg = props.outgoing == null ? props.incoming : props.outgoing
+msgItem.msiClearFloat = props.outgoing == null ? 'Clear-left' : 'Clear-right'
+if (props.status === 'pending') msgItem.msiStatusOut = '◷'
+else if (props.status === 'sent') msgItem.msiStatusOut = '✓'
+else if (props.status === 'delivered') msgItem.msiStatusOut = '✓✓'
+else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
 </script>
 <template>
   <div>
     <div :class="msgItem.msiSentOrRcvd">
-      {{msgItem.msiMsg}}
-      <span class="Time-status-container" :class="{'AlignTimeRight': msgItem.msiTimeAlign}">
-         {{msgItem.msiTime}} <span class="Status-mark" v-if="!incoming">{{msgItem.msiStatusOut}}</span>
+      {{ msgItem.msiMsg }}
+      <span class="Time-status-container" :class="{ AlignTimeRight: msgItem.msiTimeAlign }">
+        {{ time }} <span class="Status-mark" v-if="!incoming">{{ msgItem.msiStatusOut }}</span>
       </span>
     </div>
     <p :class="msgItem.msiClearFloat"></p>
@@ -64,7 +58,7 @@
   border-width: 2px;
   border-color: #fff;
   border-radius: 5px;
-  background-color: #F5F5DC;
+  background-color: #f5f5dc;
   word-break: break-word;
 }
 .Clear-left {
@@ -73,7 +67,7 @@
 
 .Time-status-container {
   display: block;
-  white-space: nowrap; 
+  white-space: nowrap;
   position: absolute;
   bottom: -8px;
   font-size: 8px;
@@ -87,8 +81,7 @@
   right: 0;
 }
 .Status-mark {
-  color: #1C39BB;
+  color: #1c39bb;
   font-weight: 600;
 }
-
 </style>

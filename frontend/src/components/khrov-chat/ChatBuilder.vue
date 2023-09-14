@@ -1,89 +1,91 @@
 <script setup lang="ts">
-  import { onMounted, onUnmounted, reactive, ref, inject } from 'vue'
-  import ChatIcon from '@/components/khrov-chat/ChatIcon.vue';
-  import ChatWindow from '@/components/khrov-chat/ChatWindow.vue';
-  import type { ChatBuilder } from '@/components/khrov-chat/interface/khrov-chat';
-  import { layer } from '@layui/layer-vue';
+import { onMounted, onUnmounted, reactive, inject } from 'vue'
+import ChatIcon from '@/components/khrov-chat/ChatIcon.vue'
+import ChatWindow from '@/components/khrov-chat/ChatWindow.vue'
+import type { ChatBuilder } from '@/components/khrov-chat/interface/khrov-chat'
+import { layer } from '@layui/layer-vue'
 
-  const $HOST = inject('$HOST');
+const $HOST = inject('$HOST')
 
-  onMounted(() => {
-    document.addEventListener("click", closeChatWindow, false);
-  })
-  onUnmounted(() => {
-    document.removeEventListener("click", closeChatWindow, false);
-  })
+onMounted(() => {
+  document.addEventListener('click', closeChatWindow, false)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', closeChatWindow, false)
+})
 
-  const closeChatWindow = (e: Event) => {
-    const chatWindow = document.getElementById('ChatWindow-container');
-    const chatIcon = document.getElementById('ChatIcon-container');
+const closeChatWindow = (e: Event) => {
+  const chatWindow = document.getElementById('ChatWindow-container')
+  const chatIcon = document.getElementById('ChatIcon-container')
 
-    if (chatWindow && chatIcon) {
-
-      if ( ! chatWindow.contains(e.target as Node) && ! chatIcon.contains(e.target as Node) ) {
-        chatWindow.style["display"] = "none";
-      }
+  if (chatWindow && chatIcon) {
+    if (!chatWindow.contains(e.target as Node) && !chatIcon.contains(e.target as Node)) {
+      chatWindow.style['display'] = 'none'
     }
   }
+}
 
-  const openChatWindow = () => {
-    const chatWindow = document.getElementById('ChatWindow-container');
-    if (chatWindow) {
-      chatWindow.style["display"] = "block";
-    }
+const openChatWindow = () => {
+  const chatWindow = document.getElementById('ChatWindow-container')
+  if (chatWindow) {
+    chatWindow.style['display'] = 'block'
+  }
+}
+
+const initialTest: ChatBuilder = reactive({
+  cbdFakeLogin: 'block',
+  cbdUserInput: 1
+})
+
+const APItest = () => {
+  if (initialTest.cbdUserInput && initialTest.cbdUserInput < 1) {
+    return
   }
 
-  const initialTest: ChatBuilder = reactive({
-    cbdFakeLogin: 'block',
-  });
-
-  const APItest = () => {
-    if (initialTest.cbdUserInput && initialTest.cbdUserInput < 1) {
-      return ;
-    }
-
-    fetch(`${$HOST}/chats/get/temp/login/${initialTest.cbdUserInput}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json'
-      },
-      credentials: "include",
-    })
-    .then(response => {
+  fetch(`${$HOST}/chats/get/temp/login/${initialTest.cbdUserInput}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    credentials: 'include'
+  })
+    .then((response) => {
       if (!response.ok) {
-
-        return response.json();
-      }
-      else {
-        layer.msg('Success. Chat Interface Now Ready!', {time:5000});
-        initialTest.cbdFakeLogin = 'none';
+        return response.json()
+      } else {
+        layer.msg('Success. Chat Interface Now Ready!', { time: 5000 })
+        initialTest.cbdFakeLogin = 'none'
       }
     })
-    .then(errorJson => {
-
+    .then((errorJson) => {
       if (errorJson) {
-        layer.msg(errorJson.message, {time:5000});
-        console.log(errorJson.message);
+        layer.msg(errorJson.message, { time: 5000 })
+        console.log(errorJson.message)
       }
     })
-  }
+}
 </script>
 
 <template>
   <div class="Login-bg">
-    <input class="APItest-box" 
-        placeholder="Enter userId"
-        v-model="initialTest.cbdUserInput"
-        @keyup.enter="APItest"
+    <input
+      class="APItest-box"
+      input
+      type="number"
+      placeholder="Enter userId"
+      v-model="initialTest.cbdUserInput"
+      @keyup.enter="APItest"
     />
   </div>
-  <div id="ChatIcon-container" @click="openChatWindow" >
+  <div id="ChatIcon-container" @click="openChatWindow">
     <ChatIcon />
   </div>
-  <div id="ChatWindow-container" v-if="initialTest.cbdFakeLogin==='none'
-    && initialTest.cbdUserInput">
-    <ChatWindow :sTemp="parseInt(<string><unknown>initialTest.cbdUserInput)" />
+  <div
+    id="ChatWindow-container"
+    v-if="initialTest.cbdFakeLogin === 'none' && initialTest.cbdUserInput"
+  >
+    <ChatWindow :sTemp="initialTest.cbdUserInput" />
   </div>
 </template>
 
@@ -116,13 +118,14 @@
   border: none;
   border-radius: 10px;
   padding: 5px 10px;
-  box-shadow: 0 0 5px #73C2FB;
+  box-shadow: 0 0 5px #73c2fb;
   outline: none;
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
 }
-.APItest-box:focus, .APItest-box:hover {
-  box-shadow: 0 0 10px #73C2FB;
+.APItest-box:focus,
+.APItest-box:hover {
+  box-shadow: 0 0 10px #73c2fb;
 }
 
 #ChatIcon-container {
@@ -142,7 +145,5 @@
   width: 300px;
   height: 500px;
   z-index: 1;
-
 }
-
 </style>

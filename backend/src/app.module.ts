@@ -6,8 +6,8 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { validate } from './config/env.validation'
 import { MulterModule } from '@nestjs/platform-express'
-import { ChatsModule } from './khrov-chat/chats/chats.module';
-import { ChannelsModule } from './khrov-chat/channels/channels.module';
+import { ChatsModule } from './khrov-chat/chats/chats.module'
+import { ChannelsModule } from './khrov-chat/channels/channels.module'
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { ChannelsModule } from './khrov-chat/channels/channels.module';
     GamesModule,
     AuthModule,
     ChatsModule,
-    ChannelsModule,
+    ChannelsModule
   ],
   controllers: [],
   providers: []

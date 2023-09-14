@@ -12,7 +12,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
+      whitelist: true
       // transform: true,
       // transformOptions: { enableImplicitConversion: true } // WE HAD A TALK ABOUT THE PITFALLS OF THIS APPROACH
     })
@@ -37,7 +37,7 @@ async function bootstrap() {
     origin: ['http://localhost:8080/'],
     methods: 'GET, PUT, POST, PATCH, DELETE',
     allowedHeaders: 'Content-Type, Authorization'
-  }) 
+  })
   app.use(cookieParser())
   await app.listen(3000)
 }

@@ -167,7 +167,7 @@ export class MatchController {
   @ApiConflictResponse({
     description:
       'A conflict arises when the match already has two players an another one should be added.'
-  }) 
+  })
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateGameDto: UpdateMatchDto) {
     if (updateGameDto.playerId === undefined && updateGameDto.scores === undefined)
       throw new HttpException('not modified', HttpStatus.NO_CONTENT) // TODO: NOT MODIFIED is 304

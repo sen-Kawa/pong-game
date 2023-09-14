@@ -1,5 +1,6 @@
 <script setup lang="ts">
-  import { ref, watch, reactive, inject } from 'vue'
+  import { reactive, inject } from 'vue'
+  import { toRef } from "vue";
   import type { ChatList, ChatListTmp, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
   import { onMounted, onUnmounted } from 'vue'
   import ChatListItem from '@/components/khrov-chat/ChatListItem.vue'
@@ -11,7 +12,7 @@
   } >()
 
   const $HOST = inject('$HOST');
-  const $_: number = props.sTemp;
+  const $_ = toRef(() => props.sTemp);
   const cList: ChatList = reactive({
     chiChatConnsApiOk: 0,
     chiUnionUnderFocus: 0,
@@ -137,7 +138,7 @@
 
   const getConversationPreviews = () => {
 
-    fetch(`${$HOST}/chats/${$_}`, {
+    fetch(`${$HOST}/chats/${$_.value}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -151,7 +152,7 @@
       }
       return response.json() } ) 
     .then( (data) => { datas = data; cList.chiChatConnsApiOk+=1; } ) 
-    .catch( (error) => { cList.chiChatConnsApiOk = cList.chiChatConnsApiOk ? 1 : 0; } );
+    .catch( () => { cList.chiChatConnsApiOk = cList.chiChatConnsApiOk ? 1 : 0; } );
 
     if (cList.chiChatConnsApiOk && cList.chiUnionUnderFocus){
       getOneConversation();
@@ -178,7 +179,7 @@
         chatCache[cList.chiUnionUnderFocus] = dataUnion.chat_historys;            
       };            
     }) 
-    .catch( (error) => {} );
+    .catch( () => {} );
   }
 
   let intervalId: ReturnType<typeof setInterval>;
@@ -217,7 +218,7 @@
   <div id="Chatlist-output-boxes">
     <div class="Chats-list Output-box" :class="{clActive: vtofctc.ChatsListIsActive}" >
       <div :key='cList.chiChatConnsApiOk' v-if='cList.chiChatConnsApiOk'>
-        <ChatListItem v-for='(item, index) in datas'
+        <ChatListItem v-for='(item) in datas' v-bind:key="item"
           :unionId="item.unionId"
           :partnerId="item.client2Id"
           :partnerUName="item.client2.userName"
@@ -260,7 +261,7 @@
               }">&#11164;
             </span>
             <img class="Union-view-dp" :src="cList.chiMorphPartnerDp" alt="Avatar">
-            <span class="Union-display-name" @click="">{{cList.chiMorphPartnerUName}}</span>
+            <span class="Union-display-name">{{cList.chiMorphPartnerUName}}</span>
             <span class="Union-hamburger-icon" @click="{
                 if (styling.TopOfChatUlHeight==='120px'){
                   styling.TopOfChatUlHeight='0px';
@@ -308,7 +309,7 @@
         </div>
 
         <div id="bodyOfChats" class="bodyOfChat" :key='chatCache[cList.chiUnionUnderFocus]' v-if='chatCache[cList.chiUnionUnderFocus]'>
-          <ChatListItemMsg v-for='(item, index) in chatCache[cList.chiUnionUnderFocus]'
+          <ChatListItemMsg v-for='(item) in chatCache[cList.chiUnionUnderFocus]' v-bind:key="item"
             :incoming="item.incoming"
             :outgoing="item.outgoing" 
             :time="item.time"
@@ -343,7 +344,7 @@
     <div class="Their-profile Output-box" :class="{clActive: vtofctc.TheirProfileIsActive}">
       <div v-if='cList.chiUnionUnderFocus'>
         <div class="Their-profile-output">
-          <p>
+          <div>
             <span class="Profile-back-btn" @click="{ 
 
                 styling.ProfileUlHeight='0px';
@@ -372,7 +373,7 @@
                 Game Invite {{cList.chiMorphPartnerUName}}
               </li>
             </ul>
-          </p>
+          </div>
           <img class="Profile-view-dp" :src="cList.chiMorphPartnerDp" alt="Avatar">
           <span class="Their-profile-details">
             <img class="Profile-icon Email" alt="Email Icon" src="/khrov-chat-media/email.png"/><span>{{cList.chiMorphPartnerEmail}}</span>

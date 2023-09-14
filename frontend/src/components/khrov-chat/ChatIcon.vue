@@ -1,10 +1,9 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div id="Icon-container">
     <p class="Chat-count">+N</p>
-    <img id="Chat-icon" alt="Chat Icon" src="/khrov-chat-media/chat-icon.svg"  />
+    <img id="Chat-icon" alt="Chat Icon" src="/khrov-chat-media/chat-icon.svg" />
   </div>
 </template>
 

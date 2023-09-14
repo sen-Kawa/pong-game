@@ -1,29 +1,29 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsNotEmpty, IsPositive } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsNumber, IsNotEmpty, IsPositive } from 'class-validator'
+import { Transform } from 'class-transformer'
 
 export class SetSeenDto {
   @Transform(({ value }) => {
-    return Number(value);
+    return Number(value)
   })
   @IsNumber()
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
     description: 'Should be an ID of a user that is a member of channel chId',
-    example: 1,
+    example: 1
   })
-  userId: number;
+  userId: number
 
   @Transform(({ value }) => {
-    return Number(value);
+    return Number(value)
   })
   @IsNumber()
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
     description: 'Should be an ID of a channel where userId is a member',
-    example: 1,
+    example: 1
   })
-  chId: number;
+  chId: number
 }

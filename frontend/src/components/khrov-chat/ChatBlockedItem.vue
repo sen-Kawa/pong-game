@@ -1,66 +1,74 @@
 <script setup lang="ts">
-  import { ref, reactive, inject } from 'vue'
-  import type { PropType } from 'vue'
-  import type { ChatBlockedItem } from '@/components/khrov-chat/interface/khrov-chat'
-  import { layer } from '@layui/layer-vue';
-  const props =  defineProps< {
-    myId: number,
-    theirId: number,
-    displayName: string,
-    profileDp: string
-  } >()
+import { reactive, inject } from 'vue'
+import type { ChatBlockedItem } from '@/components/khrov-chat/interface/khrov-chat'
+import { layer } from '@layui/layer-vue'
+defineProps<{
+  myId: number
+  theirId: number
+  displayName: string
+  profileDp: string
+}>()
 
-  const $HOST = inject('$HOST');
-  const cbItem: ChatBlockedItem = reactive({
-    cbiBlockPanelHeight: '0px',
-  });
+const $HOST = inject('$HOST')
+const cbItem: ChatBlockedItem = reactive({
+  cbiBlockPanelHeight: '0px'
+})
 
-  const unblockUser = (blocker: number, blocked: number, partner: string) => {
-    const tmp = {
-      'blockerId': blocker,
-      'blockedId': blocked,
-    }
-
-    fetch(`${$HOST}/chats/block/user/unblock`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json'
-      },
-      credentials: "include",
-      body: JSON.stringify(tmp),
-    })
-    .then(response => {
-      if (response.ok) {
-        layer.msg(`You have unblocked ${partner} successfully!`, {time:5000});
-      } else {
-        layer.msg(`Could not unblock ${partner}!`, {time:5000});
-      }
-    });
+const unblockUser = (blocker: number, blocked: number, partner: string) => {
+  const tmp = {
+    blockerId: blocker,
+    blockedId: blocked
   }
 
+  fetch(`${$HOST}/chats/block/user/unblock`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify(tmp)
+  }).then((response) => {
+    if (response.ok) {
+      layer.msg(`You have unblocked ${partner} successfully!`, { time: 5000 })
+    } else {
+      layer.msg(`Could not unblock ${partner}!`, { time: 5000 })
+    }
+  })
+}
 </script>
 <template>
   <div id="Chat-blocked-item">
     <div class="Blocked-user-preview">
       <img :src="profileDp" alt="Avatar" />
-      <span>{{displayName}}</span>
-      <img src="/khrov-chat-media/blocked.png" alt="Unblock" @click="{
-                                              // Now toggle
-                                              if (cbItem.cbiBlockPanelHeight==='0px') {
-                                                cbItem.cbiBlockPanelHeight='25px';
-                                              } else {
-                                                cbItem.cbiBlockPanelHeight='0px';
-                                              }                                            
-                                            }" />
+      <span>{{ displayName }}</span>
+      <img
+        src="/khrov-chat-media/blocked.png"
+        alt="Unblock"
+        @click="
+          {
+            // Now toggle
+            if (cbItem.cbiBlockPanelHeight === '0px') {
+              cbItem.cbiBlockPanelHeight = '25px';
+            } else {
+              cbItem.cbiBlockPanelHeight = '0px';
+            }
+          }
+        "
+      />
     </div>
     <div class="Blocking-box-div">
-      <button @click="{
-        cbItem.cbiBlockPanelHeight='0px';
-        unblockUser(myId, theirId, displayName);
-      }">Yes
+      <button
+        @click="
+          {
+            cbItem.cbiBlockPanelHeight = '0px';
+            unblockUser(myId, theirId, displayName);
+          }
+        "
+      >
+        Yes
       </button>
-      <button @click="cbItem.cbiBlockPanelHeight='0px'" >No</button>
+      <button @click="cbItem.cbiBlockPanelHeight = '0px'">No</button>
     </div>
   </div>
 </template>
@@ -80,12 +88,11 @@
 }
 .Blocked-user-preview > * {
   padding: 5px;
-  
 }
 .Blocked-user-preview:hover {
   background-color: rgb(245, 245, 245);
 }
-.Blocked-user-preview >:nth-child(1) {
+.Blocked-user-preview > :nth-child(1) {
   position: relative;
   top: 41%;
   transform: translateY(-50%);
@@ -93,20 +100,20 @@
   aspect-ratio: 1/1;
   border-radius: 50%;
 }
-.Blocked-user-preview >:nth-child(2) {
+.Blocked-user-preview > :nth-child(2) {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
   height: 100%;
   width: 100%;
   font-size: 16px;
-  color: #1C39BB;
+  color: #1c39bb;
   margin: 0 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: capitalize;
 }
-.Blocked-user-preview >:nth-child(3) {
+.Blocked-user-preview > :nth-child(3) {
   position: relative;
   top: 40%;
   transform: translateY(-50%);
@@ -138,21 +145,21 @@
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
 }
-.Blocking-box-div >:nth-child(1) {
+.Blocking-box-div > :nth-child(1) {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   margin-left: 5px;
-  background-color: #73C2FB;
+  background-color: #73c2fb;
 }
-.Blocking-box-div >:nth-child(2) {
+.Blocking-box-div > :nth-child(2) {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  background-color: #1C39BB;
+  background-color: #1c39bb;
 }
-.Blocking-box-div >:nth-child(1):hover {
-  box-shadow: 0 0 2px #73C2FB;
+.Blocking-box-div > :nth-child(1):hover {
+  box-shadow: 0 0 2px #73c2fb;
 }
-.Blocking-box-div >:nth-child(2):hover {
-  box-shadow: 0 0 2px #1C39BB;
+.Blocking-box-div > :nth-child(2):hover {
+  box-shadow: 0 0 2px #1c39bb;
 }
 </style>

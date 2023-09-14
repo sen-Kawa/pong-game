@@ -1,58 +1,59 @@
 <script setup lang="ts">
-  import { ref, reactive, inject } from 'vue'
-  import { onMounted, onUnmounted } from 'vue'
-  import ChatBlockedItem from '@/components/khrov-chat/ChatBlockedItem.vue';
-  import type { ChatBlocked, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
+import { reactive, inject } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
+import ChatBlockedItem from '@/components/khrov-chat/ChatBlockedItem.vue'
+import type { ChatBlocked, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
 
-  const props =  defineProps< {
-    sTemp: number,
-  } >()
+const props = defineProps<{
+  sTemp: number
+}>()
 
-  const $HOST = inject('$HOST');
+const $HOST = inject('$HOST')
 
-  const $: number = props.sTemp as unknown as number;
-  const cBlkd: ChatBlocked = reactive({
-    cbkKeyBuild: 0,
-  });
-  let output: Chat_unionTb[];
+const $: number = props.sTemp as unknown as number
+const cBlkd: ChatBlocked = reactive({
+  cbkKeyBuild: 0
+})
+let output: Chat_unionTb[]
 
-  const searchBlocked = () => {
-    fetch(`${$HOST}/chats/blocked/${$}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json'
-      },
-      credentials: "include",
-    })
-    .then(response => {
+const searchBlocked = () => {
+  fetch(`${$HOST}/chats/blocked/${$}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    credentials: 'include'
+  })
+    .then((response) => {
       if (!response.ok) {
-        throw response;
+        throw response
       }
-      return response.json();
+      return response.json()
     })
-    .then(data => {
+    .then((data) => {
       if (JSON.stringify(output) != JSON.stringify(data)) {
-        output = data;
-        cBlkd.cbkKeyBuild += 1;
-      }   
+        output = data
+        cBlkd.cbkKeyBuild += 1
+      }
     })
-    .catch(error => {});
-  }
+    .catch(() => {})
+}
 
-  let intervalId: ReturnType<typeof setInterval>;
-  onMounted(() => {
-    searchBlocked();
-    intervalId = setInterval(searchBlocked, 3000);
-  });
-  onUnmounted(() => {
-    clearInterval(intervalId);
-  });
-
+let intervalId: ReturnType<typeof setInterval>
+onMounted(() => {
+  searchBlocked()
+  intervalId = setInterval(searchBlocked, 3000)
+})
+onUnmounted(() => {
+  clearInterval(intervalId)
+})
 </script>
 <template>
   <div v-if="cBlkd.cbkKeyBuild" :key="cBlkd.cbkKeyBuild">
-    <ChatBlockedItem v-for='(item, index) in output'
+    <ChatBlockedItem
+      v-for="item in output"
+      v-bind:key="item"
       :myId="$"
       :theirId="item.client2Id"
       :displayName="item.client2.userName"
@@ -60,6 +61,4 @@
     />
   </div>
 </template>
-<style scoped>
-
-</style>
+<style scoped></style>

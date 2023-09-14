@@ -1,45 +1,41 @@
 <script setup lang="ts">
-  import { ref, reactive } from 'vue'
-  import type { ChatListItem } from '@/components/khrov-chat/interface/khrov-chat';
+import { reactive } from 'vue'
+import type { ChatListItem } from '@/components/khrov-chat/interface/khrov-chat'
 
-  const props =  defineProps< {
-        unionId: number,
-        partnerId: number,
-        partnerUName: string,
-        partnerDp: string,
-        blockStatus: boolean,
-        allowedToUnblock: boolean,
-        unreadCount: number,
-        outgoingMsg: string | null,
-        incomingMsg: string | null,
-        time: string | Date,
-        deliveryStatus: string,
-    } >()
+const props = defineProps<{
+  unionId: number
+  partnerId: number
+  partnerUName: string
+  partnerDp: string
+  blockStatus: boolean
+  allowedToUnblock: boolean
+  unreadCount: number
+  outgoingMsg: string | null
+  incomingMsg: string | null
+  time: string | Date
+  deliveryStatus: string
+}>()
 
-  const cliItem: ChatListItem = reactive({});
-  cliItem.cliLastMsg = (props.outgoingMsg) ? props.outgoingMsg : props.incomingMsg;
+const cliItem: ChatListItem = reactive({})
+cliItem.cliLastMsg = props.outgoingMsg ? props.outgoingMsg : props.incomingMsg
 
-  if ( props.deliveryStatus==='pending' )
-    cliItem.cliDeliveryStat = '◷';
-  else if ( props.deliveryStatus==='sent' )
-    cliItem.cliDeliveryStat = '✓';
-  else if ( props.deliveryStatus==='delivered' )
-    cliItem.cliDeliveryStat = '✓✓';
-  else if ( props.deliveryStatus==='seen' )
-    cliItem.cliDeliveryStat = '👁';
-
+if (props.deliveryStatus === 'pending') cliItem.cliDeliveryStat = '◷'
+else if (props.deliveryStatus === 'sent') cliItem.cliDeliveryStat = '✓'
+else if (props.deliveryStatus === 'delivered') cliItem.cliDeliveryStat = '✓✓'
+else if (props.deliveryStatus === 'seen') cliItem.cliDeliveryStat = '👁'
 </script>
 
 <template>
   <div class="Preview">
-    <img id="Avatar" :src="partnerDp" alt="Avatar">
+    <img id="Avatar" :src="partnerDp" alt="Avatar" />
     <div id="Chat-details">
-      <span id="Header">{{partnerUName}}</span>
-      <span id="Time">{{time}}</span>
-      <span id="Message">{{cliItem.cliLastMsg}}</span>
-      <span id="Notification" v-if="unreadCount">{{unreadCount}}</span>
-      <span id="DeliveryStatus" v-if="!unreadCount && !incomingMsg">{{cliItem.cliDeliveryStat}}</span>
-      
+      <span id="Header">{{ partnerUName }}</span>
+      <span id="Time">{{ time }}</span>
+      <span id="Message">{{ cliItem.cliLastMsg }}</span>
+      <span id="Notification" v-if="unreadCount">{{ unreadCount }}</span>
+      <span id="DeliveryStatus" v-if="!unreadCount && !incomingMsg">{{
+        cliItem.cliDeliveryStat
+      }}</span>
     </div>
   </div>
 </template>
@@ -56,7 +52,7 @@
   cursor: pointer;
 }
 .Preview:hover {
-  background-color: #F5F5DC;
+  background-color: #f5f5dc;
 }
 
 #Avatar {
@@ -66,7 +62,7 @@
 
 #Chat-details {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); 
+  grid-template-columns: repeat(5, 1fr);
   grid-template-rows: 20px 20px;
 
   width: 100%;
@@ -129,8 +125,7 @@
 #Chat-details > #DeliveryStatus {
   grid-row: 2;
   grid-column: 5/5;
-  color: #1C39BB;
+  color: #1c39bb;
   font-weight: 600;
 }
-
 </style>
