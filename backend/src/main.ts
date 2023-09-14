@@ -1,7 +1,7 @@
-import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
-import { AppModule } from './app.module'
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { AppModule } from './app.module'
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -34,7 +34,7 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:8080/'],
+    origin: ['http://localhost:8080'],
     methods: 'GET, PUT, POST, PATCH, DELETE',
     allowedHeaders: 'Content-Type, Authorization'
   })
