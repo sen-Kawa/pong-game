@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgres://postgres:password@db:5432/transcendence"
+  url      = "env("DATABASE_URL")"
 }
 
 enum Status {
