@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { validate } from './config/env.validation'
 import { MulterModule } from '@nestjs/platform-express'
+import { StatisticsModule } from './statistics/statistics.module'
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { MulterModule } from '@nestjs/platform-express'
     PrismaModule,
     UsersModule,
     GamesModule,
-    AuthModule
+    AuthModule,
+    StatisticsModule
   ],
   controllers: [],
   providers: []
