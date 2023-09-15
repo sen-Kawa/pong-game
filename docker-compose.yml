@@ -19,6 +19,7 @@ services:
         restart: true
     volumes:
       - $PWD/backend/:/app
+    tty: true
     ports:
       - "3000:3000"
 

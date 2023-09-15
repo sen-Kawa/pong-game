@@ -10,7 +10,7 @@ export class FTStrategy extends PassportStrategy(Strategy) {
   constructor(
     //private readonly authService: AuthService,
     private prisma: PrismaService,
-    readonly config: ConfigService,
+    private config: ConfigService,
     private userService: UsersService
   ) {
     super({
