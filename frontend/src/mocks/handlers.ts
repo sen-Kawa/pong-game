@@ -78,7 +78,11 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.post(`${backendURL}/users/find`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({}))
+	const requestBody = req.body;
+	if (requestBody && requestBody.name === 'Mimi')
+    	return res(ctx.status(200), ctx.json({}))
+	else if (requestBody && (requestBody.name === 'bobb' || requestBody.name === 'Bob'))
+    	return res(ctx.status(200), ctx.json([{ displayName: 'Bobu', userName: 'bobby' }]))
   }),
 
   rest.delete(`${backendURL}/users/removeFriend`, (req, res, ctx) => {

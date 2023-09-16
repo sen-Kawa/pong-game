@@ -1,8 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import FindUser from './src/components/user/friends/FindUser.vue'
 import AddFriend from './src/components/user/friends/AddFriend.vue'
-import { postFindUser } from './src/components/user/friends/api/friendship.api'
 
 describe('FindUser', () => {
 
@@ -143,20 +142,12 @@ describe('FindUser', () => {
 
 
   it('gives an error message if user not found', async () => {
-	const fetchMock = vi.spyOn(window, 'fetch');
-	fetchMock.mockResolvedValue({
-		status: 200,
-		json: vi.fn().mockResolvedValueOnce({})
-	});
     const wrapper = mount(FindUser, {
 		data() {
 			return {
 				name: 'Mimi',
 				foundUser: []
 			}
-		},
-		components: {
-			AddFriend,
 		},
 	})
 	await wrapper.vm.findUser();
@@ -167,28 +158,16 @@ describe('FindUser', () => {
 
 
   it('succesfull message and message type', async () => {
-	const foundUserData = [
-		{
-			data: [{
-				displayName: 'Bobu',
-				userName: 'bobby',
-			}],
-		},
-	]
-	const fetchMock = vi.spyOn(window, 'jwtInterceptor.post');
-	fetchMock.mockResolvedValue({
-		status: 200,
-		json: vi.fn().mockResolvedValueOnce(foundUserData)
-	});
-
     const wrapper = mount(FindUser, {
 		data() {
 			return {
 				name: 'bobb',
+				foundUser: []
 			}
 		}
 	})
 	await wrapper.vm.findUser();
+	await wrapper.vm.$nextTick();
 	expect(wrapper.vm.message).toBe('Found bobb')
 	expect(wrapper.vm.messageType).toBe('success')
   });

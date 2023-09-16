@@ -47,8 +47,6 @@ export default {
 	  try {
 	  	const response = await postFindUser(this.name)
       	this.foundUser = response.data
-		console.log('RESPONSE', response);
-		console.log('FOUND USER', this.foundUser);
    	   if (!this.foundUser || this.foundUser.length === 0 || this.foundUser.length === undefined) {
     	    this.message = `${this.name} not found.`
     	 	 this.messageType = 'error'
