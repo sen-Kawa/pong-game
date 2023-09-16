@@ -44,7 +44,7 @@ a,
   font-family: 'Segoe UI', sans-serif, 'Avenir', Helvetica, Arial;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  text-align: center; /* This line needs to be removed*/
   color: #2c3e50;
   background-color: aqua;
   height: 100%;
@@ -54,6 +54,7 @@ a,
 body {
   background-color: #fff;
   margin: 0;
+  font-size: 15px; /* This line needs to be ADDED*/
 }
 
 main {

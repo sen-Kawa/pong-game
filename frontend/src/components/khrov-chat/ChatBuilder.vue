@@ -145,5 +145,6 @@ const APItest = () => {
   width: 300px;
   height: 500px;
   z-index: 1;
+  text-align: start;
 }
 </style>

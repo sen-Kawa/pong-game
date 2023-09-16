@@ -8,7 +8,7 @@ const props = defineProps<{
   sTemp: number
 }>()
 
-const $_: number = toRef(() => props.sTemp)
+const $_: any = toRef(() => props.sTemp)
 
 const $HOST = inject('$HOST')
 
@@ -261,7 +261,6 @@ suggestedChannels($_.value)
           <p class="Chn-box-title">Search Results</p>
           <ChannelNewItem
             v-for="item in chNew.searchOutput"
-            v-bind:key="item"
             :userId="$_"
             :channelId="item.id"
             :channelName="item.name"
@@ -279,7 +278,6 @@ suggestedChannels($_.value)
           <p class="Chn-box-title">Suggested Channels</p>
           <ChannelNewItem
             v-for="item in chNew.suggestionsOutput"
-            v-bind:key="item"
             :userId="$_"
             :channelId="item.id"
             :channelName="item.name"

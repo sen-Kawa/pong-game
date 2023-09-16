@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const $HOST = inject('$HOST')
-const $_: number = toRef(() => props.sTemp)
+const $_: any = toRef(() => props.sTemp)
 const cInvite: ChatInvite = reactive({
   civContentOrNot: false,
   civSearchLoading: false,
@@ -84,7 +84,6 @@ const switchChiActive = (name: string) => {
         <div v-if="cInvite.civContentOrNot">
           <ChatInviteItem
             v-for="item in datas"
-            v-bind:key="item"
             :myId="$_"
             :theirId="item.id"
             :displayName="item.userName"

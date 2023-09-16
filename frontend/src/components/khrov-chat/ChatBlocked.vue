@@ -43,7 +43,7 @@ const searchBlocked = () => {
 let intervalId: ReturnType<typeof setInterval>
 onMounted(() => {
   searchBlocked()
-  intervalId = setInterval(searchBlocked, 3000)
+  intervalId = setInterval(searchBlocked, 5000)
 })
 onUnmounted(() => {
   clearInterval(intervalId)
@@ -53,7 +53,6 @@ onUnmounted(() => {
   <div v-if="cBlkd.cbkKeyBuild" :key="cBlkd.cbkKeyBuild">
     <ChatBlockedItem
       v-for="item in output"
-      v-bind:key="item"
       :myId="$"
       :theirId="item.client2Id"
       :displayName="item.client2.userName"

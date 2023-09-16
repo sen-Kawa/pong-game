@@ -12,7 +12,7 @@ const props = defineProps<{
 }>()
 
 const $HOST = inject('$HOST')
-const $_: number = toRef(() => props.sTemp)
+const $_: any = toRef(() => props.sTemp)
 const channCache: any = reactive({})
 const offlineCache: ChnListOfflineCache[] = []
 
@@ -115,7 +115,7 @@ const getChannelPreviews = () => {
       Accept: 'application/json'
     },
     credentials: 'include'
-  })
+    })
     .then((response) => {
       if (!response.ok) {
         throw response
@@ -220,7 +220,7 @@ const setSeen = (userId: number, chId: number) => {
 
 let intervalId: ReturnType<typeof setInterval>
 onMounted(() => {
-  intervalId = setInterval(getChannelPreviews, 2000)
+  intervalId = setInterval(getChannelPreviews, 5000)
 })
 onUnmounted(() => {
   clearInterval(intervalId)
@@ -430,7 +430,6 @@ const approveOrReject = (choice: boolean, memberId: number) => {
     >
       <ChannelListItem
         v-for="item in chList.channConn"
-        v-bind:key="item"
         :channelId="item.chId"
         :role="item.role"
         :unread="item.unreadCount"
@@ -694,7 +693,6 @@ const approveOrReject = (choice: boolean, memberId: number) => {
             <div v-if="chList.getPendingsObj" :key="chList.getPendingsObjRef">
               <ChannelListItemPendings
                 v-for="item in chList.getPendingsObj"
-                v-bind:key="item"
                 :userId="item.userId"
                 :userName="item.user.userName"
                 :chId="item.chId"

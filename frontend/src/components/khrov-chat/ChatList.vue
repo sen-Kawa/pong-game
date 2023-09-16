@@ -184,7 +184,7 @@
 
   let intervalId: ReturnType<typeof setInterval>;
   onMounted(() => {
-    intervalId = setInterval(getConversationPreviews, 2000);
+    intervalId = setInterval(getConversationPreviews, 5000);
   });
   onUnmounted(() => {
     clearInterval(intervalId);
@@ -218,7 +218,7 @@
   <div id="Chatlist-output-boxes">
     <div class="Chats-list Output-box" :class="{clActive: vtofctc.ChatsListIsActive}" >
       <div :key='cList.chiChatConnsApiOk' v-if='cList.chiChatConnsApiOk'>
-        <ChatListItem v-for='(item) in datas' v-bind:key="item"
+        <ChatListItem v-for='(item) in datas'
           :unionId="item.unionId"
           :partnerId="item.client2Id"
           :partnerUName="item.client2.userName"
@@ -366,8 +366,7 @@
             </span>
             <ul class="Profile-item-ul">
               <li class="Profile-item-li" @click="{
-                  layer.msg('This is a Todo. Depending on the implementation of Game');
-
+                  layer.msg('This is a Todo. Depending on the implementation of Match Making');
                   styling.ProfileUlHeight='0px';
                 }">
                 Game Invite {{cList.chiMorphPartnerUName}}
