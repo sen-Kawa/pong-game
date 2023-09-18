@@ -1,4 +1,3 @@
-import axios from 'axios'
 import jwtInterceptor from '@/interceptor/jwtInterceptor'
 //const BASE_URL = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users`
 const BASE_URL = 'http://localhost:3000/users'

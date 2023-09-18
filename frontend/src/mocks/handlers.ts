@@ -74,7 +74,18 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.post(`${backendURL}/users/addFriend`, (req, res, ctx) => {
-    return res(ctx.status(200), ctx.text(''))
+	const requestBody = req.body;
+	if (requestBody && requestBody.friendName === 'Not Found')
+		return res(ctx.status(404), ctx.json(['User not found']))
+	else if (requestBody && requestBody.friendName === 'Unauthorized')
+		return res(ctx.status(401), ctx.json(['Unauthorized']))
+	else if (requestBody && requestBody.friendName === 'Bad Request')
+		return res(ctx.status(400), ctx.json(['Bad Request']))
+	else if (requestBody && requestBody.friendName === 'Forbidden')
+		return res(ctx.status(403), ctx.json(['Forbidden']))
+	else
+		return res(ctx.status(200), ctx.text(''))
+
   }),
 
   rest.post(`${backendURL}/users/find`, (req, res, ctx) => {

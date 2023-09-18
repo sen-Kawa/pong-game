@@ -141,7 +141,7 @@ describe('FindUser', () => {
   });
 
 
-  it('gives an error message if user not found', async () => {
+  it('user not found scenario for message and message type', async () => {
     const wrapper = mount(FindUser, {
 		data() {
 			return {
@@ -157,7 +157,7 @@ describe('FindUser', () => {
   });
 
 
-  it('succesfull message and message type', async () => {
+  it('user found scenario for message and message type', async () => {
     const wrapper = mount(FindUser, {
 		data() {
 			return {
