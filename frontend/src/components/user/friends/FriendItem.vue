@@ -1,7 +1,7 @@
 <template>
   <div class="friend-item">
-    <span class="friend-name">{{ friend.displayName }}</span>
-    <button>Status</button>
+	<span class="friend-name">{{ friend.displayName }} {{ friend.userName }}</span>
+	<p class="status">{{ friend.currentStatus }}</p>
     <button @click="removeFriend">Remove Friend</button>
   </div>
 </template>
