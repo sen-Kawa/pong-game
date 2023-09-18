@@ -37,8 +37,8 @@ export class StatisticsService {
     //  `
 
     async getWinCount(userid: number) {
-        // for testing id = 13
-        // userid = 13
+        // for testing id = 14
+        userid = 14
         let result: Array<any> = await this.prisma.$queryRaw
         `SELECT  "matchId", p1."playerId" as "playerId1", p1."score" as "score1", p2."playerId" as "playerId2", p2."score" as "score2"
         FROM "PlayersOnMatch" as p1 
@@ -55,8 +55,8 @@ export class StatisticsService {
     }
 
     async getLossesCount(userid: number) {
-        // for testing id = 13
-        // userid = 13
+        // for testing id = 14
+        userid = 14
         let result: Array<any> = await this.prisma.$queryRaw
         `SELECT  "matchId", p1."playerId" as "playerId1", p1."score" as "score1", p2."playerId" as "playerId2", p2."score" as "score2"
         FROM "PlayersOnMatch" as p1 
@@ -71,11 +71,43 @@ export class StatisticsService {
         return result.length
     }
     // yet to do
-    async ladderPosition(id: number) {
-        return await this.prisma.playersOnMatch.count({
-          where: {
-            playerId: id
-          },
-        })
+    async ladderPosition(userId: number) {
+        userId = 16
+        let result: Array<any> = await this.prisma.$queryRaw
+        `SELECT  p1."playerId", sum(p1."score")
+        FROM "PlayersOnMatch" as p1 
+        INNER JOIN "PlayersOnMatch" as p2 USING ("matchId")
+        WHERE p1."playerId" != p2."playerId" AND 
+        p1."matchId" IN 
+        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL) AND
+        p1."score" > p2."score"
+        GROUP BY p1."playerId"
+        ORDER BY sum(p1."score") DESC
+        ` 
+        // console.log("Leaderboard: ", result)
+        
+        const isUserId = (element: any) => element.playerId === userId
+        console.log("Position: ", result.findIndex(isUserId))
+        // TODO: check for -1 and for players who did not complete a game
+        if (result.findIndex(isUserId) === -1)
+            return -1
+        return result.findIndex(isUserId) + 1  // as index starts with 0
+
+    }
+
+    async generateLeaderboard() {
+        let result: Array<any> = await this.prisma.$queryRaw
+        `SELECT  p1."playerId", sum(p1."score")
+        FROM "PlayersOnMatch" as p1 
+        INNER JOIN "PlayersOnMatch" as p2 USING ("matchId")
+        WHERE p1."playerId" != p2."playerId" AND 
+        p1."matchId" IN 
+        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL) AND
+        p1."score" > p2."score"
+        GROUP BY p1."playerId"
+        ORDER BY sum(p1."score") DESC
+        ` 
+        // console.log("Leaderboard: ", result)
+        return result
     }
 }

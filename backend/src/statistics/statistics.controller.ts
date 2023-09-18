@@ -22,4 +22,11 @@ export class StatisticsController {
         let position: number = await this.statisticsService.ladderPosition(req.user.id)
         return [{wins: `${wins}`, losses: `${losses}`,numberOfGames: `${numberOfGames}`, position: `${position}`, numberOfPlayers: `${numberOfPlayers}`}]
     }
+
+    @Get('leaderboard')
+    @UseGuards(JwtAuthGuard)
+    async getLeaderboard(@Req() req: any): Promise<any> {
+        // return await this.statisticsService.generateLeaderboard()
+        return 'leaderboard'
+    }
 }
