@@ -1,9 +1,38 @@
 <script setup lang="ts">
-import MatchListVue from '@/components/match/MatchList.vue'
-import { Scope } from '@/services/MatchService'
+import { Scope, useMatchStore } from '@/stores/match'
+import { onMounted, ref } from 'vue'
+import LoadingIndicator from '../match/LoadingIndicator.vue'
+import MatchList from '../match/MatchList.vue'
+
+interface Props {
+  initialScope: Scope
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  initialScope: Scope.global
+})
+
+const scope = ref(props.initialScope)
+const matchStore = useMatchStore()
+
+matchStore.init()
+
+function toggleScope() {
+  matchStore.matches = []
+  if (scope.value === Scope.global) scope.value = Scope.personal
+  else if (scope.value === Scope.personal) scope.value = Scope.global
+  matchStore.getMatchHistory(scope.value)
+}
+
+onMounted(() => {
+  matchStore.getMatchHistory(scope.value)
+})
 </script>
 
 <template>
-  <div class="text-center">this is the MatchHistory tap</div>
-  <MatchListVue :initialScope="Scope.personal" />
+  <h2>{{ Scope[scope] }} MatchHistory</h2>
+  <button @click="toggleScope">Switch Scope</button>
+  <LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
+    <MatchList :matches="matchStore.matches" />
+  </LoadingIndicator>
 </template>

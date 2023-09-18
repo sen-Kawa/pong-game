@@ -1,7 +1,28 @@
 import { ConflictException, Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
+
+interface Player {
+  pos: number
+  vector: number
+  player_token: string
+  id: number
+}
+
+export interface GameUpdate {
+  player: Player
+  gameid: number
+}
+
+interface Game {
+  players: {
+    0: Player
+    1: Player
+  }
+  gameid: number
+}
 
 const matchWithScore = Prisma.validator<Prisma.MatchArgs>()({
   include: { players: true }
@@ -22,10 +43,96 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
 
 @Injectable()
 export class MatchService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {
+    this.matches = {}
+  }
+
+  matches: { [id: number]: Game }
+
+  join(matchId: number, playerId: number, player_token: string) {
+    const match = this.matches[matchId]
+    if (playerId == match.players[0].id) {
+      const session_id = player_token
+      match.players[0].player_token = session_id
+      return 0
+    } else if (playerId == match.players[1].id) {
+      const session_id = player_token
+      match.players[1].player_token = session_id
+      return 1
+    }
+
+    return undefined
+  }
 
   async create(data: Prisma.MatchCreateInput) {
-    return this.prisma.match.create({ data, include: { players: { include: { player: true } } } })
+    const match = await this.prisma.match.create({
+      data,
+      include: { players: { include: { player: true } } }
+    })
+    const players = match.players
+
+    const playerTwoId = match.players.length == 2 ? players[1].playerId : 0
+
+    this.matches[match.id] = {
+      players: [
+        {
+          pos: 0,
+          vector: 0,
+          id: players[0].playerId,
+          player_token: ''
+        },
+        {
+          pos: 0,
+          vector: 0,
+          id: playerTwoId,
+          player_token: ''
+        }
+      ],
+      gameid: match.id
+    }
+
+    return match
+  }
+
+  buildResponseMatch(match: Game) {
+    const player0 = match.players[0]
+    const player1 = match.players[1]
+
+    return {
+      players: {
+        0: {
+          pos: player0.pos,
+          vector: player0.vector
+        },
+        1: {
+          pos: player1.pos,
+          vector: player1.vector
+        }
+      },
+      gameid: match.gameid
+    }
+  }
+
+  makeMove(
+    update: { player: { pos: number; vector: number }; gameid: number },
+    player_token: string
+  ) {
+    console.log('update in make move:', update)
+    const match = this.matches[update.gameid]
+    console.log('Match in make move:', match, 'Match id is:', update.gameid)
+    if (!match) {
+      return undefined
+    }
+
+    if (match.players[0].player_token === player_token) {
+      match.players[0].pos = update.player.pos
+      match.players[0].vector = update.player.vector
+    } else if (match.players[1].player_token === player_token) {
+      match.players[1].pos = update.player.pos
+      match.players[1].vector = update.player.vector
+    }
+
+    return this.buildResponseMatch(match)
   }
 
   /**
@@ -41,21 +148,18 @@ export class MatchService {
    * @param options specifies what should be included and searched for
    * @param includeScores controls the inclusion of score information
    * @param includePlayers controls the inclusion of user information
-   * @param started if true searches for matches with a start date
-   * @param completed if true searches for matches with an end date
+   * @param status filter matches based on their current status {@link GameStatus}
    * @param players filter matches to only include matches with these players in it
    * @returns a list of all matches in detailed representation according to the query parameters
    */
   async findAll(options: {
     includeScores?: boolean
     includePlayers?: boolean
-    started?: boolean
-    completed?: boolean
+    gameStatus?: GameStatus
     players?: number[]
   }): Promise<MatchEntity | unknown> {
     // TODO: add sorting and limit
-    const { includeScores, includePlayers, started, completed, players } = options
-    console.debug({ options })
+    const { includeScores, includePlayers, gameStatus, players } = options
 
     const playersOnMatchFilter =
       players?.length > 1
@@ -68,13 +172,37 @@ export class MatchService {
       includes = { players: { include: { player: true } } }
     }
 
+    const filter: Prisma.MatchWhereInput = {
+      start: undefined,
+      end: undefined,
+      players: playersOnMatchFilter
+    }
+    switch (gameStatus) {
+      case GameStatus.CREATED:
+        filter.start = null
+        break
+      case GameStatus.IN_PROGRESS:
+        filter.start = {
+          not: null
+        }
+        filter.end = null
+        break
+      case GameStatus.COMPLETED:
+        filter.start = {
+          not: null
+        }
+        filter.end = {
+          not: null
+        }
+        break
+      default:
+        if (gameStatus) console.debug(`GameStatus ${gameStatus} not valid!`)
+        break
+    }
+
     return this.prisma.match.findMany({
       include: includes,
-      where: {
-        start: started !== undefined ? (started ? { not: null } : null) : undefined,
-        end: completed !== undefined ? (completed ? { not: null } : null) : undefined,
-        players: playersOnMatchFilter
-      }
+      where: filter
     })
   }
 
@@ -85,7 +213,7 @@ export class MatchService {
       includePlayers?: boolean
     }
   ) {
-    const { includeScores, includePlayers } = options
+    const { includeScores, includePlayers } = options || {}
     let includes = { players: undefined }
     if (includeScores) includes = { players: true }
     if (includePlayers) {
@@ -162,3 +290,20 @@ export class MatchService {
     return this.prisma.match.delete({ where: { id } })
   }
 }
+
+// /**
+//  * Creates a random string of given length
+//  * @param length the lenth of the string
+//  * @returns The random string
+//  */
+// function makeid(length: number) {
+//   let result = ''
+//   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+//   const charactersLength = characters.length
+//   let counter = 0
+//   while (counter < length) {
+//     result += characters.charAt(Math.floor(Math.random() * charactersLength))
+//     counter += 1
+//   }
+//   return result
+// }

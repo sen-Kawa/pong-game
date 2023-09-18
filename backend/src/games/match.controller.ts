@@ -13,6 +13,7 @@ import {
   Post,
   Query,
   Req,
+  Session,
   UseGuards
 } from '@nestjs/common'
 import {
@@ -49,18 +50,27 @@ export class MatchController {
   @ApiNotFoundResponse({ description: 'gets send if one of the specified users does not exist' })
   async create(@Body() createMatchDto: CreateMatchDto) {
     try {
-      return await this.matchService.create({
+      const match = await this.matchService.create({
         players: {
           create: createMatchDto.playerIds.map((id) => ({
             playerId: id
           }))
         }
       })
+
+      return match
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError && error.code === 'P2003')
         throw new NotFoundException('User not found') // TODO: maybe be more verbose: which user was not found?
       throw error
     }
+  }
+
+  @Post('join')
+  joinMatch(@Req() request: any, @Session() session: Record<string, any>) {
+    const match_id = session.current_match
+
+    return this.matchService.join(match_id, request.user.id, request.user.refreshToken)
   }
 
   /**
@@ -69,12 +79,16 @@ export class MatchController {
    * @returns a detailed representation of the created match.
    */
   @Post('me')
-  async createMatchForCurrentUser(@Req() request) {
-    return await this.matchService.create({
+  async createMatchForCurrentUser(@Req() request, @Session() session: Record<string, any>) {
+    const match = await this.matchService.create({
       players: {
         create: { playerId: request.user.id }
       }
     })
+
+    session.current_match = match.id
+
+    return match
   }
 
   /**
@@ -169,12 +183,14 @@ export class MatchController {
       'A conflict arises when the match already has two players an another one should be added.'
   })
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateGameDto: UpdateMatchDto) {
+    // console.debug(`update match with id ${id} with`, { updateGameDto })
     if (updateGameDto.playerId === undefined && updateGameDto.scores === undefined)
       throw new HttpException('not modified', HttpStatus.NO_CONTENT) // TODO: NOT MODIFIED is 304
 
     try {
       await this.matchService.findOne(id)
     } catch (error) {
+      console.error(error)
       throw new NotFoundException('match does not exist')
     }
     let entity = null

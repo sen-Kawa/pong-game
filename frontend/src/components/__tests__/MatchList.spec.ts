@@ -1,10 +1,26 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
-import { flushPromises, mount } from '@vue/test-utils'
 import MatchListVue from '@/components/match/MatchList.vue'
-import { Scope } from '@/services/MatchService'
+import type { MatchMetaData } from '@/types/match'
+import { mount } from '@vue/test-utils'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
+
+const fakeMatches: MatchMetaData[] = [
+  { id: 1, players: [] },
+  {
+    id: 2,
+    // start: new Date(Date.now()),
+    players: [
+      {
+        id: 1,
+        email: 'alice@exmaple.com',
+        name: 'Alice',
+        score: 0
+      }
+    ]
+  }
+]
 
 beforeAll(() => {
   TimeAgo.addDefaultLocale(en)
@@ -14,14 +30,11 @@ describe('MatchList', () => {
   it('renders properly', async () => {
     const wrapper = mount(MatchListVue, {
       props: {
-        initialScope: Scope.global
+        matches: fakeMatches
       }
     })
 
-    expect(wrapper.text()).toContain('Match List')
-
-    await flushPromises() // wait for the promise to resolve
-
-    expect(wrapper.text()).toContain('Match #1')
+    expect(wrapper.findAll('ul.match-list').length).toBe(1)
+    expect(wrapper.findAll('ul.match-list > li').length).toBe(2)
   })
 })

@@ -97,6 +97,7 @@ export class AuthService {
   async verify2FA(id: number, code: string) {
     try {
       const user = await this.usersServive.findOne(id)
+      if (!user.twoFactorAuthenticationSecret) return false
       return authenticator.verify({
         token: code,
         secret: user.twoFactorAuthenticationSecret

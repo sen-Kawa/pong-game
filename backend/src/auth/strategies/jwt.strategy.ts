@@ -16,10 +16,21 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       secretOrKey: config.get<string>('JWTSECRET'),
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          if (!request.cookies) {
+          let data: any
+          try {
+            data = request?.cookies['auth-cookie']
+          } catch {
+            try {
+              data = parseCookie(request['handshake']['headers']['cookie'])
+            } catch {
+              data = null
+            }
+          }
+
+          if (data === null || data === undefined) {
             return null
           }
-          return request?.cookies['auth-cookie']
+          return data
         }
       ])
     })
@@ -31,4 +42,16 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (user.activated2FA != payload.isTwoFaAuth) throw new UnauthorizedException()
     return user
   }
+}
+
+function parseCookie(cookie: string) {
+  const cookies = cookie.split(';')
+  const cookiesMap = cookies.map((cookie) => {
+    return cookie.split('=')
+  })
+  const result = cookiesMap.reduce((map, obj) => {
+    map[obj[0]] = obj[1]
+    return map
+  })
+  return result[' auth-cookie']
 }

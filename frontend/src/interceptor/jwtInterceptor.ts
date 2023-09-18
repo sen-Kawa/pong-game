@@ -26,7 +26,7 @@ jwtInterceptor.interceptors.response.use(
         })
         return axios(error.config)
       } catch (err) {
-        console.log(err)
+        return Promise.reject(error)
       }
     }
     //TODO handle error on interceptors
