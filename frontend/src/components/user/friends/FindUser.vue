@@ -93,6 +93,12 @@ export default {
 	margin-left: 10px;
 }
 .find-user {
+	border: 1px solid black;
+	max-width: 600px;
+	margin: 0 auto;
+	background: darkolivegreen;
+	padding-bottom: 20px;
+
 }
 table, th, td {
 	margin: 0 auto;
