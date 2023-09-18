@@ -9,9 +9,6 @@
 
 <script lang="ts">
 import { deleteFriend } from './api/friendship.api'
-import { useAuthStore } from '@/stores/auth'
-
-const authStore = useAuthStore()
 
 export default {
   props: {
@@ -27,9 +24,6 @@ export default {
       this.$emit('friendRemoved', this.friend.id)
 	} catch (error) {
 		console.error('Failed to remove friend');
-		if (error.response.data.statusCode === 401) {
-      		authStore.logout()
-		}
 	}
     }
   }

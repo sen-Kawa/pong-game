@@ -10,9 +10,6 @@
 <script lang="ts">
 import { postAddFriend } from './api/friendship.api'
 import ButtonApp from '../../ButtonApp.vue'
-import { useAuthStore } from '@/stores/auth'
-
-const authStore = useAuthStore()
 
 export default {
   props: {
@@ -25,7 +22,7 @@ export default {
     return {
       message: '',
       messageType: '',
-      isAdded: false
+      isAdded: false,
     }
   },
   components: {
@@ -44,9 +41,6 @@ export default {
 	catch(error) {
       this.message = `Failed to add ${this.friendName} to your friend list.`
       this.messageType = 'error'
-		if (error.response.data.statusCode === 401) {
-  			authStore.logout()
-		}
 	} 
       setTimeout(() => {
         this.message = ''

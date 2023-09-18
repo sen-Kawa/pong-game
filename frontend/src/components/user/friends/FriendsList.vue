@@ -30,15 +30,12 @@ import ButtonApp from '../../ButtonApp.vue'
 import Friend from './FriendItem.vue'
 import FindUser from './FindUser.vue'
 import { getFriendList } from './api/friendship.api.js'
-import { useAuthStore } from '@/stores/auth'
-
-const authStore = useAuthStore()
 
 export default {
   data() {
     return {
       showFindUser: false,
-      friends: []
+      friends: [],
     }
   },
   components: {
@@ -65,9 +62,6 @@ export default {
 		}
 		catch(error) {
 			console.error('Error fetching friends list');
-			if (error.response.data.statusCode === 401) {
-      			authStore.logout()
-			}
 		}                  
     }              		
   }
