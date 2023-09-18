@@ -28,6 +28,9 @@
 <script lang="ts">
 import AddFriend from './AddFriend.vue'
 import { postFindUser } from './api/friendship.api.js'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 export default {
   data() {
@@ -67,6 +70,9 @@ export default {
 		}
 		else {
         	this.message = error.response.data.statusText
+			if (error.response.data.statusCode === 401) {
+          		authStore.logout()
+			}
 		}
     	this.messageType = 'error'
 	  }
