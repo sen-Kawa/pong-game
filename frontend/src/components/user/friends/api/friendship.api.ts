@@ -51,6 +51,7 @@ export async function deleteFriend(displayName: string) {
 	console.log('Request succesful on delete friend.');
   } catch (error) {
 	console.error('Error making the request in deleteFriend api', error);
+	throw error
   }
 }
 

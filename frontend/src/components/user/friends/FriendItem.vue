@@ -18,8 +18,12 @@ export default {
   },
   methods: {
     async removeFriend() {
+	try {
       await deleteFriend(this.friend.displayName)
       this.$emit('friendRemoved', this.friend.id)
+	} catch (error) {
+		console.error('Failed to remove friend');
+	}
     }
   }
 }

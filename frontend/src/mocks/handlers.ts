@@ -97,7 +97,11 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.delete(`${backendURL}/users/removeFriend`, (req, res, ctx) => {
-    return res(ctx.status(200))
+	const requestBody = req.body;
+	if (requestBody && requestBody.friendName === 'Mimi')
+    	return res(ctx.status(400))
+	else
+    	return res(ctx.status(200))
   }),
 
 ]

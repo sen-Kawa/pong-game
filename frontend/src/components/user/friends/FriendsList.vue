@@ -51,7 +51,12 @@ export default {
       this.fetchFriendList()
     },
     async fetchFriendList() {
-      this.friends = await getFriendList()
+		try {
+      		this.friends = await getFriendList()
+		}
+		catch(error) {
+			console.error('Error fetching friends list');
+		}
     }
   }
 }
