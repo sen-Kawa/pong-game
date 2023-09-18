@@ -14,7 +14,7 @@ describe('FindUser', () => {
   it('renders the "Find" button', () => {
     const wrapper = mount(FindUser)
 	const button = wrapper.find('button')
-	expect(button.text()).toBe('Find')
+	expect(button.text()).toBe('Search')
   });
 
 
@@ -47,10 +47,10 @@ describe('FindUser', () => {
 	await input.setValue('bobb');
 	await wrapper.find('form').trigger('submit.prevent');
 	await wrapper.vm.$nextTick();
-	const userDetails = wrapper.findAll('li');
-	expect(userDetails.length).toBe(1);
-	expect(userDetails[0].text()).toContain('Bobu');
-	expect(userDetails[0].text()).toContain('bobby');
+	const userDetails = wrapper.findAll('tr');
+	expect(userDetails.length).toBe(2);
+	expect(userDetails[1].text()).toContain('Bobu');
+	expect(userDetails[1].text()).toContain('bobby');
   });
 
 
@@ -72,10 +72,10 @@ describe('FindUser', () => {
 	await input.setValue('Bob');
 	await wrapper.find('form').trigger('submit.prevent');
 	await wrapper.vm.$nextTick();
-	const userDetails = wrapper.findAll('li');
-	expect(userDetails.length).toBe(1);
-	expect(userDetails[0].text()).toContain('Bobu');
-	expect(userDetails[0].text()).toContain('bobby');
+	const userDetails = wrapper.findAll('tr');
+	expect(userDetails.length).toBe(2);
+	expect(userDetails[1].text()).toContain('Bobu');
+	expect(userDetails[1].text()).toContain('bobby');
   });
 
 
@@ -101,10 +101,10 @@ describe('FindUser', () => {
 	await input.setValue('bobb');
 	await wrapper.find('form').trigger('submit.prevent');
 	await wrapper.vm.$nextTick();
-	const userDetails = wrapper.findAll('li');
-	expect(userDetails.length).toBe(2);
-	expect(userDetails[0].text()).toContain('Bobu');
-	expect(userDetails[1].text()).toContain('Bobardo');
+	const userDetails = wrapper.findAll('tr');
+	expect(userDetails.length).toBe(3);
+	expect(userDetails[1].text()).toContain('Bobu');
+	expect(userDetails[2].text()).toContain('Bobardo');
   });
 
 

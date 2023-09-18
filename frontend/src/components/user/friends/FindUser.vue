@@ -1,21 +1,27 @@
 <template>
-  <div>
+  <div class="find-user">
     <h2>Find User</h2>
     <form @submit.prevent="findUser">
       <label for="name">User's Name: </label>
       <input v-model="name" type="text" id="name" />
-      <button type="submit">Find</button>
+      <button class="search" type="submit">Search</button>
     </form>
     <div v-if="foundUser && foundUser.length > 0">
       <h3>User details</h3>
-      <li v-for="userData in foundUser" :key="userData['userName']">
-        <p>
-          {{ userData['displayName'] }} {{ userData['userName'] }}
-          <AddFriend :friendName="userData['displayName']" @friendAdded="onFriendAdded" />
-        </p>
-      </li>
+    <table>
+		<tr>
+			<th>Name</th>
+			<th>User Name</th>
+			<th></th>
+		</tr>
+      <tr v-for="userData in foundUser" :key="userData['userName']">
+		  <td>{{ userData['displayName'] }}</td>
+		  <td>{{ userData['userName'] }}</td>
+		  <td><AddFriend :friendName="userData['displayName']" @friendAdded="onFriendAdded" /></td>
+      </tr>
+    </table>
     </div>
-    <div v-if="message" :class="messageType">{{ message }}</div>
+    <div class="message" v-if="message" :class="messageType">{{ message }}</div>
   </div>
 </template>
 
@@ -82,5 +88,19 @@ export default {
 }
 .error {
   color: red;
+}
+.search {
+	margin-left: 10px;
+}
+.find-user {
+}
+table, th, td {
+	margin: 0 auto;
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 10px;
+}
+.message {
+	margin-top: 10px;
 }
 </style>
