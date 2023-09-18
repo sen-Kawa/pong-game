@@ -1,9 +1,10 @@
 <template>
-  <div class="friend-item">
-	<span class="friend-name">{{ friend.displayName }} {{ friend.userName }}</span>
-	<p class="status">{{ friend.currentStatus }}</p>
-    <button @click="removeFriend">Remove Friend</button>
-  </div>
+	<tr>
+		<td class="displayName">{{ friend.displayName }}</td>
+		<td class="userName">{{ friend.userName }}</td>
+		<td class="status">{{ friend.currentStatus }}</td>
+		<td><button @click="removeFriend">Remove Friend</button></td>
+	</tr>
 </template>
 
 <script lang="ts">
@@ -30,15 +31,9 @@ export default {
 </script>
 
 <style scoped>
-.friend-item {
-  display: flex;
-}
-.friend-name {
-  font-weight: bold;
-  margin-right: 10px;
-  font-size: 20px;
-}
-div.friends {
-  align-items: center;
+td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 10px;
 }
 </style>

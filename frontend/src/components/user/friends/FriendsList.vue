@@ -1,16 +1,22 @@
 <template>
   <div class="friends">
     <h1>Friends</h1>
-    <ul v-if="friends.length">
-      <Friend
-        v-for="friend in friends"
-        :key="friend['id']"
-        :friend="friend"
-        @friendRemoved="onFriendRemoved"
-      />
-    </ul>
+    <table v-if="friends.length">
+		<tr>
+			<th>Name</th>
+			<th>User Name</th>
+			<th>Status</th>
+			<th></th>
+		</tr>
+     		 <Friend
+       		 v-for="friend in friends"
+       		 :key="friend['id']"
+       		 :friend="friend"
+        	@friendRemoved="onFriendRemoved"
+     		 />
+    </table>
     <div v-else>You dont have friends yet!</div>
-    <ButtonApp
+    <ButtonApp class="findUser"
       @btn-click="toggleShowFindUser()"
       :text="showFindUser ? 'Close' : 'Find User'"
       color="LightGray"
@@ -64,6 +70,15 @@ export default {
 
 <style scoped>
 div.friends {
-  align-items: center;
+	text-align: center;
+}
+table, th, td {
+	margin: 0 auto;
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 10px;
+}
+.findUser {
+	margin-top: 70px;
 }
 </style>

@@ -19,25 +19,16 @@ beforeEach(() => {
   });
 
 
-  it('renders the friend\'s display name', () => {
-	const friend = { displayName: 'John Leete'};
+  it('renders the friend\'s display name and user name', () => {
+	const friend = { displayName: 'John Leete', userName: 'johnny'};
     const wrapper = mount(FriendItem, {
 		props: { friend }
 	});
-    const displayName = wrapper.find('.friend-name');
+    const displayName = wrapper.find('.displayName');
     expect(displayName.text()).toBe('John Leete');
+    const userName = wrapper.find('.userName');
+    expect(userName.text()).toBe('johnny');
   });
-
-
-  it('renders the "Status" button', () => {
-	const friend = { displayName: 'John Leetu'};
-    const wrapper = mount(FriendItem, {
-		props: { friend }
-	});
-    const buttons = wrapper.findAll('button');
-    expect(buttons[0].text()).toBe('Status')
-  });
-
 
   it('renders the "Remove Friend" button', () => {
 	const friend = { displayName: 'John Leeta'};
@@ -45,7 +36,7 @@ beforeEach(() => {
 		props: { friend }
 	});
     const buttons = wrapper.findAll('button');
-    expect(buttons[1].text()).toBe('Remove Friend')
+    expect(buttons[0].text()).toBe('Remove Friend')
   });
 
 
@@ -56,7 +47,7 @@ beforeEach(() => {
 	});
 	const removeFriendSpy = vi.spyOn(wrapper.vm, 'removeFriend');
     const buttons = wrapper.findAll('button');
-	await buttons[1].trigger('click');
+	await buttons[0].trigger('click');
 	expect(removeFriendSpy).toHaveBeenCalled();
 	await removeFriendSpy.mockRestore();
   });

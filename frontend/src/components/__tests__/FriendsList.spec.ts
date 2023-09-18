@@ -40,7 +40,7 @@ describe('FriendsList', () => {
 		}
 	})
 	await wrapper.vm.$nextTick()
-	const friendElements = wrapper.findAll('.friend-name')
+	const friendElements = wrapper.findAll('.displayName')
 	expect(friendElements.length).toBe(2)
 	expect(friendElements[0].text()).toBe('Alice')
 	expect(friendElements[1].text()).toBe('Mary')
