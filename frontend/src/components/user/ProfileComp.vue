@@ -33,10 +33,8 @@
 <script setup lang="ts">
     import { ref } from 'vue'
     import { useAuthStore } from '../../stores/auth.js'
-    import Twofactor from './TwoFactor.vue'
-    import FileUpload from './FileUpload.vue'
-    const backendUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
 
+    const backendUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
     const authStore = useAuthStore()
     authStore.getuserProfile()
     const numberOfPlayers = ref<string>()
