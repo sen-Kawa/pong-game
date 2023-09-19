@@ -22,12 +22,10 @@
         </div>
         <div class="column">
             <h1>User Statistics</h1>
-            <p>Number of games played: 5</p>
-            <p>Wins & losses: 1 wins, 4 losses</p>
-            <p>Ladder level : 2 of 25 </p>
-            <!-- <p>Number of games played: {{ statistics.numberOfGames }}</p>
-            <p>Wins & losses: {{ wins }} wins, {{ losses }} losses</p>
-            <p>Ladder level : {{ position }} of {{ numberOfPlayers }} </p> -->
+            <p>Number of games played: {{ numberOfGames }}</p>
+            <p>Wins & losses: {{ wins }} win(s), {{ losses }} loss(es)</p>
+            <p>Ladder level : {{ position }} of {{ numberOfPlayers  }} </p>
+            
         </div>
     </div>
 </template>
@@ -37,26 +35,28 @@
     import { useAuthStore } from '../../stores/auth.js'
     import Twofactor from './TwoFactor.vue'
     import FileUpload from './FileUpload.vue'
-
-    let statistics: any
+    const backendUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
 
     const authStore = useAuthStore()
     authStore.getuserProfile()
-    async function getStatistics(): Promise<any> {
-        const response = await fetch("http://localhost:3000/statistics");
-        const stats = await response.json();
-        console.log(stats);
-        return stats
-    }
-    // statistics = await getStatistics()
-    // console.log("stats>>> ",statistics)
-    // const nameInput =ref("")
+    const numberOfPlayers = ref<string>()
+    const numberOfGames = ref<string>()
+    const position = ref<string>()
+    const wins = ref<string>()
+    const losses = ref<string>()
 
-    // async function handleDisplayNameChange() {
-    //     console.log("Change name to: ", nameInput.value)
-    //     await authStore.setDisplayName2(nameInput.value, '/user/Profile')
-    //     nameInput.value = ''  // clear text field
-    // }  
+    const requestOptions: RequestInit = {
+        method: 'GET',
+        credentials: 'include'
+    }
+    fetch(`${backendUrl}/statistics/`, requestOptions).then(response => { return response.json() }).then( responseData => { 
+        // console.log(responseData)
+        numberOfPlayers.value = responseData[0].numberOfPlayers
+        numberOfGames.value = responseData[0].numberOfGames
+        position.value = responseData[0].position
+        wins.value = responseData[0].wins
+        losses.value = responseData[0].losses
+    })
 </script>
 
 <style>
