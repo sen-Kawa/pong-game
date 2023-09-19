@@ -25,7 +25,7 @@ export class MatchGateway {
   ) {}
 
   @WebSocketServer() public server: Server
-  private logger: Logger = new Logger('MatchGateWay')
+  private logger: Logger = new Logger('MatchGateway')
 
   /**
    *
