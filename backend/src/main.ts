@@ -3,6 +3,7 @@ import { AppModule } from './app.module'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter'
+import { SessionAdapter } from './SessionAdapter'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieParser = require('cookie-parser')
@@ -39,6 +40,9 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization'
   })
   app.use(cookieParser())
+
+  app.useWebSocketAdapter(new SessionAdapter(app))
+
   await app.listen(3000)
 }
 bootstrap()

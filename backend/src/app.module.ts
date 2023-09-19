@@ -7,6 +7,9 @@ import { ConfigModule } from '@nestjs/config'
 import { validate } from './config/env.validation'
 import { MulterModule } from '@nestjs/platform-express'
 import { StatisticsModule } from './statistics/statistics.module'
+import { SocketModule } from './socket/socket.module'
+import { AppGateway } from './app.gateway'
+import { StatisticsModule } from './statistics/statistics.module'
 
 @Module({
   imports: [
@@ -23,7 +26,9 @@ import { StatisticsModule } from './statistics/statistics.module'
     UsersModule,
     GamesModule,
     AuthModule,
-    StatisticsModule
+    SocketModule,
+    AppGateway,
+    StatisticsModule,
   ],
   controllers: [],
   providers: []
