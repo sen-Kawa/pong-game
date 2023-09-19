@@ -1,6 +1,5 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { StatisticsService } from './statistics.service';
-import { UserEntity } from 'src/users/entities/user.entity'
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -27,10 +26,10 @@ export class StatisticsController {
         return [{wins: `${wins}`, losses: `${losses}`,numberOfGames: `${numberOfGames}`, position: `${position}`, numberOfPlayers: `${numberOfPlayers}`}]
     }
 
-    @Get('leaderboard')
-    @UseGuards(JwtAuthGuard)
-    async getLeaderboard(@Req() req: any): Promise<any> {
-        // return await this.statisticsService.generateLeaderboard()
-        return 'leaderboard'
-    }
+    // @Get('leaderboard')
+    // @UseGuards(JwtAuthGuard)
+    // async getLeaderboard(@Req() req: any): Promise<any> {
+    //     // return await this.statisticsService.generateLeaderboard()
+    //     return 'leaderboard'
+    // }
 }
