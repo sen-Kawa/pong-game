@@ -20,6 +20,10 @@ export class StatisticsController {
         let wins: number = await this.statisticsService.getWinCount(req.user.id)
         let losses: number = await this.statisticsService.getLossesCount(req.user.id)
         let position: number = await this.statisticsService.ladderPosition(req.user.id)
+        if (position === -1) {
+            // if the player was not found set in the data set, set him to the last position
+            position = numberOfPlayers
+        }
         return [{wins: `${wins}`, losses: `${losses}`,numberOfGames: `${numberOfGames}`, position: `${position}`, numberOfPlayers: `${numberOfPlayers}`}]
     }
 

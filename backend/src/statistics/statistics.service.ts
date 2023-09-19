@@ -17,8 +17,8 @@ export class StatisticsService {
             // add right id + check for ongoing games + divide by 2
             where: {
                 // for testing
-                playerId: 5
-                //playerId: userid // userid,
+                // playerId: 5
+                playerId: userid
             }  
         })
         return numberOfGames
@@ -38,7 +38,7 @@ export class StatisticsService {
 
     async getWinCount(userid: number) {
         // for testing id = 14
-        userid = 14
+        // userid = 14
         let result: Array<any> = await this.prisma.$queryRaw
         `SELECT  "matchId", p1."playerId" as "playerId1", p1."score" as "score1", p2."playerId" as "playerId2", p2."score" as "score2"
         FROM "PlayersOnMatch" as p1 
@@ -56,7 +56,7 @@ export class StatisticsService {
 
     async getLossesCount(userid: number) {
         // for testing id = 14
-        userid = 14
+        // userid = 14
         let result: Array<any> = await this.prisma.$queryRaw
         `SELECT  "matchId", p1."playerId" as "playerId1", p1."score" as "score1", p2."playerId" as "playerId2", p2."score" as "score2"
         FROM "PlayersOnMatch" as p1 
@@ -72,7 +72,7 @@ export class StatisticsService {
     }
     // yet to do
     async ladderPosition(userId: number) {
-        userId = 16
+        // userId = 16
         let result: Array<any> = await this.prisma.$queryRaw
         `SELECT  p1."playerId", sum(p1."score")
         FROM "PlayersOnMatch" as p1 
