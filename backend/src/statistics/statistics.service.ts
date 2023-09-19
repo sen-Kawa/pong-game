@@ -11,19 +11,6 @@ export class StatisticsService {
         })
     }
 
-    async getUserGamesCount(userid: number): Promise<number> {
-        console.log("UserId: ", userid)
-        let numberOfGames = await this.prisma.playersOnMatch.count({
-            // add right id + check for ongoing games + divide by 2
-            where: {
-                // for testing
-                // playerId: 5
-                playerId: userid
-            }  
-        })
-        return numberOfGames
-    }
-
     // Template for query results
 
     // `SELECT "matchId", p1."playerId" as "playerId1", p1."score" as "score1", p2."playerId" as "playerId2", p2."score" as "score2"
@@ -35,6 +22,31 @@ export class StatisticsService {
     //     p1."playerId" = ${userid} AND
     //     p1."score" > p2."score"
     //  `
+
+    async getUserGamesCount(userid: number): Promise<number> {
+        // console.log("UserId: ", userid)
+        let result: Array<any> = await this.prisma.$queryRaw
+        `SELECT  "matchId"
+        FROM "PlayersOnMatch" 
+        WHERE "playerId" = ${userid} AND
+        "matchId" IN 
+        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL)
+        `
+        // console.log("Games: ", result, result.length)
+        return result.length
+
+
+
+        // let numberOfGames = await this.prisma.playersOnMatch.count({
+        //     // add right id + check for ongoing games + divide by 2
+        //     where: {
+        //         // for testing
+        //         // playerId: 5
+        //         playerId: userid
+        //     }  
+        // })
+        // return numberOfGames
+    }
 
     async getWinCount(userid: number) {
         // for testing id = 14
@@ -51,7 +63,6 @@ export class StatisticsService {
         `
         // console.log("Wins: ", result, result.length)
         return result.length
-        
     }
 
     async getLossesCount(userid: number) {
