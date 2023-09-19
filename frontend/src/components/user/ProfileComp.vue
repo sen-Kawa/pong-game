@@ -35,28 +35,41 @@
     import { useAuthStore } from '../../stores/auth.js'
     import Twofactor from './TwoFactor.vue'
     import FileUpload from './FileUpload.vue'
+    import axios from 'axios'
+    import jwtInterceptor from '../../interceptor/jwtInterceptor'
+
     const backendUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
 
     const authStore = useAuthStore()
     authStore.getuserProfile()
-    const numberOfPlayers = ref<string>()
-    const numberOfGames = ref<string>()
-    const position = ref<string>()
-    const wins = ref<string>()
-    const losses = ref<string>()
+    const numberOfPlayers: any = ref<string>()
+    const numberOfGames: any = ref<string>()
+    const position: any = ref<string>()
+    const wins: any = ref<string>()
+    const losses: any = ref<string>()
 
     const requestOptions: RequestInit = {
         method: 'GET',
         credentials: 'include'
     }
-    fetch(`${backendUrl}/statistics/`, requestOptions).then(response => { return response.json() }).then( responseData => { 
-        // console.log(responseData)
-        numberOfPlayers.value = responseData[0].numberOfPlayers
-        numberOfGames.value = responseData[0].numberOfGames
-        position.value = responseData[0].position
-        wins.value = responseData[0].wins
-        losses.value = responseData[0].losses
-    })
+
+    async function getStatistics() {
+        const response = await jwtInterceptor.get(backendUrl + '/statistics', {
+            withCredentials: true
+        })
+        if (response && response.status == 200) {
+            numberOfPlayers.value = response.data[0].numberOfPlayers
+            numberOfGames.value = response.data[0].numberOfGames
+            position.value = response.data[0].position
+            wins.value = response.data[0].wins
+            losses.value = response.data[0].losses
+            // console.log(response.data) //.data
+        } else {
+            window.alert("Can't get statistics");
+        }
+    }
+
+    getStatistics()
 </script>
 
 <style>
