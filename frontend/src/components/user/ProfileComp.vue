@@ -14,7 +14,9 @@
                 <button @click="handleDisplayNameChange">Change display name</button>
             </p> -->
             <p>Email      : {{ authStore.getEmail }}</p>
-            <p>Avatar     : <img src="http://localhost:3000/users/userImage" width="50" height="60"><br>
+            <!-- <p>Avatar     : <img id="avatar" src="http://localhost:3000/users/userImage" width="50" height="60"><br></p> -->
+            <p>Avatar     : <img v-bind:src="avatar2" width="50" height="60"><br></p>
+            <p>
                 <FileUpload></FileUpload>
             </p>
             <p>Two-Factor Authentication enabled: {{ authStore.activated2FA }} </p>
@@ -47,6 +49,7 @@
     const position: any = ref<string>()
     const wins: any = ref<string>()
     const losses: any = ref<string>()
+    const avatar2: any = ref<string>()
 
     const requestOptions: RequestInit = {
         method: 'GET',
@@ -68,8 +71,27 @@
             window.alert("Can't get statistics");
         }
     }
-
+   
+    async function getAvatar() {
+        const response = await jwtInterceptor.get(backendUrl + '/users/userImage', {
+            withCredentials: true, responseType: 'blob', timeout: 30000,
+        })
+        if (response && response.status == 200) {
+            avatar2.value =  URL.createObjectURL(response.data)
+            // console.log(response.data) //.data
+        } else {
+            window.alert("Can't get avatar");
+        }
+    }
     getStatistics()
+    // fetch(backendUrl + '/users/userImage', { method: "GET", credentials: "include" }).then(response => {
+    //     console.log(response)
+    //     return response.blob()
+    // }).then((blob => {
+    //     console.log(blob)
+    //     avatar2.value =  URL.createObjectURL(blob)
+    // }))
+    getAvatar()
 </script>
 
 <style>
