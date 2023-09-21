@@ -1,5 +1,5 @@
 # THIS IS NOT A TECHNICAL DOCUMENTATION:
-But notes from the Author regading the current progress of the chat development.
+But notes from the Author regarding the current progress of the chat development.
 
 # Chat Todo
 > Wiring all 3 unwired frontend notification points to update notification counts reactively
@@ -13,11 +13,13 @@ But notes from the Author regading the current progress of the chat development.
 
 # Author's Comment
 I believe that will be all for the CHATS portion of the project requirements. 
-Criticisms/Corrections/Suggestions are welcome, but please criticize constructively after you have ully understood why I implemented the logic in the specific part that got your interest. 
-I am open to working with anyone on their specific tasks if required.
+Criticisms/Corrections/Suggestions are welcome, but please criticize constructively after asking me why I implemented the logic in the specific part that got your interest. 
+I am open to assisting anyone with their specific tasks of the project, if invited.
 
 
 # Miscellaneous (NOT MANDATORY)
+> Unit / End-to-End Testing
+
 > Visual/UI Improvements 
 
 > Proper(prettier) Datetime formatting

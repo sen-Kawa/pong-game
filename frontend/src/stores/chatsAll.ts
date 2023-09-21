@@ -20,6 +20,7 @@ export const useChatsStore = defineStore('chats', () => {
       }
       else {
         authStore.setLoginStatus(false);
+        return false;
       }
     }
     return response;
