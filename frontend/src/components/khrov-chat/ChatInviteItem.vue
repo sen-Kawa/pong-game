@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { reactive, inject } from 'vue'
+import { reactive } from 'vue'
 import type { ChatInviteItem } from '@/components/khrov-chat/interface/khrov-chat'
 import { layer } from '@layui/layer-vue'
+import { useChatsStore } from '@/stores/chatsAll'
+
 const props = defineProps<{
   myId: number
   theirId: number
@@ -9,7 +11,7 @@ const props = defineProps<{
   profileDp: string
 }>()
 
-const $HOST = inject('$HOST')
+const chatsStore = useChatsStore();
 
 const ciItem: ChatInviteItem = reactive({
   ciiBlockPanelHeight: '0px',
@@ -17,96 +19,85 @@ const ciItem: ChatInviteItem = reactive({
   ciiMsgInput: ''
 })
 
-const sendNewMsg = () => {
+const sendNewMsg = async () => {
   if (ciItem.ciiMsgInput.length < 1) {
     return
   }
-
   const tmp = {
     senderId: props.myId,
     receiverId: props.theirId,
     msg: ciItem.ciiMsgInput
   }
-
-  fetch(`${$HOST}/chats`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  }).then((response) => {
-    if (!response.ok) {
-      layer.msg('Message could not be sent', { time: 5000 })
-      throw response
+  const response = await chatsStore.fetchForKhrov('/chats', 'POST', tmp);
+    if (response) {
+      try {
+        if (!response.ok) {
+          layer.msg('Message could not be sent', { time: 5000 })
+          throw response
+        }
+        ciItem.ciiMsgInput = ''
+        ciItem.ciiMsgPanelHeight = '0px'
+        layer.msg('Message sent Successfully', { time: 5000 })
+      } catch {/* Do nothing */}
     }
-
-    ciItem.ciiMsgInput = ''
-
-    ciItem.ciiMsgPanelHeight = '0px'
-    layer.msg('Message sent Successfully', { time: 5000 })
-  })
 }
 
-const blockUser = (blocker: number, blocked: number, partner: string) => {
+const blockUser = async (blocker: number, blocked: number, partner: string) => {
   const tmp = {
     blockerId: blocker,
     blockedId: blocked
   }
-
-  fetch(`${$HOST}/chats/block/user`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  }).then((response) => {
+  const response = await chatsStore.fetchForKhrov('/chats/block/user', 'PUT', tmp);
+  if (response) {
     if (response.ok) {
       layer.msg(`You have blocked ${partner} successfully!`, { time: 5000 })
     } else {
       layer.msg(`Could not block ${partner}!`, { time: 5000 })
     }
-  })
+  }
 }
 </script>
 <template>
   <div id="Chat-invite-item">
     <div class="User-preview">
-      <img :src="profileDp" alt="Avatar" />
+      <div>
+        <img :src="profileDp" alt="Avatar" />
+      </div>
       <span>{{ displayName }}</span>
-      <img
-        src="/khrov-chat-media/chat.png"
-        alt="Message"
-        @click="
-          {
-            ciItem.ciiBlockPanelHeight = '0px';
-
-            if (ciItem.ciiMsgPanelHeight === '0px') {
-              ciItem.ciiMsgPanelHeight = '25px';
-            } else {
-              ciItem.ciiMsgPanelHeight = '0px';
-            }
-          }
-        "
-      />
-      <img
-        src="/khrov-chat-media/block.png"
-        alt="Block"
-        @click="
-          {
-            ciItem.ciiMsgPanelHeight = '0px';
-
-            if (ciItem.ciiBlockPanelHeight === '0px') {
-              ciItem.ciiBlockPanelHeight = '25px';
-            } else {
+      <div>
+        <img
+          src="/khrov-chat-media/chat.png"
+          alt="Message"
+          @click="
+            {
               ciItem.ciiBlockPanelHeight = '0px';
+
+              if (ciItem.ciiMsgPanelHeight === '0px') {
+                ciItem.ciiMsgPanelHeight = '25px';
+              } else {
+                ciItem.ciiMsgPanelHeight = '0px';
+              }
             }
-          }
-        "
-      />
+          "
+        />
+      </div>
+      <div>
+        <img
+          src="/khrov-chat-media/block.png"
+          alt="Block"
+          @click="
+            {
+              ciItem.ciiMsgPanelHeight = '0px';
+
+              if (ciItem.ciiBlockPanelHeight === '0px') {
+                ciItem.ciiBlockPanelHeight = '25px';
+              } else {
+                ciItem.ciiBlockPanelHeight = '0px';
+              }
+            }
+          "
+        />
+      </div>
     </div>
     <div class="Messaging-box-div">
       <input class="Messaging-box" v-model="ciItem.ciiMsgInput" @keyup.enter="sendNewMsg" />
@@ -143,12 +134,14 @@ const blockUser = (blocker: number, blocked: number, partner: string) => {
   transition: 0.5s;
 }
 .User-preview > * {
+  width: 100%;
+  height: 100%;
   padding: 5px;
 }
 .User-preview:hover {
   background-color: #f5f5dc;
 }
-.User-preview > :nth-child(1) {
+.User-preview > :nth-child(1) > img {
   position: relative;
   top: 41%;
   transform: translateY(-50%);
@@ -169,8 +162,8 @@ const blockUser = (blocker: number, blocked: number, partner: string) => {
   text-overflow: ellipsis;
   text-transform: capitalize;
 }
-.User-preview > :nth-child(3),
-.User-preview > :nth-child(4) {
+.User-preview > :nth-child(3) > img,
+.User-preview > :nth-child(4) > img {
   position: relative;
   top: 40%;
   transform: translateY(-50%);

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, inject } from 'vue'
+import { reactive } from 'vue'
 import { layer } from '@layui/layer-vue'
+import { useChatsStore } from '@/stores/chatsAll'
 
 const props = defineProps<{
   userId: number
@@ -11,7 +12,7 @@ const props = defineProps<{
   memberOr: string
 }>()
 
-const $HOST = inject('$HOST')
+const chatsStore = useChatsStore();
 
 const emit = defineEmits(['inFocus', 'joinOrExitComplete'])
 
@@ -39,39 +40,26 @@ const cnItem: JoinStatus = reactive({
 
 let joinExitFlag: boolean = false
 
-const changeMembership = (joinOrExit: boolean) => {
+const changeMembership = async (joinOrExit: boolean) => {
   if (!String(cnItem.cniPwdInput).match(/^[a-zA-Z\d]*$/)) {
     layer.msg('Password Contains Unsupported Characters', { time: 5000 })
     return
   }
-
   const tmp = {
     userId: props.userId,
     chId: props.channelId,
     password: cnItem.cniPwdInput,
     joinOrExit: joinOrExit
   }
-
   cnItem.cniPwdInput = ''
-
-  fetch(`${$HOST}/channels/${props.userId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .then((data) => {
+  const response = await chatsStore.fetchForKhrov(`/channels/${props.userId}`, 'PUT', tmp);
+  if (response) {
+    try {
+      const jsonObj = await response.json();
       emit('joinOrExitComplete')
-
-      layer.msg(data.message, { time: 5000 })
-    })
-    .catch(() => {})
+      layer.msg(jsonObj.message, { time: 5000 })
+    } catch {/* Do nothing */}
+  }
 }
 </script>
 <template>

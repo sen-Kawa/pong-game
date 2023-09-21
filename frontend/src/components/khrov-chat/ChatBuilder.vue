@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, inject } from 'vue'
+import { onMounted, onUnmounted, reactive } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 import ChatIcon from '@/components/khrov-chat/ChatIcon.vue'
 import ChatWindow from '@/components/khrov-chat/ChatWindow.vue'
 import type { ChatBuilder } from '@/components/khrov-chat/interface/khrov-chat'
 import { layer } from '@layui/layer-vue'
+import { useChatsStore } from '@/stores/chatsAll'
 
-const $HOST = inject('$HOST')
+const chatsStore = useChatsStore();
+const authStore = useAuthStore();
+const { isLoggedIn } = storeToRefs(authStore)
 
 onMounted(() => {
   document.addEventListener('click', closeChatWindow, false)
@@ -37,55 +42,46 @@ const initialTest: ChatBuilder = reactive({
   cbdUserInput: 1
 })
 
-const APItest = () => {
+const APItest = async () => {
   if (initialTest.cbdUserInput && initialTest.cbdUserInput < 1) {
     return
   }
-
-  fetch(`${$HOST}/chats/get/temp/login/${initialTest.cbdUserInput}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response) => {
+  const response = await chatsStore.fetchForKhrov(`/chats/get/temp/login/${initialTest.cbdUserInput}`, 'GET', {});
+  if (response) {
+    try {
       if (!response.ok) {
-        return response.json()
+        const errorJson = await response.json();
+        layer.msg(errorJson.message, { time: 5000 })
       } else {
         layer.msg('Success. Chat Interface Now Ready!', { time: 5000 })
         initialTest.cbdFakeLogin = 'none'
       }
-    })
-    .then((errorJson) => {
-      if (errorJson) {
-        layer.msg(errorJson.message, { time: 5000 })
-        console.log(errorJson.message)
-      }
-    })
+    } catch {/* Do nothing */}
+  }
 }
 </script>
 
 <template>
-  <div class="Login-bg">
-    <input
-      class="APItest-box"
-      input
-      type="number"
-      placeholder="Enter userId"
-      v-model="initialTest.cbdUserInput"
-      @keyup.enter="APItest"
-    />
-  </div>
-  <div id="ChatIcon-container" @click="openChatWindow">
-    <ChatIcon />
-  </div>
-  <div
-    id="ChatWindow-container"
-    v-if="initialTest.cbdFakeLogin === 'none' && initialTest.cbdUserInput"
-  >
-    <ChatWindow :sTemp="initialTest.cbdUserInput" />
+  <div v-if="isLoggedIn">
+    <div class="Login-bg">
+      <input
+        class="APItest-box"
+        input
+        type="number"
+        placeholder="Enter userId"
+        v-model="initialTest.cbdUserInput"
+        @keyup.enter="APItest"
+      />
+    </div>
+    <div id="ChatIcon-container" @click="openChatWindow">
+      <ChatIcon />
+    </div>
+    <div
+      id="ChatWindow-container"
+      v-if="initialTest.cbdFakeLogin === 'none' && initialTest.cbdUserInput"
+    >
+      <ChatWindow :sTemp="initialTest.cbdUserInput" />
+    </div>
   </div>
 </template>
 

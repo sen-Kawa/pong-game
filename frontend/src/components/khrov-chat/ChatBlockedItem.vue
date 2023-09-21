@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { reactive, inject } from 'vue'
+import { reactive } from 'vue'
 import type { ChatBlockedItem } from '@/components/khrov-chat/interface/khrov-chat'
 import { layer } from '@layui/layer-vue'
+import { useChatsStore } from '@/stores/chatsAll'
+
 defineProps<{
   myId: number
   theirId: number
@@ -9,53 +11,47 @@ defineProps<{
   profileDp: string
 }>()
 
-const $HOST = inject('$HOST')
+const chatsStore = useChatsStore();
 const cbItem: ChatBlockedItem = reactive({
   cbiBlockPanelHeight: '0px'
 })
 
-const unblockUser = (blocker: number, blocked: number, partner: string) => {
+const unblockUser = async (blocker: number, blocked: number, partner: string) => {
   const tmp = {
     blockerId: blocker,
     blockedId: blocked
   }
-
-  fetch(`${$HOST}/chats/block/user/unblock`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  }).then((response) => {
-    if (response.ok) {
-      layer.msg(`You have unblocked ${partner} successfully!`, { time: 5000 })
-    } else {
-      layer.msg(`Could not unblock ${partner}!`, { time: 5000 })
-    }
-  })
+  const response = await chatsStore.fetchForKhrov('/chats/block/user/unblock', 'PUT', tmp);
+  if (response && response.ok) {
+    layer.msg(`You have unblocked ${partner} successfully!`, { time: 5000 })
+  } else {
+    layer.msg(`Could not unblock ${partner}!`, { time: 5000 })
+  }
 }
 </script>
 <template>
   <div id="Chat-blocked-item">
     <div class="Blocked-user-preview">
-      <img :src="profileDp" alt="Avatar" />
+      <div>
+        <img :src="profileDp" alt="Avatar" />
+      </div>
       <span>{{ displayName }}</span>
-      <img
-        src="/khrov-chat-media/blocked.png"
-        alt="Unblock"
-        @click="
-          {
-            // Now toggle
-            if (cbItem.cbiBlockPanelHeight === '0px') {
-              cbItem.cbiBlockPanelHeight = '25px';
-            } else {
-              cbItem.cbiBlockPanelHeight = '0px';
+      <div>
+        <img
+          src="/khrov-chat-media/blocked.png"
+          alt="Unblock"
+          @click="
+            {
+              // Now toggle
+              if (cbItem.cbiBlockPanelHeight === '0px') {
+                cbItem.cbiBlockPanelHeight = '25px';
+              } else {
+                cbItem.cbiBlockPanelHeight = '0px';
+              }
             }
-          }
-        "
-      />
+          "
+        />
+      </div>
     </div>
     <div class="Blocking-box-div">
       <button
@@ -87,12 +83,14 @@ const unblockUser = (blocker: number, blocked: number, partner: string) => {
   position: relative;
 }
 .Blocked-user-preview > * {
+  width: 100%;
+  height: 100%;
   padding: 5px;
 }
 .Blocked-user-preview:hover {
   background-color: rgb(245, 245, 245);
 }
-.Blocked-user-preview > :nth-child(1) {
+.Blocked-user-preview > :nth-child(1) > img {
   position: relative;
   top: 41%;
   transform: translateY(-50%);
@@ -108,12 +106,12 @@ const unblockUser = (blocker: number, blocked: number, partner: string) => {
   width: 100%;
   font-size: 16px;
   color: #1c39bb;
-  margin: 0 auto;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: capitalize;
 }
-.Blocked-user-preview > :nth-child(3) {
+.Blocked-user-preview > :nth-child(3) > img {
   position: relative;
   top: 40%;
   transform: translateY(-50%);

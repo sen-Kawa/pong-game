@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { reactive, inject } from 'vue'
+import { reactive } from 'vue'
 import { toRef } from 'vue'
 import { onMounted, onUnmounted } from 'vue'
 import ChannelListItem from '@/components/khrov-chat/ChannelListItem.vue'
 import ChannelListItemMsg from '@/components/khrov-chat/ChannelListItemMsg.vue'
 import ChannelListItemPendings from '@/components/khrov-chat/ChannelListItemPendings.vue'
 import type { ChnListOfflineCache } from '@/components/khrov-chat/interface/khrov-chat'
+import { useChatsStore } from '@/stores/chatsAll'
 
 const props = defineProps<{
   sTemp: number
 }>()
 
-const $HOST = inject('$HOST')
+const chatsStore = useChatsStore();
 const $_: any = toRef(() => props.sTemp)
 const channCache: any = reactive({})
 const offlineCache: ChnListOfflineCache[] = []
@@ -107,65 +108,43 @@ const chList: ChList = reactive({
   getPendingsObjRef: 0
 })
 
-const getChannelPreviews = () => {
-  fetch(`${$HOST}/channels/get/connections/${$_.value}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include'
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw response
+const getChannelPreviews = async () => {
+  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/${$_.value}`, 'GET', {});
+  if (response) {
+    try {
+      if (!response.ok) throw response;
+      const jsonObj = await response.json();
+      if (JSON.stringify(jsonObj) != JSON.stringify(chList.channConn)) {
+        chList.channConn = jsonObj
       }
-      return response.json()
-    })
-    .then((data) => {
-      if (JSON.stringify(data) != JSON.stringify(chList.channConn)) {
-        chList.channConn = data
-      }
-
       if (chList.chlIdOfFocus != 0) {
         getFocusedChannelHistory()
       }
-    })
-    .catch(() => {})
+    } catch {/* Do nothing */}
+  }
 }
 
-const getFocusedChannelHistory = () => {
-  fetch(`${$HOST}/channels/get/connections/${$_.value}/${chList.chlIdOfFocus}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response) => {
+const getFocusedChannelHistory = async () => {
+  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/${$_.value}/${chList.chlIdOfFocus}`, 'GET', {});
+  if (response) {
+    try {
       if (!response.ok) {
-        chList.chlIdOfFocus = 0
-        throw response
+        chList.chlIdOfFocus = 0;
+        throw response;
       }
-      return response.json()
-    })
-    .then((data) => {
-      if (
-        !offlineCache.length &&
-        JSON.stringify(data) != JSON.stringify(channCache[chList.chlIdOfFocus])
-      ) {
-        channCache[chList.chlIdOfFocus] = data
+      const jsonObj = await response.json();
+      if (!offlineCache.length &&
+          JSON.stringify(jsonObj) != JSON.stringify(channCache[chList.chlIdOfFocus])) {
+        channCache[chList.chlIdOfFocus] = jsonObj
       }
-    })
-    .catch(() => {})
+    } catch {/* Do nothing */}
+  }
 }
 
-const submitChannMsg = () => {
+const submitChannMsg = async () => {
   if (chList.chlMsgInput && chList.chlMsgInput.length == 0) {
     return
   }
-
   const offlineAppend = {
     outgoing: chList.chlMsgInput as string,
     createdAt: new Date().toISOString(),
@@ -175,52 +154,31 @@ const submitChannMsg = () => {
     }
   }
   channCache[chList.chlIdOfFocus] = [offlineAppend, ...channCache[chList.chlIdOfFocus]]
-
   const tmp = {
     userId: $_.value,
     chId: chList.chlIdOfFocus,
     msg: chList.chlMsgInput as string,
     time: new Date().toISOString()
   }
-
   offlineCache.push(tmp)
-
   chList.chlMsgInput = ''
-
-  fetch(`${$HOST}/channels/`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(offlineCache)
-  }).then((responseMsg) => {
-    if (responseMsg.ok) {
-      offlineCache.length = 0
-    }
-  })
+  const response = await chatsStore.fetchForKhrov('/channels', 'PUT', offlineCache);
+  if (response) 
+    if (response.ok)
+      offlineCache.length = 0;
 }
 
-const setSeen = (userId: number, chId: number) => {
+const setSeen = async (userId: number, chId: number) => {
   const tmp = {
     userId: userId,
     chId: chId
   }
-  fetch(`${$HOST}/channels/put/set-seen`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  })
+  await chatsStore.fetchForKhrov(`/channels/put/set-seen`, 'PUT', tmp);
 }
 
 let intervalId: ReturnType<typeof setInterval>
 onMounted(() => {
-  intervalId = setInterval(getChannelPreviews, 5000)
+  intervalId = setInterval(getChannelPreviews, 3000)
 })
 onUnmounted(() => {
   clearInterval(intervalId)
@@ -249,36 +207,24 @@ const visibilityToImage = (visibility: string): string => {
   return visImage.substring(0, 18) + 'password' + visImage.substring(18)
 }
 
-const getUserID = (userNameInput: string) => {
+const getUserID = async (userNameInput: string) => {
   chList.notifMsg = ''
-
   if (!userNameInput || userNameInput.length < 3) {
     chList.notifMsg = 'Input in "userName" must be more than 3 chars'
     return
   }
-
-  fetch(
-    `${$HOST}/channels/?adminId=${$_.value}&chId=${chList.chlIdOfFocus}&userName=${userNameInput}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      credentials: 'include'
-    }
-  )
-    .then((response) => {
-      if (response.ok) {
-        chList.modGetUserIdInput = ''
-        return response.json()
-      }
-    })
-    .then((data) => (chList.notifMsg = data.message))
-    .catch()
+  const response = await chatsStore.fetchForKhrov(`/channels/?adminId=${$_.value}&chId=${chList.chlIdOfFocus}&userName=${userNameInput}`, 'GET', {});
+  if (response) {
+    try {
+      if (!response.ok) throw response;
+      chList.modGetUserIdInput = ''
+      const jsonObj = await response.json();
+      chList.notifMsg = jsonObj.message
+    } catch {/* Do nothing */}
+  }
 }
 
-const moderateMembers = () => {
+const moderateMembers = async () => {
   chList.notifModerMsg = ''
 
   if (!parseInt(chList.modModerMemberId) || parseInt(chList.modModerMemberId) < 1) {
@@ -308,28 +254,20 @@ const moderateMembers = () => {
     mutedUntil: mutedUntil.toISOString()
   }
 
-  fetch(`${$HOST}/channels/put/channel/moderate`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  })
-    .then((response) => {
-      if (response.ok) {
-        chList.modModerMemberId = ''
-        chList.modModerSelectAction = ''
-        chList.modModerMuteMins = ''
-        return response.json()
-      }
-    })
-    .then((data) => (chList.notifModerMsg = data.message))
-    .catch()
+  const response = await chatsStore.fetchForKhrov(`/channels/put/channel/moderate`, 'PUT', tmp);
+  if (response) {
+    try {
+      if (!response.ok) throw response;
+      chList.modModerMemberId = ''
+      chList.modModerSelectAction = ''
+      chList.modModerMuteMins = ''
+      const jsonObj = await response.json();
+      chList.notifModerMsg = jsonObj.message
+    } catch {/* Do nothing */}
+  }
 }
 
-const modifyChannel = () => {
+const modifyChannel = async () => {
   chList.notifModifyMsg = ''
 
   if (!chList.modModifySelectVisi.match(/^public$|^private$|^password$/)) {
@@ -354,70 +292,41 @@ const modifyChannel = () => {
     password: passTmp
   }
 
-  fetch(`${$HOST}/channels/put/channel/moderate/modify`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  })
-    .then((response) => {
-      if (response.ok) {
-        chList.modModifySelectVisi = ''
-        chList.modModifyPwd = ''
-        return response.json()
-      }
-    })
-    .then((data) => (chList.notifModifyMsg = data.message))
-    .catch()
+  const response = await chatsStore.fetchForKhrov('/channels/put/channel/moderate/modify', 'PUT', tmp);
+  if (response) {
+    try {
+      if (!response.ok) throw response;
+      chList.modModifySelectVisi = ''
+      chList.modModifyPwd = ''
+      const jsonObj = await response.json();
+      chList.notifModifyMsg = jsonObj.message
+    } catch {/* Do nothing */}
+  }
 }
 
-const getAllPending = () => {
+const getAllPending = async () => {
   chList.getPendingsObj.length = 0
 
-  fetch(`${$HOST}/channels/get/channel/moderate/${$_.value}/${chList.chlIdOfFocus}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json()
-      }
-    })
-    .then((data) => {
-      chList.getPendingsObj = data
-
+  const response = await chatsStore.fetchForKhrov(`/channels/get/channel/moderate/${$_.value}/${chList.chlIdOfFocus}`, 'GET', {});
+  if (response) {
+    try {
+      if (!response.ok) throw response;
+      const jsonObj = await response.json();
+      chList.getPendingsObj = jsonObj
       chList.getPendingsObjRef += 1
-    })
-    .catch()
+    } catch {/* Do nothing */}
+  }
 }
 
-const approveOrReject = (choice: boolean, memberId: number) => {
+const approveOrReject = async (choice: boolean, memberId: number) => {
   const tmp = {
     adminId: $_.value,
     chId: chList.chlIdOfFocus,
     memberId: memberId,
     action: choice
   }
-  fetch(`${$HOST}/channels/put/channel/moderate/pending/decide`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  }).then((response) => {
-    if (response.ok) {
-      getAllPending()
-    }
-  })
+  const response = await chatsStore.fetchForKhrov('/channels/put/channel/moderate/pending/decide', 'PUT', tmp);
+  if (response && response.ok) getAllPending();
 }
 </script>
 

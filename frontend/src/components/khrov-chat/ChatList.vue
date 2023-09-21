@@ -1,18 +1,20 @@
 <script setup lang="ts">
-  import { reactive, inject } from 'vue'
+  import { reactive } from 'vue'
   import { toRef } from "vue";
   import type { ChatList, ChatListTmp, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
   import { onMounted, onUnmounted } from 'vue'
   import ChatListItem from '@/components/khrov-chat/ChatListItem.vue'
   import ChatListItemMsg from '@/components/khrov-chat/ChatListItemMsg.vue'
   import { layer } from '@layui/layer-vue';
+  import { useChatsStore } from '@/stores/chatsAll'
 
   const props =  defineProps< {
     sTemp: number,
   } >()
 
-  const $HOST = inject('$HOST');
   const $_ = toRef(() => props.sTemp);
+  const chatsStore = useChatsStore();
+
   const cList: ChatList = reactive({
     chiChatConnsApiOk: 0,
     chiUnionUnderFocus: 0,
@@ -26,165 +28,99 @@
   const offlineCache: ChatListTmp[] = []; 
   let datas: Chat_unionTb[] = [];
 
-  const deleteConversation = (unionId: number) => {
+  const deleteConversation = async (unionId: number) => {
     const tmp = {
       'unionId': unionId,
     }
-
-    fetch(`${$HOST}/chats`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json'
-      },
-      credentials: "include",
-      body: JSON.stringify(tmp),
-    })
-    .then(response => {
-      if (response.ok) {
-        layer.msg('Conversation Deleted Successfully!', {time:5000});
-      }
-    });
+    const response = await chatsStore.fetchForKhrov('/chats', 'DELETE', tmp);
+    if (response && response.ok) {
+      layer.msg('Conversation Deleted Successfully!', {time:5000});
+    }
   }
 
-  const blockUnblock = (blocker: number, blocked: number, partner: string, flag: boolean) => {
+  const blockUnblock = async (blocker: number, blocked: number, partner: string, flag: boolean) => {
     const tmp = {
       'blockerId': blocker,
       'blockedId': blocked,
     }
     let msg: string = `You have unblocked ${partner} successfully!` ;
-
-    let route: string = `${$HOST}/chats`;
+    let route: string = '/chats';
     if (flag === true) {
       route += '/block/user';
-
       msg = msg.substr(0, 9) + msg.substr(11, msg.length);
     } else {
       route += '/block/user/unblock';
     }
-    fetch(route, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json'
-      },
-      credentials: "include",
-      body: JSON.stringify(tmp),
-    })
-    .then(response => {
-      if (response.ok) {
-        layer.msg(msg, {time:5000});
-      }
-    });
+    const response = await chatsStore.fetchForKhrov(route, 'PUT', tmp);
+    if (response && response.ok) {
+      layer.msg(msg, {time:5000});
+    }
   }
 
-  const setSeen = (meReceiver: number, theySender: number) => {
-
+  const setSeen = async (meReceiver: number, theySender: number) => {
     const tmp = {
       'meReceiver': meReceiver,
       'theySender': theySender
     }
-
-    fetch(`${$HOST}/chats/seen`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json'
-        },
-      credentials: "include",
-      body: JSON.stringify(tmp),
-    })
+    await chatsStore.fetchForKhrov('/chats/seen', 'PUT', tmp);
   }
 
-  const submitChatMsg = () => {
-
+  const submitChatMsg = async () => {
     if (cList.chiChatMsg && cList.chiChatMsg.length == 0) {
       return ;
     }
-
     const tmp: ChatListTmp = {
         'outgoing': cList.chiChatMsg as string,
         'incoming': null,
         'time': new Date().toISOString(),
         'deliveryStatus': 'pending'
       };
-
     chatCache[cList.chiUnionUnderFocus] = [
       tmp, ...chatCache[cList.chiUnionUnderFocus]
     ];
-
     cList.chiChatMsg = '';
-
     tmp.unionId = cList.chiUnionUnderFocus;
     tmp.unionIdOther = cList.chiUnionIdOther;
-
     offlineCache.push(tmp);
-    fetch(`${$HOST}/chats`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept':'application/json'
-          },
-          credentials: "include",
-          body: JSON.stringify(offlineCache),
-        })
-      .then( (responseMsg) => {
-
-        if (responseMsg.ok) {
-          offlineCache.length = 0;
-        }
-      } );
-  }
-
-  const getConversationPreviews = () => {
-
-    fetch(`${$HOST}/chats/${$_.value}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept':'application/json'
-        },
-      credentials: "include",
-      })
-    .then( (response) => { 
-      if (!response.ok) {
-        throw response;
-      }
-      return response.json() } ) 
-    .then( (data) => { datas = data; cList.chiChatConnsApiOk+=1; } ) 
-    .catch( () => { cList.chiChatConnsApiOk = cList.chiChatConnsApiOk ? 1 : 0; } );
-
-    if (cList.chiChatConnsApiOk && cList.chiUnionUnderFocus){
-      getOneConversation();
+    const response = await chatsStore.fetchForKhrov('/chats', 'PUT', offlineCache);
+    if (response && response.ok) {
+      offlineCache.length = 0;
     }
   }
 
-  const getOneConversation = () => {
-    fetch(`${$HOST}/chats?unionId=${cList.chiUnionUnderFocus}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept':'application/json'
-          },
-          credentials: "include",
-        })
-    .then(  (response) => { 
-      if (!response.ok) {
-        throw response;
+  const getConversationPreviews = async () => {
+    const response = await chatsStore.fetchForKhrov(`/chats/${$_.value}`, 'GET', {});
+    if (response) {
+      try {
+        if (!response.ok) throw response;
+        const jsonObj = await response.json();
+        datas = jsonObj; 
+        cList.chiChatConnsApiOk+=1;
+      } catch (error) {
+         cList.chiChatConnsApiOk = cList.chiChatConnsApiOk ? 1 : 0;
       }
-      return response.json() } )
-    .then( (dataUnion) => { 
+    }
+    if (cList.chiChatConnsApiOk && cList.chiUnionUnderFocus){
+      await getOneConversation();
+    }
+  }
 
-      if (JSON.stringify(chatCache[cList.chiUnionUnderFocus]) != JSON.stringify(dataUnion.chat_historys)) {
-        chatCache[cList.chiUnionUnderFocus] = dataUnion.chat_historys;            
-      };            
-    }) 
-    .catch( () => {} );
+  const getOneConversation = async () => {
+    const response = await chatsStore.fetchForKhrov(`/chats?unionId=${cList.chiUnionUnderFocus}`, 'GET', {});
+    if (response) {
+      try {
+        if (!response.ok) throw response;
+        const jsonObj = await response.json();
+        if (JSON.stringify(chatCache[cList.chiUnionUnderFocus]) != JSON.stringify(jsonObj.chat_historys)) {
+          chatCache[cList.chiUnionUnderFocus] = jsonObj.chat_historys;            
+        }
+      } catch {/* Do nothing */}
+    }
   }
 
   let intervalId: ReturnType<typeof setInterval>;
   onMounted(() => {
-    intervalId = setInterval(getConversationPreviews, 5000);
+    intervalId = setInterval(getConversationPreviews, 3000);
   });
   onUnmounted(() => {
     clearInterval(intervalId);

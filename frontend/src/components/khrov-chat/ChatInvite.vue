@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { toRef } from 'vue'
-import { reactive, inject } from 'vue'
+import { reactive } from 'vue'
 import ChatInviteItem from '@/components/khrov-chat/ChatInviteItem.vue'
 import ChatBlocked from '@/components/khrov-chat/ChatBlocked.vue'
 import type { ChatInvite, UserTb } from '@/components/khrov-chat/interface/khrov-chat'
+import { useChatsStore } from '@/stores/chatsAll'
 
 const props = defineProps<{
   sTemp: number
 }>()
 
-const $HOST = inject('$HOST')
+const chatsStore = useChatsStore();
 const $_: any = toRef(() => props.sTemp)
 const cInvite: ChatInvite = reactive({
   civContentOrNot: false,
@@ -20,38 +21,25 @@ const cInvite: ChatInvite = reactive({
 
 let datas: UserTb[]
 
-const searchUsers = (myId: number, key: string) => {
+const searchUsers = async (myId: number, key: string) => {
   cInvite.civContentOrNot = false
-
   cInvite.civSearchLoading = true
   if (key.length < 1) {
     cInvite.civSearchLoading = false
     return
   }
-
-  fetch(`${$HOST}/chats/get/search/user?searcherId=${myId}&key=${key}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response) => {
+  const response = await chatsStore.fetchForKhrov(`/chats/get/search/user?searcherId=${myId}&key=${key}`, 'GET', {});
+  if (response) {
+    try {
       cInvite.civSearchLoading = false
-      if (!response.ok) {
-        throw response
-      }
-      return response.json()
-    })
-    .then((data) => {
-      datas = data
-
-      if (data.length > 0) {
+      if (!response.ok) throw response
+      const jsonObj = await response.json()
+      datas = jsonObj
+      if (jsonObj.length > 0) {
         cInvite.civContentOrNot = true
       }
-    })
-    .catch(() => {})
+    } catch {/* Do nothing */}
+  }
 }
 
 const switchChiActive = (name: string) => {

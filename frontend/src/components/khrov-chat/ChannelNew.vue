@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { toRef } from 'vue'
-import { reactive, inject } from 'vue'
+import { reactive } from 'vue'
 import ChannelNewItem from '@/components/khrov-chat/ChannelNewItem.vue'
 import { layer } from '@layui/layer-vue'
+import { useChatsStore } from '@/stores/chatsAll'
 
 const props = defineProps<{
   sTemp: number
@@ -10,7 +11,7 @@ const props = defineProps<{
 
 const $_: any = toRef(() => props.sTemp)
 
-const $HOST = inject('$HOST')
+const chatsStore = useChatsStore();
 
 interface ChNewSearchOutput {
   id: number
@@ -101,9 +102,7 @@ const chnPassValidator = () => {
   }
 }
 
-const requestChannelCreation = (e: Event) => {
-  e.preventDefault()
-
+const requestChannelCreation = async () => {
   if (!String(chNew.chnNameInput).match(/^[a-zA-Z\d]{3,15}$/)) {
     chNew.chnError =
       '* Channel name must be between 3-15 characters long and contain only alphanumeric characters'
@@ -112,7 +111,6 @@ const requestChannelCreation = (e: Event) => {
     chNew.chnError = '* A visibility option must be selected'
     return false
   }
-
   if (
     chNew.chnVisiSelect === 'password' &&
     !chNew.chnPassInput.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])^[a-zA-Z\d]{6,20}$/)
@@ -126,7 +124,6 @@ const requestChannelCreation = (e: Event) => {
   } else {
     chNew.chnError = ''
   }
-
   let tmp = {
     name: chNew.chnNameInput,
     desc: chNew.chnDescInput,
@@ -134,21 +131,13 @@ const requestChannelCreation = (e: Event) => {
     userId: $_.value,
     password: ''
   }
-
   tmp.password = chNew.chnVisiSelect === 'password' ? chNew.chnPassInput : 'Aa1234'
-
-  fetch(`${$HOST}/channels`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include',
-    body: JSON.stringify(tmp)
-  })
-    .then((response) => {
+  const response = await chatsStore.fetchForKhrov('/channels', 'POST', tmp);
+  if (response) {
+    try {
       if (!response.ok) {
-        return response.json()
+        const error = await response.json()
+        chNew.chnError = error.message
       } else {
         layer.msg(`Success. Channel ${chNew.chnNameInput} Created Successfully!`, { time: 5000 })
         chNew.chnNameInput = ''
@@ -156,23 +145,14 @@ const requestChannelCreation = (e: Event) => {
         chNew.chnPassInput = ''
         chNew.chnDescInput = ''
       }
-    })
-    .then((error) => {
-      if (error) {
-        chNew.chnError = error.message
-      }
-    })
-    .catch(() => {})
-
-  return false
+    } catch {/* Do nothing */}
+  }
 }
 
-const searchChannels = (myId: number, key: string) => {
+const searchChannels = async (myId: number, key: string) => {
   chNew.renderSearchOutput = true
-
   chNew.searchOutput = []
   chNew.searchOutputRef += 1
-
   chNew.chnSearchLoading = true
   if (key.length === 1) {
     return
@@ -180,55 +160,31 @@ const searchChannels = (myId: number, key: string) => {
     suggestedChannels(myId)
     return
   }
-
-  fetch(`${$HOST}/channels/${myId}/${key}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response) => {
+  const response = await chatsStore.fetchForKhrov(`/channels/${myId}/${key}`, 'GET', {});
+  if (response) {
+    try {
       chNew.chnSearchLoading = false
-
-      if (!response.ok) {
-        throw response
-      }
-      return response.json()
-    })
-    .then((data) => {
-      chNew.searchOutput = data
+      if (!response.ok) throw response;
+      const jsonObj = await response.json();
+      chNew.searchOutput = jsonObj
       chNew.searchOutputRef += 1
-    })
-    .catch(() => {})
+    } catch {/* Do nothing */}
+  }
 }
 
-const suggestedChannels = (myId: number) => {
+const suggestedChannels = async (myId: number) => {
   chNew.renderSearchOutput = false
-
   chNew.chnSearchLoading = true
-  fetch(`${$HOST}/channels/${myId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    credentials: 'include'
-  })
-    .then((response) => {
+  const response = await chatsStore.fetchForKhrov(`/channels/${myId}`, 'GET', {});
+  if (response) {
+    try {
       chNew.chnSearchLoading = false
-
-      if (!response.ok) {
-        throw response
-      }
-      return response.json()
-    })
-    .then((data) => {
-      chNew.suggestionsOutput = data
-      chNew.suggestionsOutputRef += 1
-    })
-    .catch(() => {})
+      if (!response.ok) throw response;
+      const jsonObj = await response.json();
+      chNew.suggestionsOutput = jsonObj
+      chNew.suggestionsOutputRef += 1 
+    } catch {/* Do nothing */}
+  }
 }
 
 suggestedChannels($_.value)
@@ -296,7 +252,7 @@ suggestedChannels($_.value)
       </div>
       <div class="Ch-new-creat Ch-new-out" :class="{ ChnActive: chNew.chnLiSecondIsActive }">
         <p class="Chn-box-title">Create New Channel</p>
-        <form>
+        <form @submit.prevent="requestChannelCreation" >
           <label for="chName">Channel Name:</label>
           <input
             type="text"
@@ -359,7 +315,6 @@ suggestedChannels($_.value)
             type="submit"
             class="chSubmit"
             value="Create Channel"
-            @click="(e) => requestChannelCreation(e)"
           />
         </form>
       </div>
@@ -570,6 +525,7 @@ suggestedChannels($_.value)
   border: none;
   border-radius: 10px;
   padding: 5px;
+  cursor: pointer;
   box-shadow: 0 0 2px #73c2fb;
   -webkit-transition: 0.5s;
   transition: 0.5s;

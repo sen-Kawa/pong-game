@@ -1,27 +1,27 @@
-# Chat Todo(Nestjs)
-> Standardizing the APIs
+# THIS IS NOT A TECHNICAL DOCUMENTATION:
+But notes from the Author regading the current progress of the chat development.
 
-> Conforming codes to DRY
+# Chat Todo
+> Wiring all 3 unwired frontend notification points to update notification counts reactively
 
-> Better organization of routes managements
+> Simply Adding a fetch() API call to the link in user profile, to call the matchmaking API Endpoint(Implemented by the Team member working on the match-making part)
 
-> Proper Typescript-ing of codes
+> Researching how the Real-time API fetch() call logic can be improved (Current logic uses setInterval) 
 
-> Putting each API route behind the User's login session
+> When the above three are completed, The current test-login box will be removed and all backend API Endpoints updated to retrieve userID from cookies. 
 
-> Modifying current Users' Session Authentication to Project Requirements
 
-# Chat Todo(Vuejs)
-> Break down large components into smaller child components(if necessary)
+# Author's Comment
+I believe that will be all for the CHATS portion of the project requirements. 
+Criticisms/Corrections/Suggestions are welcome, but please criticize constructively after you have ully understood why I implemented the logic in the specific part that got your interest. 
+I am open to working with anyone on their specific tasks if required.
 
+
+# Miscellaneous (NOT MANDATORY)
 > Visual/UI Improvements 
 
 > Proper(prettier) Datetime formatting
 
 > Cleaner fonts (if necessary)
 
-> Wiring the universal notifications count to root component AKA ChatIcon.vue
-
 > Ideally some enter/exit keyframes CSS + Javascript Animations for smoother feel when navigating the app
-
-> Regarding the project requirement part that says (The user should be able to invite other users to play a Pong game through the chat interface.), I have created just a placeholder for that ATM, pending when I receive briefings about how the players matching feature is implemented on the game matchmaking part
