@@ -15,6 +15,8 @@ const app = createApp(App)
 
 TimeAgo.addDefaultLocale(en)
 
+document.title = '42 Pong'
+
 app.use(createPinia())
 app.use(router)
 app.use(layer)

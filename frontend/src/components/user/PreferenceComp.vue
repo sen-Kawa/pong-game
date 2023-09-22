@@ -17,4 +17,6 @@ authStore.getuserProfile()
 const avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage`
 
 const { getUserName } = storeToRefs(authStore)
+
+
 </script>
