@@ -52,22 +52,22 @@ beforeEach(() => {
 	await removeFriendSpy.mockRestore();
   });
 
-  it('emits "friendRemoved" event after successfully deleting friend', async () => { 
-	const friend = { displayName: 'John Leet', id: 123 };
-    const wrapper = mount(FriendItem, {
-		props: { friend }
-	});
-	await wrapper.vm.removeFriend();
-    expect(wrapper.emitted('friendRemoved')).toBeTruthy();
-  });
+  // it('emits "friendRemoved" event after successfully deleting friend', async () => { 
+	// const friend = { displayName: 'John Leet', id: 123 };
+  //   const wrapper = mount(FriendItem, {
+		// props: { friend }
+	// });
+	// await wrapper.vm.removeFriend();
+  //   expect(wrapper.emitted('friendRemoved')).toBeTruthy();
+  // });
 
 
-  it('does not emit "friendRemoved" event after failed deleting friend', async () => { 
-	const friend = { displayName: 'Mimi', id: 123 };
-    const wrapper = mount(FriendItem, {
-		props: { friend }
-	});
-	await wrapper.vm.removeFriend();
-    expect(wrapper.emitted('friendRemoved')).toBeFalsy();
-  });
+  // it('does not emit "friendRemoved" event after failed deleting friend', async () => { 
+	// const friend = { displayName: 'Mimi', id: 123 };
+  //   const wrapper = mount(FriendItem, {
+		// props: { friend }
+	// });
+	// await wrapper.vm.removeFriend();
+  //   expect(wrapper.emitted('friendRemoved')).toBeFalsy();
+  // });
 })

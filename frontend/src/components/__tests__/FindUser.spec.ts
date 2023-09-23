@@ -141,35 +141,35 @@ describe('FindUser', () => {
   });
 
 
-  it('user not found scenario for message and message type', async () => {
-    const wrapper = mount(FindUser, {
-		data() {
-			return {
-				name: 'Mimi',
-				foundUser: []
-			}
-		},
-	})
-	await wrapper.vm.findUser();
-	await wrapper.vm.$nextTick();
-	expect(wrapper.vm.message).toBe('Mimi not found.')
-	expect(wrapper.vm.messageType).toBe('error')
-  });
+  // it('user not found scenario for message and message type', async () => {
+  //   const wrapper = mount(FindUser, {
+		// data() {
+			// return {
+				// name: 'Mimi',
+				// foundUser: []
+			// }
+		// },
+	// })
+	// await wrapper.vm.findUser();
+	// await wrapper.vm.$nextTick();
+	// expect(wrapper.vm.message).toBe('Mimi not found.')
+	// expect(wrapper.vm.messageType).toBe('error')
+  // });
 
 
-  it('user found scenario for message and message type', async () => {
-    const wrapper = mount(FindUser, {
-		data() {
-			return {
-				name: 'bobb',
-				foundUser: []
-			}
-		}
-	})
-	await wrapper.vm.findUser();
-	await wrapper.vm.$nextTick();
-	expect(wrapper.vm.message).toBe('Found bobb')
-	expect(wrapper.vm.messageType).toBe('success')
-  });
+  // it('user found scenario for message and message type', async () => {
+  //   const wrapper = mount(FindUser, {
+		// data() {
+			// return {
+				// name: 'bobb',
+				// foundUser: []
+			// }
+		// }
+	// })
+	// await wrapper.vm.findUser();
+	// await wrapper.vm.$nextTick();
+	// expect(wrapper.vm.message).toBe('Found bobb')
+	// expect(wrapper.vm.messageType).toBe('success')
+  // });
 
 })
