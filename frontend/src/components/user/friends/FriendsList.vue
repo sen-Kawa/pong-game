@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       showFindUser: false,
-      friends: [],
+      friends: [] as { displayName: string; id: number; }[],
     }
   },
   components: {

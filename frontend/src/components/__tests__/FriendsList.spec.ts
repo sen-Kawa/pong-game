@@ -14,7 +14,7 @@ describe('FriendsList', () => {
 
 
   it('fetches the friend list on mount', () => {
-	const fetchListSpy = vi.spyOn(FriendsList.methods, 'fetchFriendList');
+	const fetchListSpy = vi.spyOn(FriendsList.methods as any, 'fetchFriendList');
     const wrapper = mount(FriendsList);
 	expect(fetchListSpy).toHaveBeenCalled();
   });
@@ -30,7 +30,7 @@ describe('FriendsList', () => {
 
   it('displays friends names when there are existing friends and has the correct length of friends object', async () => {
 	const friends = [
-		{"displayName":"Alice"},{"displayName":"Mary"}
+		{"displayName":"Alice", "id":1},{"displayName":"Mary", "id":2}
 	];
     const wrapper = mount(FriendsList, {
 		data() {
@@ -68,9 +68,9 @@ describe('FriendsList', () => {
 
 
   it('onFriendRemoved() method called when friend removed in child component FriendItem.vue and fetches the friend list', async () => {
-	const onFriendRemovedSpy = vi.spyOn(FriendsList.methods, 'onFriendRemoved');
-	const fetchListSpy = vi.spyOn(FriendsList.methods, 'fetchFriendList');
-	const friends = [{ displayName: "Alice" }];
+	const onFriendRemovedSpy = vi.spyOn(FriendsList.methods as any, 'onFriendRemoved');
+	const fetchListSpy = vi.spyOn(FriendsList.methods as any, 'fetchFriendList');
+	const friends = [{ displayName: "Alice", "id":1 }];
     const wrapper = mount(FriendsList, {
 		data() {
 			return {
@@ -91,8 +91,8 @@ describe('FriendsList', () => {
 
 
   it('onFriendAdded() method called when friend added in child component FindUser.vue and fetches the friend list', async () => {
-	const onFriendAddedSpy = vi.spyOn(FriendsList.methods, 'onFriendAdded');
-	const fetchListSpy = vi.spyOn(FriendsList.methods, 'fetchFriendList');
+	const onFriendAddedSpy = vi.spyOn(FriendsList.methods as any, 'onFriendAdded');
+	const fetchListSpy = vi.spyOn(FriendsList.methods as any, 'fetchFriendList');
     const wrapper = mount(FriendsList, {
 		data() {
 			return {

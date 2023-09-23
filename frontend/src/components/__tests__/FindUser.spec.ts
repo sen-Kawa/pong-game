@@ -19,7 +19,7 @@ describe('FindUser', () => {
 
 
   it('calls findUser() method based on a search with input value from user', async () => {
-	const FindUserSpy = vi.spyOn(FindUser.methods, 'findUser') 
+	const FindUserSpy = vi.spyOn(FindUser.methods as any, 'findUser') 
     const wrapper = mount(FindUser)
 	const input = wrapper.find('input');
 	await input.setValue('bobb');

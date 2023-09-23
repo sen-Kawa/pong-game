@@ -35,8 +35,8 @@ export default {
       name: '',
       message: '',
       messageType: '',
-	  foundUser: [],
-    }
+	  foundUser: [] as { displayName: string; userName: string; }[],
+	}
   },
   components: {
     AddFriend
@@ -62,14 +62,16 @@ export default {
       	}
 	} catch(error) {
 		console.error('Error making the request in FindUser', error);
-		if (error.response.data.statusCode === 400) {
-        	this.message = error.response.data.message[0]
+		if (error instanceof Error) {
+			if (error && error.response && error.response.data && error.response.data.statusCode === 400) {
+        		this.message = error.response.data.message[0]
+			}
+			else {
+        		this.message = error.response.data.statusText
+			}
+    		this.messageType = 'error'
+	 	 }
 		}
-		else {
-        	this.message = error.response.data.statusText
-		}
-    	this.messageType = 'error'
-	  }
       this.name = ''
       setTimeout(() => {
         this.message = ''
