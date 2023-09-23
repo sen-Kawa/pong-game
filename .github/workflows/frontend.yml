@@ -4,8 +4,9 @@
 name: Frontend (Vue) - Node.js CI
 
 on:
-  push:
-    branches: ["main"]
+  [push]
+  #push:
+  # branches: ["main"]
   pull_request:
     branches: ["main"]
 
