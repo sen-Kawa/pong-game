@@ -11,6 +11,7 @@
 		name: 'FooterApp',
 	}
 </script>
+
 <style scoped>
 	a {
 		color: white;
