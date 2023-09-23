@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import AddFriend from './src/components/user/friends/AddFriend.vue'
-import ButtonApp from './src/components/ButtonApp.vue'
+import AddFriend from '@/components/user/friends/AddFriend.vue'
+import ButtonApp from '@/components/ButtonApp.vue'
 
 describe('AddFriend', () => {
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import FindUser from './src/components/user/friends/FindUser.vue'
-import AddFriend from './src/components/user/friends/AddFriend.vue'
+import FindUser from '@/components/user/friends/FindUser.vue'
+import AddFriend from '@/components/user/friends/AddFriend.vue'
 
 describe('FindUser', () => {
 

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import FriendsList from './src/components/user/friends/FriendsList.vue'
-import Friend from './src/components/user/friends/FriendItem.vue'
-import FindUser from './src/components/user/friends/FindUser.vue'
-import ButtonApp from './src/components/ButtonApp.vue'
+import FriendsList from '@/components/user/friends/FriendsList.vue'
+import Friend from '@/components/user/friends/FriendItem.vue'
+import FindUser from '@/components/user/friends/FindUser.vue'
+import ButtonApp from '@/components/ButtonApp.vue'
 
 describe('FriendsList', () => {
 

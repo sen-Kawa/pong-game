@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import FriendItem from './src/components/user/friends/FriendItem.vue'
+import FriendItem from '@/components/user/friends/FriendItem.vue'
 import {afterEach, beforeEach} from 'node:test';
 
 
