@@ -1,13 +1,7 @@
 <script setup lang="ts">
-interface Player {
-	pos: number,
-	vector: number
-}
-
-interface GameUpdate {
-	player: Player,
-	gameid: number
-}
+import { socket } from '@/sockets/sockets';
+import { ref } from 'vue';
+import { type Player, type GameUpdate } from 'common-types'
 
 interface Game {
 	players: {
@@ -16,9 +10,6 @@ interface Game {
     },
     matchid: number
 }
-
-import { socket } from '@/sockets/sockets';
-import { ref } from 'vue';
 
 const props = defineProps(['match', 'player_number']);
 const game_state = ref({

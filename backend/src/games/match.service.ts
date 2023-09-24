@@ -3,18 +3,7 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
-
-interface Player {
-  pos: number
-  vector: number
-  player_token: string
-  id: number
-}
-
-export interface GameUpdate {
-  player: Player
-  gameid: number
-}
+import { Player, GameUpdate } from 'common-types'
 
 interface Game {
   players: {
@@ -114,10 +103,11 @@ export class MatchService {
   }
 
   makeMove(
-    update: { player: { pos: number; vector: number }; gameid: number },
+    update: GameUpdate,
     player_token: string
   ) {
     console.log('update in make move:', update)
+    console.log("Matches: ", this.matches)
     const match = this.matches[update.gameid]
     console.log('Match in make move:', match, 'Match id is:', update.gameid)
     if (!match) {
