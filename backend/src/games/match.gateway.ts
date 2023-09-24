@@ -34,9 +34,7 @@ export class MatchGateway {
    */
   @SubscribeMessage('move')
   game_update(@Req() request: any, @MessageBody() update: GameUpdate) {
-    const match = this.matchService.makeMove(update, request.user.refreshToken)
-    console.log('Update in game_update:', update)
+    const match = this.matchService.makeMove((update as any)[0], request.user.refreshToken)
     this.socketService.socket.emit('game_update', match)
-    console.log('Match is: ' + match)
   }
 }

@@ -118,10 +118,7 @@ export class MatchService {
     update: GameUpdate,
     player_token: string
   ) {
-    console.log('update in make move:', update)
-    console.log("Matches: ", this.matches)
     const match = this.matches[update.gameid]
-    console.log('Match in make move:', match, 'Match id is:', update.gameid)
     if (!match) {
       return undefined
     }
