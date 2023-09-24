@@ -7,8 +7,16 @@ import { Player, GameUpdate } from 'common-types'
 
 interface Game {
   players: {
-    0: Player
-    1: Player
+    0: {
+        player: Player,
+        player_token: string,
+        id: number
+    },
+    1: {
+        player: Player,
+        player_token: string,
+        id: number
+    }
   }
   gameid: number
 }
@@ -65,14 +73,18 @@ export class MatchService {
     this.matches[match.id] = {
       players: [
         {
-          pos: 0,
-          vector: 0,
+          player: {
+            pos: 0,
+            vector: 0
+          },
           id: players[0].playerId,
           player_token: ''
         },
         {
-          pos: 0,
-          vector: 0,
+          player: {
+            pos: 0,
+            vector: 0
+          },
           id: playerTwoId,
           player_token: ''
         }
@@ -84,8 +96,8 @@ export class MatchService {
   }
 
   buildResponseMatch(match: Game) {
-    const player0 = match.players[0]
-    const player1 = match.players[1]
+    const player0 = match.players[0].player
+    const player1 = match.players[1].player
 
     return {
       players: {
@@ -115,11 +127,11 @@ export class MatchService {
     }
 
     if (match.players[0].player_token === player_token) {
-      match.players[0].pos = update.player.pos
-      match.players[0].vector = update.player.vector
+      match.players[0].player.pos = update.player.pos
+      match.players[0].player.vector = update.player.vector
     } else if (match.players[1].player_token === player_token) {
-      match.players[1].pos = update.player.pos
-      match.players[1].vector = update.player.vector
+      match.players[1].player.pos = update.player.pos
+      match.players[1].player.vector = update.player.vector
     }
 
     return this.buildResponseMatch(match)
