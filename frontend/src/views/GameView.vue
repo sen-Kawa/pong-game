@@ -1,13 +1,15 @@
 <template>
   <div class="text-center">this is the game tap</div>
-  <button @click="createNewGame">New Game</button>
-  <SearchMatch />
+  <button v-if="!matchStore.currentMatch" @click="createNewGame">New Game</button>
+  <GameComponent v-if="matchStore.currentMatch" :match="matchStore.currentMatch" :player_number="0" />
+  <SearchMatch v-else />
 </template>
 
 <script setup lang="ts">
 import SearchMatch from '@/components/match/SearchMatch.vue'
 import { useMatchStore } from '@/stores/match'
 import { onMounted } from 'vue'
+import GameComponent from '../components/match/GameComponent.vue'
 
 const matchStore = useMatchStore()
 
