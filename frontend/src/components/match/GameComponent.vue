@@ -30,7 +30,8 @@ const game_state = ref({
 
 socket.on("game_update", (update: Game) => {
     console.log("Update: " + update);
-    game_state.value.game = update;
+    if (update)
+        game_state.value.game = update;
 })
 
 function makeMove(newVec: number) {
