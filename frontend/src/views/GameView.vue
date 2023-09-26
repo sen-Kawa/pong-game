@@ -1,8 +1,8 @@
 <template>
   <div class="text-center">this is the game tap</div>
   <button v-if="!matchStore.currentMatch" @click="createNewGame">New Game</button>
-  <GameComponent v-if="matchStore.currentMatch" :match="matchStore.currentMatch" :player_number="0" />
-  <SearchMatch v-else />
+  <GameComponent v-if="matchStore.currentMatch" :match="matchStore.currentMatch" :player_number="matchStore.player_number" />
+  <SearchMatch :join-game="matchStore.joinMatch" v-else />
 </template>
 
 <script setup lang="ts">
@@ -20,6 +20,7 @@ onMounted(async () => {
   // TODO: only await once
   await matchStore.getMatchesToJoin()
   await matchStore.getMatchesToSpectate()
+
 })
 
 async function createNewGame() {

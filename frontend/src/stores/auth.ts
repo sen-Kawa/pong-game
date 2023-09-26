@@ -35,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
   const getDisplayName = computed(() => userProfile.value.displayName)
   const getName = computed(() => userProfile.value.name)
   const getEmail = computed(() => userProfile.value.email)
+  const getId = computed(() => userProfile.value.id)
 
   function setUserProfile(date: any) {
     // console.log(date.id);
@@ -81,9 +82,9 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
-  
+
   async function getuserProfile() {
-    
+
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
@@ -180,6 +181,7 @@ export const useAuthStore = defineStore('auth', () => {
     getUserName,
     getName,
     getEmail,
+    getId,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,

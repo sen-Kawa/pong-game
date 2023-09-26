@@ -7,6 +7,10 @@ defineProps({
   matches: {
     type: Array as PropType<MatchMetaData[]>,
     required: true
+  },
+  joinGame: {
+    type: Function as PropType<(id: number) => void>,
+    required: true
   }
 })
 </script>
@@ -14,7 +18,7 @@ defineProps({
 <template>
   <div class="content">
     <ul v-if="matches.length" class="match-list">
-      <MatchItemVue v-for="match in matches" :key="match.id" :match="match" />
+      <MatchItemVue v-for="match in matches" :join-game="joinGame" :key="match.id" :match="match" />
     </ul>
   </div>
 </template>

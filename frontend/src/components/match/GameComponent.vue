@@ -2,6 +2,7 @@
 import { socket } from '@/sockets/sockets';
 import { ref } from 'vue';
 import { type Player, type GameUpdate } from 'common-types'
+import { useAuthStore } from '@/stores/auth';
 
 interface Game {
 	players: {
@@ -23,14 +24,13 @@ const game_state = ref({
                 pos: 0,
                 vector: 0
             }
-        },
-        matchid: 0
+        }
     }
 });
 
 socket.on("game_update", (update: GameUpdate) => {
     const player_number = props.player_number == 0 ? 1 : 0;
-    if (update)
+    if (update && props.match.id == update.gameid)
         game_state.value.game.players[player_number] = update.player;
 })
 
@@ -69,6 +69,8 @@ document.addEventListener('keyup', (event) => {
 		reset();
 	}
 })
+
+const userStore = useAuthStore();
 
 const interval = setInterval(drawGame, 33);
 

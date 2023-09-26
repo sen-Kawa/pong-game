@@ -6,7 +6,7 @@ import { MatchEntity } from './entities/match.entity'
 import { Player, GameUpdate } from 'common-types'
 import { SocketService } from 'src/socket/socket.service'
 
-interface Game {
+export interface Game {
   players: {
     0: {
         player: Player,
@@ -55,17 +55,20 @@ export class MatchService {
 
   join(matchId: number, playerId: number, player_token: string) {
     const match = this.matches[matchId]
+
+    if (match === undefined)
+        return undefined
+
     if (playerId == match.players[0].id) {
       const session_id = player_token
       match.players[0].player_token = session_id
-      return 0
-    } else if (playerId == match.players[1].id) {
+    } else if (playerId == match.players[1].id || match.players[1].id === undefined) {
       const session_id = player_token
+      match.players[1].id = playerId
       match.players[1].player_token = session_id
-      return 1
     }
 
-    return undefined
+    return match
   }
 
   async create(data: Prisma.MatchCreateInput) {
@@ -75,7 +78,7 @@ export class MatchService {
     })
     const players = match.players
 
-    const playerTwoId = match.players.length == 2 ? players[1].playerId : 0
+    const playerTwoId = match.players.length == 2 ? players[1].playerId : undefined
 
     this.matches[match.id] = {
       players: [

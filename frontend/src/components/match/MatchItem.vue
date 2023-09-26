@@ -7,6 +7,10 @@ const props = defineProps({
   match: {
     type: Object as PropType<MatchMetaData>,
     required: true
+  },
+  joinGame: {
+    type: Function as PropType<(id: number) => void>,
+    requred: true
   }
 })
 
@@ -51,6 +55,8 @@ const timeSinceEnd = computed(() => {
   return timeAgo.format(props.match.end)
 })
 
+const join_game = props.joinGame as (id: number) => void
+
 // const highscore = computed(() => {
 //   return Math.max(props.match.players[0].score, props.match.players[1].score)
 // })
@@ -73,7 +79,7 @@ const timeSinceEnd = computed(() => {
     <p id="match-time-since-end">{{ timeSinceEnd }}</p>
     <!-- TODO: watch to live update the duration for matches in progress -->
     <p v-if="inProgress || isCompleted">duration: {{ duration }}</p>
-    <button v-if="canJoin" class="button join">Join Game</button>
+    <button v-if="canJoin" @click="join_game(match.id)" class="button join">Join Game</button>
     <button v-if="canSpectate" class="button spectate">Spectate</button>
   </li>
 </template>
