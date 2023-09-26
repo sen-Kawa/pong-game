@@ -37,7 +37,6 @@
     import { useAuthStore } from '../../stores/auth.js'
     import Twofactor from './TwoFactor.vue'
     import FileUpload from './FileUpload.vue'
-    import axios from 'axios'
     import jwtInterceptor from '../../interceptor/jwtInterceptor'
 
     const backendUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}`
@@ -51,10 +50,10 @@
     const losses: any = ref<string>()
     const avatar2: any = ref<string>()
 
-    const requestOptions: RequestInit = {
-        method: 'GET',
-        credentials: 'include'
-    }
+    // const requestOptions: RequestInit = {
+    //     method: 'GET',
+    //     credentials: 'include'
+    // }
 
     async function getStatistics() {
         const response = await jwtInterceptor.get(backendUrl + '/statistics', {
