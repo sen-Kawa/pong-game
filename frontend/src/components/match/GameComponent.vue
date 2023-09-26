@@ -70,21 +70,24 @@ document.addEventListener('keyup', (event) => {
 	}
 })
 
-setInterval(drawGame, 33);
+const interval = setInterval(drawGame, 33);
 
 function drawGame() {
 	const c = document.getElementById("game-canvas") as HTMLCanvasElement;
 	if (c === null) {
 		console.log("cant get canvas");
+        clearInterval(interval);
 		return;
 	}
 	const ctx = c.getContext("2d");
 	if (ctx === null) {
 		console.log("Cant get canvas");
+        clearInterval(interval);
 		return;
 	}
 	if (props.match === undefined) {
 		console.log("Not in a match");
+        clearInterval(interval);
 		return;
 	}
 
