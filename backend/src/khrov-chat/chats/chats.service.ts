@@ -305,7 +305,7 @@ export class ChatsService {
             userName: true,
             email: true,
             name: true,
-            updatedAt: true,
+            // updatedAt: true,
             profile_pics: {
               select: {
                 avatar: true
@@ -579,14 +579,14 @@ export class ChatsService {
           id: details.searcherId
         }
       },
-      orderBy: {
-        updatedAt: 'desc'
-      },
+      // orderBy: {
+      //   updatedAt: 'desc'
+      // },
       take: 10,
       select: {
         id: true,
         userName: true,
-        createdAt: true,
+        // createdAt: true,
         profile_pics: {
           select: {
             avatar: true

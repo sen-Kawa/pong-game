@@ -196,17 +196,6 @@ async function main() {
       });
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 }
 
 // execute the main function

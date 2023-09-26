@@ -44,11 +44,11 @@ export class SearchUsersResultDto {
   })
   readonly userName: string
 
-  @ApiProperty({
-    description: 'Time of UserName registration',
-    example: '2023-07-26T17:59:54.868Z'
-  })
-  readonly createdAt: Date
+  // @ApiProperty({
+  //   description: 'Time of UserName registration',
+  //   example: '2023-07-26T17:59:54.868Z'
+  // })
+  // readonly createdAt: Date
 
   @ApiProperty()
   profile_pics: Profile_picsType[]

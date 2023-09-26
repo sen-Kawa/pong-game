@@ -77,11 +77,11 @@ class Client2Type {
   })
   readonly name: string
 
-  @ApiProperty({
-    description: 'Time of last message posted to the conversation',
-    example: '2023-07-26T17:59:54.868Z'
-  })
-  readonly updatedAt: Date
+  // @ApiProperty({
+  //   description: 'Time of last message posted to the conversation',
+  //   example: '2023-07-26T17:59:54.868Z'
+  // })
+  // readonly updatedAt: Date
 
   @ApiProperty()
   profile_pics: Profile_picsType[]

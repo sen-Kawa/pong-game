@@ -1,12 +1,48 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('ONLINE', 'OFFLINE', 'INGAME');
 
-  - Added the required column `updatedAt` to the `User` table without a default value. This is not possible if the table is not empty.
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "displayName" TEXT,
+    "name" TEXT DEFAULT '',
+    "userName" TEXT,
+    "email" TEXT DEFAULT '',
+    "activated2FA" BOOLEAN NOT NULL DEFAULT false,
+    "twoFactorAuthenticationSecret" TEXT,
+    "refreshToken" TEXT,
+    "currentStatus" "Status" NOT NULL DEFAULT 'OFFLINE',
+    "avatarId" INTEGER NOT NULL DEFAULT 1,
 
-*/
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PlayersOnMatch" (
+    "playerId" INTEGER NOT NULL,
+    "matchId" INTEGER NOT NULL,
+    "score" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "PlayersOnMatch_pkey" PRIMARY KEY ("playerId","matchId")
+);
+
+-- CreateTable
+CREATE TABLE "Match" (
+    "id" SERIAL NOT NULL,
+    "start" TIMESTAMP(3),
+    "end" TIMESTAMP(3),
+
+    CONSTRAINT "Match_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserAvatar" (
+    "id" SERIAL NOT NULL,
+    "private" BOOLEAN NOT NULL DEFAULT true,
+    "filename" TEXT NOT NULL,
+
+    CONSTRAINT "UserAvatar_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Profile_pic" (
@@ -91,19 +127,61 @@ CREATE TABLE "Channel_pending" (
 );
 
 -- CreateTable
+CREATE TABLE "_UserFriend" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_UserBlocked" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "_Channel_historyToChannel_link" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_displayName_key" ON "User"("displayName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_userName_key" ON "User"("userName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserAvatar_filename_key" ON "UserAvatar"("filename");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Channel_name_key" ON "Channel"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_UserFriend_AB_unique" ON "_UserFriend"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_UserFriend_B_index" ON "_UserFriend"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_UserBlocked_AB_unique" ON "_UserBlocked"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_UserBlocked_B_index" ON "_UserBlocked"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_Channel_historyToChannel_link_AB_unique" ON "_Channel_historyToChannel_link"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_Channel_historyToChannel_link_B_index" ON "_Channel_historyToChannel_link"("B");
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "UserAvatar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlayersOnMatch" ADD CONSTRAINT "PlayersOnMatch_playerId_fkey" FOREIGN KEY ("playerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlayersOnMatch" ADD CONSTRAINT "PlayersOnMatch_matchId_fkey" FOREIGN KEY ("matchId") REFERENCES "Match"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Profile_pic" ADD CONSTRAINT "Profile_pic_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -134,6 +212,18 @@ ALTER TABLE "Channel_pending" ADD CONSTRAINT "Channel_pending_chId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "Channel_pending" ADD CONSTRAINT "Channel_pending_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserFriend" ADD CONSTRAINT "_UserFriend_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserFriend" ADD CONSTRAINT "_UserFriend_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserBlocked" ADD CONSTRAINT "_UserBlocked_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserBlocked" ADD CONSTRAINT "_UserBlocked_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_Channel_historyToChannel_link" ADD CONSTRAINT "_Channel_historyToChannel_link_A_fkey" FOREIGN KEY ("A") REFERENCES "Channel_history"("id") ON DELETE CASCADE ON UPDATE CASCADE;

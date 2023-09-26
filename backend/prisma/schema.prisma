@@ -31,8 +31,8 @@ model User {
   matches                       PlayersOnMatch[]
   avatar                        UserAvatar       @relation(fields: [avatarId], references: [id])
   avatarId                      Int              @default(1)
-  createdAt                     DateTime           @default(now())
-  updatedAt                     DateTime           @updatedAt
+//  createdAt                     DateTime           @default(now())
+//  updatedAt                     DateTime           @updatedAt
   profile_pics                  Profile_pic[]
   chat_union1                   Chat_union[]       @relation("Client1")
   chat_union2                   Chat_union[]       @relation("Client2")
