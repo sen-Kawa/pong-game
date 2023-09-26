@@ -4,21 +4,25 @@ import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
 import { Player, GameUpdate } from 'common-types'
+import { SocketService } from 'src/socket/socket.service'
 
 interface Game {
   players: {
     0: {
         player: Player,
         player_token: string,
-        id: number
+        id: number,
+        connection: string
     },
     1: {
         player: Player,
         player_token: string,
-        id: number
+        id: number,
+        connection: string
     }
   }
-  gameid: number
+  gameid: number,
+  last_modified: Date
 }
 
 const matchWithScore = Prisma.validator<Prisma.MatchArgs>()({
@@ -40,7 +44,10 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
 
 @Injectable()
 export class MatchService {
-  constructor(private prisma: PrismaService) {
+  constructor(
+    private prisma: PrismaService,
+    private socketService: SocketService
+    ) {
     this.matches = {}
   }
 
@@ -78,7 +85,8 @@ export class MatchService {
             vector: 0
           },
           id: players[0].playerId,
-          player_token: ''
+          player_token: '',
+          connection: ''
         },
         {
           player: {
@@ -86,10 +94,12 @@ export class MatchService {
             vector: 0
           },
           id: playerTwoId,
-          player_token: ''
+          player_token: '',
+          connection: ''
         }
       ],
-      gameid: match.id
+      gameid: match.id,
+      last_modified: new Date()
     }
 
     return match
@@ -114,9 +124,21 @@ export class MatchService {
     }
   }
 
+  moveHandler(match: Game, player_number: number, update: GameUpdate, connection: string) {
+    match.players[player_number].player.pos = update.player.pos
+    match.players[player_number].player.vector = update.player.vector
+    match.players[player_number].connection = connection
+    match.last_modified = new Date()
+
+    const other_player_number = player_number == 0 ? 1 : 0
+    const other_player = match.players[other_player_number]
+    this.socketService.socket.to(other_player.connection).emit("game_update", update)
+  }
+
   makeMove(
     update: GameUpdate,
-    player_token: string
+    player_token: string,
+    connection: string
   ) {
     const match = this.matches[update.gameid]
     if (!match) {
@@ -124,14 +146,10 @@ export class MatchService {
     }
 
     if (match.players[0].player_token === player_token) {
-      match.players[0].player.pos = update.player.pos
-      match.players[0].player.vector = update.player.vector
+        this.moveHandler(match, 0, update, connection)
     } else if (match.players[1].player_token === player_token) {
-      match.players[1].player.pos = update.player.pos
-      match.players[1].player.vector = update.player.vector
+        this.moveHandler(match, 1, update, connection)
     }
-
-    return this.buildResponseMatch(match)
   }
 
   /**

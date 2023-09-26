@@ -28,10 +28,10 @@ const game_state = ref({
     }
 });
 
-socket.on("game_update", (update: Game) => {
-    console.log("Update: " + update);
+socket.on("game_update", (update: GameUpdate) => {
+    const player_number = props.player_number == 0 ? 1 : 0;
     if (update)
-        game_state.value.game = update;
+        game_state.value.game.players[player_number] = update.player;
 })
 
 function makeMove(newVec: number) {
@@ -41,7 +41,7 @@ function makeMove(newVec: number) {
     };
 
     update.player.vector = newVec;
-    console.log(update);
+    update.player.pos += newVec;
 	socket.emit("move", update);
 }
 
