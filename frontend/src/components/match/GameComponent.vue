@@ -1,108 +1,159 @@
+<template>
+	<canvas id="game-canvas" width="600" height="450" style="background-color: black; border: 1px solid grey;"></canvas>
+    <h3>{{ playerInfo }}</h3>
+</template>
+
+
 <script setup lang="ts">
-import { socket } from '@/sockets/sockets';
-import { ref } from 'vue';
-import { type Player, type GameUpdate } from 'common-types'
-import { useAuthStore } from '@/stores/auth';
+    import { socket } from '@/sockets/sockets';
+    import { ref } from 'vue';
+    import { type Player, type GameUpdate } from 'common-types'
+    import { useAuthStore } from '@/stores/auth';
 
-interface Game {
-	players: {
-        0: Player,
-        1: Player
-    },
-    matchid: number
-}
+    let keyUp: string = 'w'
+    let keyDown: string = 's'
+    const playerInfo = ref('Control your player with [w] for up and [s] for down.')
+    const elementColor:string = 'white'
+    const paddleWidth = 15
+    const paddleHeight = 70
 
-const props = defineProps(['match', 'player_number']);
-const game_state = ref({
-	game: {
+    interface Game {
         players: {
-            0: {
-                pos: 0,
-                vector: 0
-            },
-            1: {
-                pos: 0,
-                vector: 0
+            0: Player,
+            1: Player
+        },
+        matchid: number
+    }
+
+    const props = defineProps(['match', 'player_number']);
+    const game_state = ref({
+        game: {
+            players: {
+                0: {
+                    pos: 0,
+                    vector: 0
+                },
+                1: {
+                    pos: 0,
+                    vector: 0
+                }
             }
         }
+    });
+
+    socket.on("game_update", (update: GameUpdate) => {
+        const player_number = props.player_number == 0 ? 1 : 0;
+        if (update && props.match.id == update.gameid)
+            game_state.value.game.players[player_number] = update.player;
+    })
+
+    function makeMove(newVec: number) {
+        const update: GameUpdate = {
+            player: game_state.value.game.players[props.player_number as 0 | 1],
+            gameid: props.match.id
+        };
+
+        update.player.vector = newVec;
+        update.player.pos += newVec;
+        socket.emit("move", update);
     }
-});
 
-socket.on("game_update", (update: GameUpdate) => {
-    const player_number = props.player_number == 0 ? 1 : 0;
-    if (update && props.match.id == update.gameid)
-        game_state.value.game.players[player_number] = update.player;
-})
+    function moveUp() { makeMove(-3) }
 
-function makeMove(newVec: number) {
-    const update: GameUpdate = {
-        player: game_state.value.game.players[props.player_number as 0 | 1],
-        gameid: props.match.id
-    };
+    function moveDown() { makeMove(3) }
 
-    update.player.vector = newVec;
-    update.player.pos += newVec;
-	socket.emit("move", update);
-}
+    function reset() { makeMove(0) }
 
-function moveUp() {
-    makeMove(-3);
-}
+    document.addEventListener('keydown', (event) => {
+        if (event.key == keyDown) {
+            moveDown();
+        } else if(event.key == keyUp) {
+            moveUp();
+        }
+    })
+    document.addEventListener('keyup', (event) => {
+        if (event.key == keyDown || event.key == keyUp) {
+            reset();
+        }
+    })
 
-function moveDown() {
-    makeMove(3);
-}
+    const userStore = useAuthStore();
 
-function reset() {
-    makeMove(0);
-}
+    const setKeysRightSide = () => {
+        keyUp = 'p'
+        keyDown = 'l'
+    }
 
-document.addEventListener('keydown', (event) => {
-	if (event.key == 's') {
-		moveDown();
-	} else if(event.key == 'w') {
-		moveUp();
-	}
-})
-document.addEventListener('keyup', (event) => {
-	if (event.key == 's' || event.key == 'w') {
-		reset();
-	}
-})
+    const drawBall = (x: number, y: number, ctx: CanvasRenderingContext2D) => {
+        let ballRadius = 8
+        ctx.fillStyle = elementColor
+        ctx.beginPath()
+        ctx.arc(x, y, ballRadius, 0, Math.PI * 2, false)
+        ctx.closePath()
+        ctx.fill()
+    }
 
-const userStore = useAuthStore();
+    const drawNet = (ctx: CanvasRenderingContext2D) => {
+        ctx.fillStyle = elementColor
+        for(let i: number = 0; i < 450; i += 10) {
+            ctx.fillRect(300 - 2, i, 4, 5)
+        }   
+    }
 
-const interval = setInterval(drawGame, 33);
+    const drawScore = (player1Score: number, player2Score: number, ctx: CanvasRenderingContext2D) => {
+        ctx.fillStyle = elementColor
+        ctx.font = '65px arial'
+        ctx.fillText("0", 250, 70)
+        ctx.fillText("1", 320, 70)
+    }
 
-function drawGame() {
-	const c = document.getElementById("game-canvas") as HTMLCanvasElement;
-	if (c === null) {
-		console.log("cant get canvas");
-        clearInterval(interval);
-		return;
-	}
-	const ctx = c.getContext("2d");
-	if (ctx === null) {
-		console.log("Cant get canvas");
-        clearInterval(interval);
-		return;
-	}
-	if (props.match === undefined) {
-		console.log("Not in a match");
-        clearInterval(interval);
-		return;
-	}
+    const drawPaddle = (x: number,y: number, ctx: CanvasRenderingContext2D) => {
+        ctx.fillStyle = "white"
+        ctx.fillRect(x, y, 15, 70)
+    }
 
-	const state = game_state.value.game;
-	state.players[0].pos += state.players[0].vector;
-	state.players[1].pos += state.players[1].vector;
-	ctx.clearRect(0, 0, c.width, c.height);
-	ctx.fillStyle = '#000000';
-	ctx.fillRect(0, state.players[0].pos, 50, 100);
-	ctx.fillRect(c.width - 50, state.players[1].pos, 50, 100);
-}
+    function drawGame() {
+
+        // console.log(" Player number ==> ", props.player_number)
+        // change the key and info if player is on the right side (maybe put it to a setup function later)
+        if (props.player_number === 1) {
+            playerInfo.value = 'Control your player with [p] for up and [l] for down.'
+            setKeysRightSide()
+        }
+
+        const c = document.getElementById("game-canvas") as HTMLCanvasElement;
+        if (c === null) {
+            console.log("cant get canvas");
+            clearInterval(interval);
+            return;
+        }
+        const ctx = c.getContext("2d");
+        if (ctx === null) {
+            console.log("Cant get canvas");
+            clearInterval(interval);
+            return;
+        }
+        if (props.match === undefined) {
+            console.log("Not in a match");
+            clearInterval(interval);
+            return;
+        }
+
+        const state = game_state.value.game;
+        state.players[0].pos += state.players[0].vector;
+        state.players[1].pos += state.players[1].vector;
+        ctx.clearRect(0, 0, c.width, c.height)
+        drawNet(ctx)
+        drawScore(0, 1, ctx)
+        drawPaddle(0, state.players[0].pos - paddleHeight/2, ctx)
+        drawPaddle(c.width - 1 - paddleWidth,state.players[1].pos - paddleHeight/2, ctx)
+        // ctx.fillStyle = elementColor
+        // ctx.fillRect(0, state.players[0].pos, 50, 100);
+        // ctx.fillRect(c.width - 50, state.players[1].pos, 50, 100);
+        drawBall(150, 150, ctx)
+    }
+
+    const interval = setInterval(drawGame, 33);
 </script>
 
-<template>
-	<canvas id="game-canvas" width="600" height="480" style="border: 1px solid grey;"></canvas>
-</template>
+
