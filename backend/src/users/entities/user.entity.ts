@@ -40,10 +40,4 @@ export class UserEntity implements User {
   @ApiHideProperty()
   @Exclude()
   twoFactorAuthenticationSecret: string
-
-  @Exclude()
-  createdAt: Date
-
-  @Exclude()
-  updatedAt: Date
 }

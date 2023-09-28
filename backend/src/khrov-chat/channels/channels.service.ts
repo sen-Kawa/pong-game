@@ -15,10 +15,14 @@ import { GetMemberIdDto } from './dto/get-member-id.dto'
 import { PendingApprovalsDto, PendingApprovalsResultDto } from './dto/pending-approvals.dto'
 import { ApproveOrRejectDto } from './dto/approve-or-reject.dto'
 import { ModifyChannelDto } from './dto/modify-channel.dto'
+import { ChannelsGateway } from './channels.gateway'
 
 @Injectable()
 export class ChannelsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private gateway: ChannelsGateway
+  ) {}
 
   async suggestedChannels(userId: number): Promise<SuggestedChannelsResultDto[] | ErrorValue> {
     try {
@@ -136,7 +140,7 @@ export class ChannelsService {
             deliveryStatus: 'exited'
           }
         })
-
+        this.gateway.emitToAll('new-channel-event', 0)
         return `You have left channel ${theChannel.name} Successfully`
       } else {
         return `Nothing to process!`
@@ -187,6 +191,7 @@ export class ChannelsService {
             }
           }
         })
+        this.gateway.emitToAll('new-channel-event', 0)
         return `You are now a member of ${theChannel.name} channel`
       } else if (theChannel.visibility == 'password') {
         const isMatch = await bcrypt.compare(requestProps.password, theChannel.password)
@@ -211,6 +216,7 @@ export class ChannelsService {
             }
           }
         })
+        this.gateway.emitToAll('new-channel-event', 0)
         return `You are now a member of ${theChannel.name} channel`
       } else if (theChannel.visibility == 'private') {
         await this.prisma.channel_pending.create({
@@ -219,10 +225,10 @@ export class ChannelsService {
             userId: requestProps.userId
           }
         })
+        this.gateway.emitToAll('new-channel-event', 0)
         return `Your request to join ${theChannel.name} channel is now awaiting moderation`
       }
     }
-
     return 'Your request was not understood!'
   }
 
@@ -366,6 +372,7 @@ export class ChannelsService {
       })
 
     if (linkResult) {
+      this.gateway.emitToAll('new-channel-event', 0)
       return ErrorValue.SUCCESS
     }
   }
@@ -539,6 +546,7 @@ export class ChannelsService {
           userId: singleChannObject.userId
         }
       })
+      this.gateway.emitToAll('new-channel-event', singleChannObject.chId)
     }
   }
 
@@ -552,6 +560,7 @@ export class ChannelsService {
         unreadCount: 0
       }
     })
+    this.gateway.emitToAll('new-channel-event', channDetails.chId)
   }
 
   async getMemberId(getMemberId: GetMemberIdDto): Promise<string> {

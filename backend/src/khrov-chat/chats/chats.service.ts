@@ -8,10 +8,14 @@ import { BlockingDto } from './dto/blocking.dto'
 import { ChatConnectionsResultDto } from './dto/chat-connections.dto'
 import { GetBlockedResultDto } from './dto/get-blocked.dto'
 import { SearchUsersDto, SearchUsersResultDto } from './dto/search-users.dto'
+import { ChatsGateway } from './chats.gateway'
 
 @Injectable()
 export class ChatsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private gateway: ChatsGateway
+  ) {}
 
   async getChatHistory(chatUnion: number): Promise<ChatHistoryResultDto | boolean> {
     try {
@@ -127,6 +131,8 @@ export class ChatsService {
         unionId: singleChatObject.unionId
       }
     })
+    this.gateway.emitToAll('new-chat-event', singleChatObject.unionIdOther)
+    this.gateway.emitToAll('new-chat-event', singleChatObject.unionId)
   }
 
   async newChat(newChat: NewChatDto): Promise<boolean> {
@@ -237,6 +243,7 @@ export class ChatsService {
     if ((await this.insertMsgToDb(chatToObject)) === false) {
       return false
     }
+    this.gateway.emitToAll('new-chat-event', 0)
   }
 
   async setSeen(chatDetails: SetSeenDto): Promise<boolean> {
@@ -271,6 +278,8 @@ export class ChatsService {
             unreadCount: 0
           }
         })
+        this.gateway.emitToAll('new-chat-event', chatDetails.meReceiver)
+        this.gateway.emitToAll('new-chat-event', chatDetails.theySender)
       }
     } catch (error) {
       return false
@@ -284,6 +293,7 @@ export class ChatsService {
           unionId: union
         }
       })
+      this.gateway.emitToAll('new-chat-event', union)
     } catch (error) {
       return false
     }
@@ -420,6 +430,8 @@ export class ChatsService {
       }
     })
     if (final) {
+      this.gateway.emitToAll('new-chat-event', blockedUnionId)
+      this.gateway.emitToAll('new-chat-event', blockerUnionId)
       return true
     }
   }
@@ -455,6 +467,8 @@ export class ChatsService {
           allowedToUnblock: false
         }
       })
+      this.gateway.emitToAll('new-chat-event', blockedUnionId)
+      this.gateway.emitToAll('new-chat-event', blockerUnionId)
     } catch (error) {
       return false
     }

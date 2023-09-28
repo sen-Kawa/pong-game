@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { toRef } from 'vue'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted } from 'vue'
 import ChannelListItem from '@/components/khrov-chat/ChannelListItem.vue'
 import ChannelListItemMsg from '@/components/khrov-chat/ChannelListItemMsg.vue'
 import ChannelListItemPendings from '@/components/khrov-chat/ChannelListItemPendings.vue'
 import type { ChnListOfflineCache } from '@/components/khrov-chat/interface/khrov-chat'
 import { useChatsStore } from '@/stores/chatsAll'
+import { socket } from '@/sockets/sockets'
 
 const props = defineProps<{
   sTemp: number
@@ -176,12 +177,14 @@ const setSeen = async (userId: number, chId: number) => {
   await chatsStore.fetchForKhrov(`/channels/put/set-seen`, 'PUT', tmp);
 }
 
-let intervalId: ReturnType<typeof setInterval>
 onMounted(() => {
-  intervalId = setInterval(getChannelPreviews, 3000)
-})
-onUnmounted(() => {
-  clearInterval(intervalId)
+  getChannelPreviews();
+  socket.on('new-channel-event', (id: number) => {
+    const found = chList.channConn.find((element) => element.chId===id)
+    if (found !== undefined || id === 0) {
+      getChannelPreviews();
+    }
+  })
 })
 
 const changeActiveBox = (name: string) => {
@@ -339,6 +342,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
     >
       <ChannelListItem
         v-for="item in chList.channConn"
+        v-bind:key="item.chId"
         :channelId="item.chId"
         :role="item.role"
         :unread="item.unreadCount"
@@ -363,7 +367,9 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
 
             changeActiveBox('Chl-msgs');
 
+            getChannelPreviews();
             setSeen($_, chList.chlIdOfFocus);
+
           }"
       />
     </div>
@@ -602,6 +608,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
             <div v-if="chList.getPendingsObj" :key="chList.getPendingsObjRef">
               <ChannelListItemPendings
                 v-for="item in chList.getPendingsObj"
+                v-bind:key="item.userId"
                 :userId="item.userId"
                 :userName="item.user.userName"
                 :chId="item.chId"

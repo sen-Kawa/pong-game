@@ -217,6 +217,7 @@ suggestedChannels($_.value)
           <p class="Chn-box-title">Search Results</p>
           <ChannelNewItem
             v-for="item in chNew.searchOutput"
+            v-bind:key="item.id"
             :userId="$_"
             :channelId="item.id"
             :channelName="item.name"
@@ -234,6 +235,7 @@ suggestedChannels($_.value)
           <p class="Chn-box-title">Suggested Channels</p>
           <ChannelNewItem
             v-for="item in chNew.suggestionsOutput"
+            v-bind:key="item.id"
             :userId="$_"
             :channelId="item.id"
             :channelName="item.name"

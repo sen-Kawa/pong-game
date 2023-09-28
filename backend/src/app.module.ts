@@ -27,12 +27,11 @@ import { ChannelsModule } from './khrov-chat/channels/channels.module'
     GamesModule,
     AuthModule,
     SocketModule,
-    AppGateway,
     StatisticsModule,
     ChatsModule,
     ChannelsModule,
   ],
   controllers: [],
-  providers: []
+  providers: [AppGateway]
 })
 export class AppModule {}

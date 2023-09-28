@@ -72,6 +72,7 @@ const switchChiActive = (name: string) => {
         <div v-if="cInvite.civContentOrNot">
           <ChatInviteItem
             v-for="item in datas"
+            v-bind:key="item.id"
             :myId="$_"
             :theirId="item.id"
             :displayName="item.userName"

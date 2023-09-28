@@ -2,11 +2,12 @@
   import { reactive } from 'vue'
   import { toRef } from "vue";
   import type { ChatList, ChatListTmp, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
-  import { onMounted, onUnmounted } from 'vue'
+  import { onMounted } from 'vue'
   import ChatListItem from '@/components/khrov-chat/ChatListItem.vue'
   import ChatListItemMsg from '@/components/khrov-chat/ChatListItemMsg.vue'
   import { layer } from '@layui/layer-vue';
   import { useChatsStore } from '@/stores/chatsAll'
+  import { socket } from '@/sockets/sockets'
 
   const props =  defineProps< {
     sTemp: number,
@@ -118,13 +119,16 @@
     }
   }
 
-  let intervalId: ReturnType<typeof setInterval>;
   onMounted(() => {
-    intervalId = setInterval(getConversationPreviews, 3000);
-  });
-  onUnmounted(() => {
-    clearInterval(intervalId);
-  });
+    getConversationPreviews();
+    socket.on('new-chat-event', (id: number) => {
+    // const found: boolean = chatCache.hasOwnProperty(id)
+    const found = Object.getOwnPropertyDescriptor(chatCache, id)
+    if (found !== undefined || id === 0) {
+      getConversationPreviews();
+    }
+  })
+});
 
   const vtofctc = reactive({
     ChatsListIsActive: true,
@@ -155,6 +159,7 @@
     <div class="Chats-list Output-box" :class="{clActive: vtofctc.ChatsListIsActive}" >
       <div :key='cList.chiChatConnsApiOk' v-if='cList.chiChatConnsApiOk'>
         <ChatListItem v-for='(item) in datas'
+          v-bind:key="item.client2Id"
           :unionId="item.unionId"
           :partnerId="item.client2Id"
           :partnerUName="item.client2.userName"
@@ -179,6 +184,7 @@
             cList.chiMorphBlockStatus = item.blockStatus;
             cList.chiMorphUnbAllowed = item.allowedToUnblock;
             setSeen(item.unionId, item.unionIdOther);
+            getConversationPreviews();
             cactc('Single-conversation');
             }"
           />

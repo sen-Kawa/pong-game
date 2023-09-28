@@ -27,10 +27,6 @@ export class MatchGateway {
   @WebSocketServer() public server: Server
   private logger: Logger = new Logger('MatchGateWay')
 
-  /**
-   *
-   * @param update
-   */
   @SubscribeMessage('move')
   game_update(@Req() request: any, @MessageBody() update: any) {
     const match = this.matchService.makeMove(update, request.user.refreshToken)

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted } from 'vue'
 import ChatBlockedItem from '@/components/khrov-chat/ChatBlockedItem.vue'
 import type { ChatBlocked, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
 import { useChatsStore } from '@/stores/chatsAll'
+import { socket } from '@/sockets/sockets'
 
 const props = defineProps<{
   sTemp: number
@@ -30,19 +31,22 @@ const searchBlocked = async () => {
   }
 }
 
-let intervalId: ReturnType<typeof setInterval>
 onMounted(() => {
-  searchBlocked()
-  intervalId = setInterval(searchBlocked, 5000)
-})
-onUnmounted(() => {
-  clearInterval(intervalId)
+  searchBlocked();
+  socket.on('new-chat-event', (/*id: number*/) => {
+    // Todo make this blocked more responsive 
+    // const found: boolean = chatCache.hasOwnProperty(id)
+    // if (found || id === 0) {
+      searchBlocked();
+    // }
+  })
 })
 </script>
 <template>
   <div v-if="cBlkd.cbkKeyBuild" :key="cBlkd.cbkKeyBuild">
     <ChatBlockedItem
       v-for="item in output"
+      v-bind:key="item.client2Id"
       :myId="$"
       :theirId="item.client2Id"
       :displayName="item.client2.userName"
