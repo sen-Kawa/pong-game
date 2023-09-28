@@ -33,7 +33,6 @@ import { QuerySingleMatchDTO } from './dto/query-single-match.dto'
 import { UpdateMatchDto } from './dto/update-match.dto'
 import { MatchEntity } from './entities/match.entity'
 import { MatchService } from './match.service'
-import { MessageBody } from '@nestjs/websockets'
 
 @Controller('match')
 @ApiTags('match')
@@ -68,10 +67,8 @@ export class MatchController {
   }
 
   @Post('join')
-  joinMatch(@Req() request: any, @MessageBody() match_id: number) {
-    const match = this.matchService.join(match_id, request.user.id, request.user.refreshToken)
-
-    return match
+  joinMatch(@Req() request: any, @Body() body: any) {
+    return this.matchService.join(body['matchId'], request.user.id, request.user.refreshToken)
   }
 
   /**
