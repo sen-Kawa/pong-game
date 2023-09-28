@@ -278,8 +278,7 @@ export class ChatsService {
             unreadCount: 0
           }
         })
-        this.gateway.emitToAll('new-chat-event', chatDetails.meReceiver)
-        this.gateway.emitToAll('new-chat-event', chatDetails.theySender)
+        this.gateway.emitToAll('new-chat-event', 0)
       }
     } catch (error) {
       return false

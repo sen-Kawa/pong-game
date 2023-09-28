@@ -29,7 +29,7 @@ import { ChannelsModule } from './khrov-chat/channels/channels.module'
     SocketModule,
     StatisticsModule,
     ChatsModule,
-    ChannelsModule,
+    ChannelsModule
   ],
   controllers: [],
   providers: [AppGateway]
