@@ -118,7 +118,10 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.post(`${backendURL}/users/addFriend`, (req, res, ctx) => {
-	const requestBody = req.body;
+	  interface MyRequestBody {
+		  friendName?: string;
+	  }
+	const requestBody: MyRequestBody | null | undefined = req.body as MyRequestBody;
 	if (requestBody && requestBody.friendName === 'Not Found')
 		return res(ctx.status(404), ctx.json(['User not found']))
 	else if (requestBody && requestBody.friendName === 'Unauthorized')
@@ -133,7 +136,10 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.post(`${backendURL}/users/find`, (req, res, ctx) => {
-	const requestBody = req.body;
+	  interface MyRequestBody {
+		  name?: string;
+	  }
+	const requestBody: MyRequestBody | null | undefined = req.body as MyRequestBody;
 	if (requestBody && requestBody.name === 'Mimi')
     	return res(ctx.status(200), ctx.json({}))
 	else if (requestBody && (requestBody.name === 'bobb' || requestBody.name === 'Bob'))
@@ -141,7 +147,10 @@ export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
 
   rest.delete(`${backendURL}/users/removeFriend`, (req, res, ctx) => {
-	const requestBody = req.body;
+	  interface MyRequestBody {
+		  friendName?: string;
+	  }
+	const requestBody: MyRequestBody | null | undefined = req.body as MyRequestBody;
 	if (requestBody && requestBody.friendName === 'Mimi')
     	return res(ctx.status(400))
 	else

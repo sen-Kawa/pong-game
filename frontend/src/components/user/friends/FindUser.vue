@@ -60,10 +60,9 @@ export default {
        	 this.message = `Found ${this.name}`
        	 this.messageType = 'success'
       	}
-	} catch(error) {
+	} catch(error: any) {
 		console.error('Error making the request in FindUser', error);
-		if (error instanceof Error) {
-			if (error && error.response && error.response.data && error.response.data.statusCode === 400) {
+			if (error.response.data.statusCode === 400) {
         		this.message = error.response.data.message[0]
 			}
 			else {
@@ -71,7 +70,6 @@ export default {
 			}
     		this.messageType = 'error'
 	 	 }
-		}
       this.name = ''
       setTimeout(() => {
         this.message = ''
