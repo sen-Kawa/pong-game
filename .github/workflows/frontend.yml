@@ -68,5 +68,6 @@ jobs:
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-      - run: sed -i '#"import": "./lib/layer-vue.es.js"#"import": { "types": "./types/index.d.ts", "style": "./lib/index.css", "default": "./lib/layer-vue.es.js" }' ./frontend/node_modules/@layui/layer-vue/package.json
+      - run: |
+          sed -i '#"import": "./lib/layer-vue.es.js"#"import": { "types": "./types/index.d.ts", "style": "./lib/index.css", "default": "./lib/layer-vue.es.js" }' ./frontend/node_modules/@layui/layer-vue/package.json
       - run: npm run build
