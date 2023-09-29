@@ -155,10 +155,10 @@ export class UsersService {
   }
 
   //TODO fail on download handle / and tests?
-  downloadProfil(url: string, fileName: string): boolean {
+  downloadProfil(url: string, fileName: string): string {
     const dest = './files/' + fileName + '.jpg'
     const file = fs.createWriteStream(dest)
-    https.get(url, function (res) {
+    const req = https.get(url, function (res) {
       res.pipe(file)
       file
         .on('finish', function () {
@@ -171,24 +171,37 @@ export class UsersService {
           })
         })
     })
-    return true
+    req.end()
+    if (req && fs.existsSync(dest)) {
+      try {
+        const base64 = `data:image/gif;base64, ${fs.readFileSync(dest, { encoding: 'base64' })}`
+        return base64
+      } catch (error) {
+        return ''
+      }
+    }
+    return ''
+  }
+
+  async createAvatarId(name: string): Promise<number> {
+    try {
+      const avatar = await this.prisma.userAvatar.create({
+        data: {
+          filename: name
+        },
+        select: {
+          id: true
+        }
+      })
+      return avatar.id
+    } catch (error) {
+      return 1
+    }
   }
 
   async createUser(profile: any): Promise<any> {
-    let avatar: any
-    if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
-      try {
-        avatar = await this.prisma.userAvatar.create({
-          data: {
-            filename: profile.username + '.jpg'
-          }
-        })
-      } catch (error) {
-        avatar = { id: 1 }
-      }
-    } else {
-      avatar = { id: 1 }
-    }
+    const userDp64 = this.downloadProfil(profile._json.image.versions.small, profile.username)
+    const avatarId = await this.createAvatarId(profile.username + '.jpg')
     try {
       const user = await this.prisma.user.create({
         data: {
@@ -197,9 +210,19 @@ export class UsersService {
           userName: profile.username,
           email: profile.email,
           activated2FA: false,
-          avatarId: avatar.id
+          avatarId: avatarId
         }
       })
+      if (userDp64 && userDp64.length === 0) {
+        await this.prisma.profile_pic.create({ data: { userId: user.id } })
+      } else {
+        await this.prisma.profile_pic.create({
+          data: {
+            userId: user.id,
+            avatar: userDp64
+          }
+        })
+      }
       return user
     } catch (error) {
       throw new InternalServerErrorException('createUser')

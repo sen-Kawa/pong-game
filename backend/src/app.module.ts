@@ -9,6 +9,8 @@ import { MulterModule } from '@nestjs/platform-express'
 import { SocketModule } from './socket/socket.module'
 import { AppGateway } from './app.gateway'
 import { StatisticsModule } from './statistics/statistics.module'
+import { ChatsModule } from './khrov-chat/chats/chats.module'
+import { ChannelsModule } from './khrov-chat/channels/channels.module'
 
 @Module({
   imports: [
@@ -20,16 +22,16 @@ import { StatisticsModule } from './statistics/statistics.module'
     MulterModule.register({
       dest: './files'
     }),
-
     PrismaModule,
     UsersModule,
     GamesModule,
     AuthModule,
     SocketModule,
-    AppGateway,
     StatisticsModule,
+    ChatsModule,
+    ChannelsModule
   ],
   controllers: [],
-  providers: []
+  providers: [AppGateway]
 })
 export class AppModule {}

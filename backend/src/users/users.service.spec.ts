@@ -569,7 +569,9 @@ describe('Unit test for UsersService', () => {
         }
       }
     }
-    jest.spyOn(service, 'downloadProfil').mockReturnValue(false)
+    jest
+      .spyOn(service, 'downloadProfil')
+      .mockReturnValue('false') /* mockReturnValue was never used */
     // @ts-ignore
     prisma.user.create.mockResolvedValue({
       id: 1,
