@@ -1,56 +1,70 @@
-const BASE_URL = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users`
+import jwtInterceptor from '@/interceptor/jwtInterceptor'
+//const BASE_URL = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users`
+const BASE_URL = 'http://localhost:3000/users'
 
 export async function postAddFriend(friendName: string) {
-  const requestOptions: RequestInit = {
-    method: 'POST',
-    credentials: 'include',
+  const requestOptions = {
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ friendName: friendName })
   }
-  const response = await fetch(`${BASE_URL}/addFriend/`, requestOptions)
-  if (!response.ok) {
-    const responseData = await response.json()
-    return responseData
-  }
+  const requestBody = JSON.stringify({ friendName: friendName })
+  try {
+  	const response = await jwtInterceptor.post(`${BASE_URL}/addFriend/`, requestBody, requestOptions)
+	console.log('Request succesful in add friend.');
+	return response.data
+  } catch (error) {
+	console.error('Error making the request', error);
+	throw error
+	}
 }
 
 export async function postFindUser(name: string) {
-  const requestOptions: RequestInit = {
-    method: 'POST',
-    credentials: 'include',
+  const requestOptions = {
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ name: name })
   }
-  const response = await fetch(`${BASE_URL}/find/`, requestOptions)
-
-  if (response.ok) {
-    const userData = await response.json()
-    return userData
-  }
+  const requestBody = JSON.stringify({ name: name })
+  try {
+  	const response = await jwtInterceptor.post(`${BASE_URL}/find/`, requestBody, requestOptions)
+	console.log('Request succesful in find user.');
+	return response
+  } catch (error) {
+	console.error('Error making the request', error);
+	throw error
+	}
 }
 
 export async function deleteFriend(displayName: string) {
-  const requestOptions: RequestInit = {
-    method: 'DELETE',
-    credentials: 'include',
+  const requestOptions = {
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ friendName: displayName })
+    data: JSON.stringify({ friendName: displayName })
   }
-  await fetch(`${BASE_URL}/removeFriend/`, requestOptions)
+  try {
+  	const response = await jwtInterceptor.delete(`${BASE_URL}/removeFriend/`, requestOptions)
+	console.log('Request succesful on delete friend.');
+  } catch (error) {
+	console.error('Error making the request in deleteFriend api', error);
+	throw error
+  }
 }
 
 export async function getFriendList() {
-  const requestOptions: RequestInit = {
-    method: 'GET',
-    credentials: 'include'
+  const requestOptions = {
+    withCredentials: true,
   }
-  const response = await fetch(`${BASE_URL}/friends/`, requestOptions)
-  const responseData = await response.json()
-  return responseData
+  try {
+  	const response = await jwtInterceptor.get(`${BASE_URL}/friends/`, requestOptions)
+	console.log('Request succesful in friends list.');
+	return response.data
+  } catch (error) {
+	  console.error('Error fetching friends list: ', error);
+	  throw error;
+  }
 }
