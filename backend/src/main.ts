@@ -1,7 +1,7 @@
-import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
-import { AppModule } from './app.module'
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
+import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { AppModule } from './app.module'
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter'
 import { SessionAdapter } from './SessionAdapter'
 
@@ -13,9 +13,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true }
+      whitelist: true
+      // transform: true,
+      // transformOptions: { enableImplicitConversion: true } // WE HAD A TALK ABOUT THE PITFALLS OF THIS APPROACH
     })
   )
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))

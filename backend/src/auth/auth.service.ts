@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
-import { PrismaService } from './../prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
 import { UserEntity } from '../users/entities/user.entity'
 import { authenticator } from 'otplib'
