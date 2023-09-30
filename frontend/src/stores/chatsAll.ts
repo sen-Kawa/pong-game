@@ -27,7 +27,7 @@ export const useChatsStore = defineStore('chats', () => {
   }
   const useFetch = async (path: string, meth: string, body: object): Promise<any> => {
     try {
-      const res = fetch(path, {
+      const res = await fetch(path, {
         method: meth,
         headers: {
           'Content-Type': 'application/json',

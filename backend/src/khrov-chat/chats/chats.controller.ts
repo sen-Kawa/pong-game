@@ -6,6 +6,7 @@ import {
   Body,
   Param,
   Query,
+  Req,
   UseGuards,
   ParseArrayPipe,
   HttpException,
@@ -229,6 +230,13 @@ export class ChatsController {
   async searchUsers(@Query() details: SearchUsersDto) {
     const response: SearchUsersResultDto[] = await this.chatsService.searchUsers(details)
     return response
+  }
+
+  @ApiOperation({ summary: 'Health Check and Fix Operations for Chat DB Tables' })
+  @UseGuards(JwtAuthGuard)
+  @Put('/app/plugin/chat/health')
+  async chatHealth(@Req() req) {
+    await this.chatsService.chatHealth(req.user.avatarId, req.user.id)
   }
 
   // just a test api // will be removed

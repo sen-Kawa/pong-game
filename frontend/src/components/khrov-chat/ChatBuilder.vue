@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive } from 'vue'
+import { onMounted, onUnmounted, reactive, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import ChatIcon from '@/components/khrov-chat/ChatIcon.vue'
@@ -15,9 +15,16 @@ const { isLoggedIn } = storeToRefs(authStore)
 onMounted(() => {
   document.addEventListener('click', closeChatWindow, false)
 })
+
 onUnmounted(() => {
   document.removeEventListener('click', closeChatWindow, false)
 })
+
+watch(isLoggedIn, (newStatus) => { if (newStatus===true) ApiHealth(); })
+
+const ApiHealth = async () => {
+  await chatsStore.fetchForKhrov('/chats/app/plugin/chat/health', 'PUT', {});
+}
 
 const closeChatWindow = (e: Event) => {
   const chatWindow = document.getElementById('ChatWindow-container')
