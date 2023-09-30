@@ -87,3 +87,7 @@ main {
   height: 7vh;
   top: 0;
 }
+.avatar {
+	height: 120px;
+	object-fit: cover;
+}

@@ -2,7 +2,7 @@
   <div class="component-title">Welcome {{ getUserName }}</div>
   <div class="text-center">change user name</div>
 
-  <img v-bind:src="avatarUrl" width="50" height="60" />
+  <img class="avatar" v-bind:src="avatarUrl" />
   <Twofactor></Twofactor>
   <FileUpload></FileUpload>
 </template>
