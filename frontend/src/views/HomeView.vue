@@ -4,9 +4,11 @@
 		  <img src="../../public/oauth.svg" alt="OAuth image">
 	  </div>
     <div>
-      <a class="component-title" v-bind:href="back_url"> Login with your 42 account </a>
+      <a class="component-title login" v-bind:href="back_url"> Login with your 42 account </a>
     </div>
   </div>
+	<div v-else class="component-title">Welcome {{ getUserName}}
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -16,10 +18,11 @@ import { storeToRefs } from 'pinia'
 const authStore = useAuthStore()
 const back_url = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/42login/`
 const { isLoggedIn } = storeToRefs(authStore)
+const { getUserName } = storeToRefs(authStore)
 </script>
 
 <style scoped>
-.component-title {
+.login {
 	font-size: 20px;
 }
 
