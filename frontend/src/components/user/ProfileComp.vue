@@ -17,12 +17,8 @@
            <!-- <p>Avatar     : <img id="avatar" src="http://localhost:3000/users/userImage" width="50" height="60"><br></p> -->
            <h2 class="component-subtitle">Avatar</h2>
            <img class="avatar" v-bind:src="avatar2">
-           <p>
-               <FileUpload></FileUpload>
-           </p>
            <h2 class="component-subtitle">Two Factor Authentication</h2>
            <p class="details">{{ authStore.activated2FA }} </p>
-           <Twofactor></Twofactor>
        </div>
        <div class="column">
            <h1 class="component-title">User Statistics</h1>
