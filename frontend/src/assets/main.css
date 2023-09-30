@@ -58,7 +58,8 @@ body {
 }
 .component-title {
 	font-family: space;
-	color: white;
+	color: #B7D198;
+	opacity: 0.9;
   font-size: 35px;
 }
 .component-subtitle {
