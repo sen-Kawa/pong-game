@@ -106,4 +106,6 @@ button {
 	background-color: transparent;
 	box-shadow: 5px 2px;
 	font-family: Helvetica;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }

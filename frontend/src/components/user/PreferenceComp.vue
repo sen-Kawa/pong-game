@@ -1,10 +1,10 @@
 <template>
-  <div class="component-title">Welcome {{ getUserName }}</div>
-  <div class="text-center">change user name</div>
-
+  <div class="component-title">{{ getUserName }} Preferences</div>
   <img class="avatar" v-bind:src="avatarUrl" />
-  <Twofactor></Twofactor>
+  <div class="component-subtitle">Change Avatar</div>
   <FileUpload></FileUpload>
+  <div class="component-subtitle">Enable/Disable 2FA</div>
+  <Twofactor></Twofactor>
 </template>
 
 <script setup lang="ts">
@@ -20,3 +20,9 @@ const { getUserName } = storeToRefs(authStore)
 
 
 </script>
+
+<style scoped>
+.component-subtitle {
+	margin-top: 30px;
+}
+</style>
