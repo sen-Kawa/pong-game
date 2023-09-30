@@ -100,7 +100,9 @@ export const useMatchStore = defineStore('match', () => {
         loading.value = true
         const response = await jwtInterceptor.post(
             requestPath,
-            id,
+            {
+              matchId: id
+            },
             {
                 withCredentials: true
             }
