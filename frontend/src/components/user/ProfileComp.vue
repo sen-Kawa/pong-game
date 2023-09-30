@@ -1,5 +1,6 @@
 <template>
     <div class="profile row">
+		<div class="column-container">
        <div class="column">
            <h1 class="component-title">User Profile</h1>
            <h2 class="component-subtitle">Full name: </h2>
@@ -29,6 +30,7 @@
            <h2 class="component-subtitle">Ladder level: </h2>
            <p class="details">{{ position }} of {{ numberOfPlayers  }} </p>
         </div>
+		</div>
     </div>
 </template>
 
@@ -95,8 +97,4 @@
 
 <style scoped>
 
-    .column {
-        float: left;
-        width: 50%;
-    }
 </style>

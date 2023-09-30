@@ -60,6 +60,7 @@ body {
 	font-family: space;
 	color: #B7D198;
   font-size: 35px;
+  margin-bottom: 20px;
 }
 .component-subtitle {
 	font-family: space;
@@ -120,12 +121,17 @@ button {
 	border: 1px white solid;
 	padding: 20px;
 	box-shadow: 10px 10px;
+	transition: transform .2s;
+}
+
+.column:hover {
+	transform: scale(1.1);
 }
 
 .column-container {
 	display: flex;
 	justify-content: space-evenly;
- 	 max-width: 983px;
+ 	 max-width: 1500px;
  	 margin: 0 auto;
 	 margin-top: 20px;
 }
