@@ -63,8 +63,13 @@ body {
 }
 .component-subtitle {
 	font-family: space;
+	color: #725A92;
+  font-size: 30px;
+}
+.details {
 	color: white;
-  font-size: 20px;
+	font-family: Helvetica;
+  font-size: 25px;
 }
 
 main {

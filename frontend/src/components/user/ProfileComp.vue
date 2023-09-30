@@ -3,34 +3,35 @@
        <div class="column">
            <h1 class="component-title">User Profile</h1>
            <h2 class="component-subtitle">Full name: </h2>
-           <p>{{ authStore.getName }}</p>
+           <p class="details">{{ authStore.getName }}</p>
            <h2 class="component-subtitle">42 Username: </h2>
-           <p>{{ authStore.getUserName }}</p>
+           <p class="details">{{ authStore.getUserName }}</p>
            <h2 class="component-subtitle">Player name: </h2>
-           <p>{{ authStore.getDisplayName }}</p>
+           <p class="details">{{ authStore.getDisplayName }}</p>
            <!-- <p>
                <input type="text" placeholder="new display name" v-model="nameInput" />
                <button @click="handleDisplayNameChange">Change display name</button>
            </p> -->
            <h2 class="component-subtitle">Email: </h2>
-           <p>{{ authStore.getEmail }}</p>
+           <p class="details">{{ authStore.getEmail }}</p>
            <!-- <p>Avatar     : <img id="avatar" src="http://localhost:3000/users/userImage" width="50" height="60"><br></p> -->
            <h2 class="component-subtitle">Avatar</h2>
            <img class="avatar" v-bind:src="avatar2">
            <p>
                <FileUpload></FileUpload>
            </p>
-           <p>Two-Factor Authentication enabled: {{ authStore.activated2FA }} </p>
+           <h2 class="component-subtitle">Two Factor Authentication</h2>
+           <p class="details">{{ authStore.activated2FA }} </p>
            <Twofactor></Twofactor>
        </div>
        <div class="column">
            <h1 class="component-title">User Statistics</h1>
            <h2 class="component-subtitle">Number of games played: </h2>
-           <p>{{ numberOfGames }}</p>
+           <p class="details">{{ numberOfGames }}</p>
            <h2 class="component-subtitle">Wins and losses: </h2>
-           <p>{{ wins }} win(s), {{ losses }} loss(es)</p>
+           <p class="details">{{ wins }} win(s), {{ losses }} loss(es)</p>
            <h2 class="component-subtitle">Ladder level: </h2>
-           <p>{{ position }} of {{ numberOfPlayers  }} </p>
+           <p class="details">{{ position }} of {{ numberOfPlayers  }} </p>
         </div>
     </div>
 </template>
