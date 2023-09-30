@@ -25,6 +25,5 @@
 	  position: absolute;
 	  bottom: 0%;
 	  width: 100%;
-	  line-height: 0.4;
 	}
 </style>
