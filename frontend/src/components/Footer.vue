@@ -12,10 +12,12 @@
 </script>
 
 <style scoped>
+@import '../assets/styles.css';
 	a {
 		color: white;
 	}
 	footer {
+		font-family: space;
 		padding-top: 1px;
 		padding-bottom: 4px;
 		text-align: center;
