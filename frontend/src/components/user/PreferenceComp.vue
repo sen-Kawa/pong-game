@@ -1,10 +1,16 @@
 <template>
   <div class="component-title">{{ getUserName }} Preferences</div>
   <img class="avatar" v-bind:src="avatarUrl" />
-  <div class="component-subtitle">Change Avatar</div>
-  <FileUpload></FileUpload>
-  <div class="component-subtitle">Enable/Disable 2FA</div>
-  <Twofactor></Twofactor>
+  <div class="column-container">
+  <div class="column">
+	  <div class="component-subtitle">Change Avatar</div>
+ 	 <FileUpload></FileUpload>
+ </div>
+  <div class="column">
+	<div class="component-subtitle">Enable/Disable 2FA</div>
+  	<Twofactor></Twofactor>
+  </div>
+  </div>
 </template>
 
 <script setup lang="ts">

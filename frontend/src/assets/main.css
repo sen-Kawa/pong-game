@@ -65,6 +65,7 @@ body {
 	font-family: space;
 	color: #725A92;
   font-size: 30px;
+  margin-bottom: 20px;
 }
 .details {
 	color: white;
@@ -113,4 +114,17 @@ button {
 .file-upload-form {
 	text-align: center;
 	font-size: 20px;
+}
+
+.column {
+	border: 1px white solid;
+	padding: 20px;
+}
+
+.column-container {
+	display: flex;
+	justify-content: space-evenly;
+ 	 max-width: 983px;
+ 	 margin: 0 auto;
+	 margin-top: 20px;
 }
