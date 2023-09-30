@@ -97,8 +97,13 @@ export default {
 	max-width: 600px;
 	margin: 0 auto;
 	padding-bottom: 20px;
+	margin-top: 60px;
 	padding-top: 20px;
-
+	box-shadow: 10px 10px;
+	transition: transform .2s;
+}
+.find-user:hover {
+	transform: scale(1.1);
 }
 input {
 	height: 35px;
