@@ -61,6 +61,11 @@ body {
 	color: white;
   font-size: 35px;
 }
+.component-subtitle {
+	font-family: space;
+	color: white;
+  font-size: 25px;
+}
 
 main {
   overflow-y: auto;
