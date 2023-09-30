@@ -213,6 +213,6 @@ export const useAuthStore = defineStore('auth', () => {
     setDisplayName,
     setDisplayName2,
     getDisplayName,
-    //login
+    login
   }
 })
