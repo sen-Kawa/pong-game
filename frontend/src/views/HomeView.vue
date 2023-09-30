@@ -3,7 +3,7 @@
     <div>
       <a v-bind:href="back_url"> 42 login </a>
     </div>
-    <p>Fake login for testing</p>
+  <!--  <p>Fake login for testing</p>
    <Form @submit="onSubmit" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
       <div class="form-group">
         <label>User Id</label>
@@ -22,7 +22,7 @@
         </button>
       </div>
       <div v-if="errors.apiError">{{ errors.apiError }}</div>
-    </Form>
+    </Form> -->
   </div>
 </template>
 
@@ -31,17 +31,17 @@ import { useAuthStore } from '../stores/auth'
 import { storeToRefs } from 'pinia'
 
 //TODO fake login for chat testing
-import { Form, Field } from 'vee-validate'
-import * as Yup from 'yup'
-const schema = Yup.object().shape({
-  username: Yup.string().required('Username is required')
-})
+// import { Form, Field } from 'vee-validate'
+// import * as Yup from 'yup'
+// const schema = Yup.object().shape({
+//   username: Yup.string().required('Username is required')
+// })
 
-async function onSubmit(values: any, { setErrors }: any) {
-  const { username } = values
-  const stuff = await authStore.login(username)
-  setErrors({ apiError: stuff })
-}
+// async function onSubmit(values: any, { setErrors }: any) {
+//   const { username } = values
+//   const stuff = await authStore.login(username)
+//   setErrors({ apiError: stuff })
+// }
 
 
 const authStore = useAuthStore()
