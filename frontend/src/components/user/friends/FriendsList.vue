@@ -1,6 +1,6 @@
 <template>
   <div class="friends">
-    <h1>Friends</h1>
+    <h1 class="component-title">Friends</h1>
     <table v-if="friends.length">
 		<tr>
 			<th>Name</th>
