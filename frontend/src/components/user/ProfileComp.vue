@@ -4,18 +4,21 @@
 
         <div class="column">
             <h1 class="component-title">User Profile</h1>
-            <p>Full name  : {{ authStore.getName }}</p>
-            <p>42 User name  : {{ authStore.getUserName }}</p>
-            <p>
-                Player name: {{ authStore.getDisplayName }}
-            </p>
+            <h2 class="component-subtitle">Full name: </h2>
+            <p>{{ authStore.getName }}</p>
+            <h2 class="component-subtitle">42 Username: </h2>
+            <p>{{ authStore.getUserName }}</p>
+            <h2 class="component-subtitle">Player name: </h2>
+            <p>{{ authStore.getDisplayName }}</p>
             <!-- <p>
                 <input type="text" placeholder="new display name" v-model="nameInput" />
                 <button @click="handleDisplayNameChange">Change display name</button>
             </p> -->
-            <p>Email      : {{ authStore.getEmail }}</p>
+            <h2 class="component-subtitle">Email: </h2>
+            <p>{{ authStore.getEmail }}</p>
             <!-- <p>Avatar     : <img id="avatar" src="http://localhost:3000/users/userImage" width="50" height="60"><br></p> -->
-            <p>Avatar     : <img v-bind:src="avatar2" width="50" height="60"><br></p>
+            <h2 class="component-subtitle">Avatar</h2>
+            <img v-bind:src="avatar2" width="80" height="120">
             <p>
                 <FileUpload></FileUpload>
             </p>
@@ -24,9 +27,12 @@
         </div>
         <div class="column">
             <h1 class="component-title">User Statistics</h1>
-            <p>Number of games played: {{ numberOfGames }}</p>
-            <p>Wins & losses: {{ wins }} win(s), {{ losses }} loss(es)</p>
-            <p>Ladder level : {{ position }} of {{ numberOfPlayers  }} </p>
+            <h2 class="component-subtitle">Number of games played: </h2>
+            <p>{{ numberOfGames }}</p>
+            <h2 class="component-subtitle">Wins and losses: </h2>
+            <p>{{ wins }} win(s), {{ losses }} loss(es)</p>
+            <h2 class="component-subtitle">Ladder level: </h2>
+            <p>{{ position }} of {{ numberOfPlayers  }} </p>
             
         </div>
     </div>
