@@ -1,22 +1,22 @@
 <template>
   <div class="find-user">
-    <h2>Find User</h2>
+    <h2 class="component-title">Find User</h2>
     <form @submit.prevent="findUser">
-      <label for="name">User's Name: </label>
+      <label class="component-subtitle" for="name">User's Name: </label>
       <input v-model="name" type="text" id="name" />
       <button class="search" type="submit">Search</button>
     </form>
     <div v-if="foundUser && foundUser.length > 0">
-      <h3>User details</h3>
+      <h3 class="component-title user-details">User details</h3>
     <table>
 		<tr>
-			<th>Name</th>
-			<th>User Name</th>
+			<th class="component-subtitle">Name</th>
+			<th class="component-subtitle">User Name</th>
 			<th></th>
 		</tr>
       <tr v-for="userData in foundUser" :key="userData['userName']">
-		  <td>{{ userData['displayName'] }}</td>
-		  <td>{{ userData['userName'] }}</td>
+		  <td class="details">{{ userData['displayName'] }}</td>
+		  <td class="details">{{ userData['userName'] }}</td>
 		  <td><AddFriend :friendName="userData['displayName']" @friendAdded="onFriendAdded" /></td>
       </tr>
     </table>
@@ -97,15 +97,23 @@ export default {
 	max-width: 600px;
 	margin: 0 auto;
 	padding-bottom: 20px;
+	padding-top: 20px;
 
+}
+input {
+	height: 35px;
 }
 table, th, td {
 	margin: 0 auto;
 	border: 1px solid black;
 	border-collapse: collapse;
 	padding: 10px;
+	box-shadow: 2px 2px;
 }
 .message {
 	margin-top: 10px;
 }
+	.user-details {
+		padding-top: 40px;
+	}
 </style>

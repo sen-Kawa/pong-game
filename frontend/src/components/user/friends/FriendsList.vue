@@ -3,9 +3,9 @@
     <h1 class="component-title">Friends</h1>
     <table v-if="friends.length">
 		<tr>
-			<th>Name</th>
-			<th>User Name</th>
-			<th>Status</th>
+			<th class="component-subtitle">Name</th>
+			<th class="component-subtitle">User Name</th>
+			<th class="component-subtitle">Status</th>
 			<th></th>
 		</tr>
      		 <Friend
@@ -15,7 +15,7 @@
         	@friendRemoved="onFriendRemoved"
      		 />
     </table>
-    <div v-else>You dont have friends yet!</div>
+    <div class="details" v-else>You dont have friends yet!</div>
     <ButtonApp class="findUser"
       @btn-click="toggleShowFindUser()"
       :text="showFindUser ? 'Close' : 'Find User'"
