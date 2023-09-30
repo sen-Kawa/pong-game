@@ -6,6 +6,8 @@ nav {
   justify-content: center;
 }
 nav .menu-item {
+	font-family: space;
+	font-size: 18px;
   color: #fff;
   padding: 25px 5px;
   position: relative;
