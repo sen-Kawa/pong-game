@@ -53,22 +53,31 @@ export class MatchService {
 
   matches: { [id: number]: Game }
 
-  join(matchId: number, playerId: number, player_token: string) {
+  async join(matchId: number, playerId: number, player_token: string) {
     const match = this.matches[matchId]
-
-    if (match === undefined)
-        return undefined
+    if (match === undefined) {
+      console.log("Match is undefined")
+      return undefined;
+    }
 
     if (playerId == match.players[0].id) {
       const session_id = player_token
       match.players[0].player_token = session_id
+      console.log("Player joined as 1");
     } else if (playerId == match.players[1].id || match.players[1].id === undefined) {
       const session_id = player_token
       match.players[1].id = playerId
       match.players[1].player_token = session_id
+      await this.addPlayer(matchId, playerId);
+      console.log("Player joined as 2");
     }
 
-    return match
+    const db_match = await this.findOne(matchId, {
+      includePlayers: true,
+      includeScores: true
+    })
+
+    return db_match
   }
 
   async create(data: Prisma.MatchCreateInput) {
