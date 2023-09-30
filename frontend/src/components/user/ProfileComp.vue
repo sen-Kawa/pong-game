@@ -3,7 +3,7 @@
         
 
         <div class="column">
-            <h1>User Profile</h1>
+            <h1 class="component-title">User Profile</h1>
             <p>Full name  : {{ authStore.getName }}</p>
             <p>42 User name  : {{ authStore.getUserName }}</p>
             <p>
@@ -23,7 +23,7 @@
             <Twofactor></Twofactor>
         </div>
         <div class="column">
-            <h1>User Statistics</h1>
+            <h1 class="component-title">User Statistics</h1>
             <p>Number of games played: {{ numberOfGames }}</p>
             <p>Wins & losses: {{ wins }} win(s), {{ losses }} loss(es)</p>
             <p>Ladder level : {{ position }} of {{ numberOfPlayers  }} </p>
