@@ -56,6 +56,11 @@ body {
   margin: 0;
   font-size: 15px; /* This line needs to be ADDED*/
 }
+.subtitle {
+	font-family: space;
+	color: white;
+  font-size: 30px;
+}
 
 main {
   overflow-y: auto;
