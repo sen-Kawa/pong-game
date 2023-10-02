@@ -9,19 +9,19 @@ import { SocketService } from 'src/socket/socket.service'
 export interface Game {
   players: {
     0: {
-        player: Player,
-        player_token: string,
-        id: number,
-        connection: string
-    },
+      player: Player
+      player_token: string
+      id: number
+      connection: string
+    }
     1: {
-        player: Player,
-        player_token: string,
-        id: number,
-        connection: string
+      player: Player
+      player_token: string
+      id: number
+      connection: string
     }
   }
-  gameid: number,
+  gameid: number
   last_modified: Date
 }
 
@@ -47,7 +47,7 @@ export class MatchService {
   constructor(
     private prisma: PrismaService,
     private socketService: SocketService
-    ) {
+  ) {
     this.matches = {}
   }
 
@@ -56,20 +56,20 @@ export class MatchService {
   async join(matchId: number, playerId: number, player_token: string) {
     const match = this.matches[matchId]
     if (match === undefined) {
-      console.log("Match is undefined")
-      return undefined;
+      console.log('Match is undefined')
+      return undefined
     }
 
     if (playerId == match.players[0].id) {
       const session_id = player_token
       match.players[0].player_token = session_id
-      console.log("Player joined as 1");
+      console.log('Player joined as 1')
     } else if (playerId == match.players[1].id || match.players[1].id === undefined) {
       const session_id = player_token
       match.players[1].id = playerId
       match.players[1].player_token = session_id
-      await this.addPlayer(matchId, playerId);
-      console.log("Player joined as 2");
+      await this.addPlayer(matchId, playerId)
+      console.log('Player joined as 2')
     }
 
     const db_match = await this.findOne(matchId, {
@@ -113,7 +113,7 @@ export class MatchService {
       gameid: match.id,
       last_modified: new Date()
     }
-    console.log(this.matches[match.id]);
+    console.log(this.matches[match.id])
 
     return match
   }
@@ -145,23 +145,19 @@ export class MatchService {
 
     const other_player_number = player_number == 0 ? 1 : 0
     const other_player = match.players[other_player_number]
-    this.socketService.socket.to(other_player.connection).emit("game_update", update)
+    this.socketService.socket.to(other_player.connection).emit('game_update', update)
   }
 
-  makeMove(
-    update: GameUpdate,
-    player_token: string,
-    connection: string
-  ) {
+  makeMove(update: GameUpdate, player_token: string, connection: string) {
     const match = this.matches[update.gameid]
     if (!match) {
       return undefined
     }
 
     if (match.players[0].player_token === player_token) {
-        this.moveHandler(match, 0, update, connection)
+      this.moveHandler(match, 0, update, connection)
     } else if (match.players[1].player_token === player_token) {
-        this.moveHandler(match, 1, update, connection)
+      this.moveHandler(match, 1, update, connection)
     }
   }
 

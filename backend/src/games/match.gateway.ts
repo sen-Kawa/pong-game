@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets'
 import { SocketService } from '../socket/socket.service'
 import { Server } from 'socket.io'
-import { Logger, Req, UseGuards } from '@nestjs/common'
+import { Logger, UseGuards } from '@nestjs/common'
 import { MatchService } from './match.service'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { GameUpdate } from 'common-types'
@@ -21,7 +21,7 @@ import { OnGatewayConnection } from '@nestjs/websockets'
   transports: ['websocket', 'polling']
 })
 @UseGuards(JwtAuthGuard)
-export class MatchGateway implements OnGatewayConnection {
+export class MatchGateway {
   constructor(
     private socketService: SocketService,
     private matchService: MatchService
@@ -31,15 +31,16 @@ export class MatchGateway implements OnGatewayConnection {
 
   private logger: Logger = new Logger('MatchGatewxay')
 
-  handleConnection(client: any, ...args: any[]) {
-  }
-
   /**
    *
    * @param update
    */
   @SubscribeMessage('move')
   game_update(@MessageBody() update: GameUpdate, @ConnectedSocket() client: any) {
-    const game_update = this.matchService.makeMove((update as any)[0], client.user.refreshToken, client.id)
+    this.matchService.makeMove(
+      (update as any)[0],
+      client.user.refreshToken,
+      client.id
+    )
   }
 }
