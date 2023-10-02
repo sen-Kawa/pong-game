@@ -7,7 +7,7 @@
 <script setup lang="ts">
     import { socket } from '@/sockets/sockets';
     import { ref } from 'vue';
-    import { type Player, type GameUpdate } from 'common-types'
+    import {type GameUpdate } from 'common-types'
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
@@ -55,17 +55,25 @@
 
     function reset() { makeMove(0) }
 
-    document.addEventListener('keydown', (event) => {
+    function keyDownHandler(event: any) {
         if (event.key == keyDown) {
             moveDown();
         } else if(event.key == keyUp) {
             moveUp();
         }
-    })
-    document.addEventListener('keyup', (event) => {
+    }
+
+    function keyUpHandler(event: any) {
         if (event.key == keyDown || event.key == keyUp) {
             reset();
         }
+    }
+
+    document.addEventListener('keydown', (event) => {
+        keyDownHandler(event)
+    })
+    document.addEventListener('keyup', (event) => {
+        keyUpHandler(event)
     })
 
     const drawBall = (x: number, y: number, ctx: CanvasRenderingContext2D) => {
@@ -102,6 +110,12 @@
         if (c === null) {
             console.log("cant get canvas");
             clearInterval(interval);
+            document.removeEventListener("keydown", (event) => {
+                keyUpHandler(event)
+            });
+            document.removeEventListener("keyup", (event) => {
+                keyUpHandler(event)
+            });
             return;
         }
         const ctx = c.getContext("2d");
