@@ -80,7 +80,7 @@ export class MatchService {
     return db_match
   }
 
-  async create(data: Prisma.MatchCreateInput) {
+  async create(data: Prisma.MatchCreateInput, playerToken?: string) {
     const match = await this.prisma.match.create({
       data,
       include: { players: { include: { player: true } } }
@@ -97,7 +97,7 @@ export class MatchService {
             vector: 0
           },
           id: players[0].playerId,
-          player_token: '',
+          player_token: playerToken ? playerToken : '',
           connection: ''
         },
         {
@@ -113,6 +113,7 @@ export class MatchService {
       gameid: match.id,
       last_modified: new Date()
     }
+    console.log(this.matches[match.id]);
 
     return match
   }

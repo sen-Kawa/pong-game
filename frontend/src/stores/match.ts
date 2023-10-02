@@ -113,7 +113,6 @@ export const useMatchStore = defineStore('match', () => {
           throw new Error(response.statusText)
         }
         const newMatch = transformMatchDTO(response.data)
-        matches.value.push(newMatch)
         currentMatch.value = newMatch
         player_number.value = 1
     } catch (e) {
