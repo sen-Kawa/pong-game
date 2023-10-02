@@ -48,13 +48,25 @@ export class MatchService {
     private prisma: PrismaService,
     private socketService: SocketService
   ) {
-    this.matches = {}
+    this.matches = new Map<number, Game>()
+    setInterval(() => {
+      let remove: number[] = []
+      this.matches.forEach((game, key) => {
+        const diff = Date.now() - game.last_modified.getTime()
+        if (diff > 1000 * 60 * 2) {
+          remove.push(key);
+        }
+      })
+      remove.map((key) => {
+        this.matches.delete(key);
+      })
+    }, 1000 * 60)
   }
 
-  matches: { [id: number]: Game }
+  matches: Map<number, Game>
 
   async join(matchId: number, playerId: number, player_token: string) {
-    const match = this.matches[matchId]
+    const match = this.matches.get(matchId)
     if (match === undefined) {
       console.log('Match is undefined')
       return undefined
@@ -89,7 +101,7 @@ export class MatchService {
 
     const playerTwoId = match.players.length == 2 ? players[1].playerId : undefined
 
-    this.matches[match.id] = {
+    this.matches.set(match.id, {
       players: [
         {
           player: {
@@ -112,7 +124,7 @@ export class MatchService {
       ],
       gameid: match.id,
       last_modified: new Date()
-    }
+    })
 
     return match
   }
@@ -148,7 +160,7 @@ export class MatchService {
   }
 
   makeMove(update: GameUpdate, player_token: string, connection: string) {
-    const match = this.matches[update.gameid]
+    const match = this.matches.get(update.gameid)
     if (!match) {
       return undefined
     }
