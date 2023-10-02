@@ -8,7 +8,6 @@
     import { socket } from '@/sockets/sockets';
     import { ref } from 'vue';
     import { type Player, type GameUpdate } from 'common-types'
-    import { useAuthStore } from '@/stores/auth';
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
@@ -16,14 +15,6 @@
     const elementColor:string = 'white'
     const paddleWidth = 15
     const paddleHeight = 70
-
-    interface Game {
-        players: {
-            0: Player,
-            1: Player
-        },
-        matchid: number
-    }
 
     const props = defineProps(['match', 'player_number']);
     const game_state = ref({
@@ -77,13 +68,6 @@
         }
     })
 
-    const userStore = useAuthStore();
-
-    const setKeysRightSide = () => {
-        keyUp = 'p'
-        keyDown = 'l'
-    }
-
     const drawBall = (x: number, y: number, ctx: CanvasRenderingContext2D) => {
         let ballRadius = 8
         ctx.fillStyle = elementColor
@@ -113,13 +97,6 @@
     }
 
     function drawGame() {
-
-        // console.log(" Player number ==> ", props.player_number)
-        // change the key and info if player is on the right side (maybe put it to a setup function later)
-        if (props.player_number === 1) {
-            playerInfo.value = 'Control your player with [p] for up and [l] for down.'
-            setKeysRightSide()
-        }
 
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
