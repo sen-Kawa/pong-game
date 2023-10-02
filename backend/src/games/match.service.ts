@@ -113,7 +113,6 @@ export class MatchService {
       gameid: match.id,
       last_modified: new Date()
     }
-    console.log(this.matches[match.id])
 
     return match
   }
