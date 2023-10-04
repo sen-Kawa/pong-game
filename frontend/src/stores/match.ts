@@ -89,7 +89,10 @@ export const useMatchStore = defineStore('match', () => {
   }
 
   async function joinMatch(id: number) {
+    console.log("joinMatch called:", id)
     const requestPath = baseUrlMatch + '/join'
+    // console.log("Join cM 1: ", currentMatch.value)
+
 
     if (currentMatch.value) {
         const message = 'already in game'
@@ -97,22 +100,24 @@ export const useMatchStore = defineStore('match', () => {
         throw new Error(message)
     }
     try {
+        console.log("TryBlock1")
+
         loading.value = true
         const response = await jwtInterceptor.post(
             requestPath,
-            {
-              matchId: id
-            },
-            {
-                withCredentials: true
-            }
+            { matchId: id },  // match id was not transferred correctly before
+            { withCredentials: true }
         )
+        console.log("TryBlock2")
         error.value = ''
         loading.value = false
+        console.log("TryBlock3")
         if (response.status != 201) {
           throw new Error(response.statusText)
         }
-        const newMatch = transformMatchDTO(response.data)
+        console.log("TryBlock4")
+        const newMatch = transformMatchDTO(response)
+        console.log("TryBlock5", response.data)
         currentMatch.value = newMatch
         player_number.value = 1
     } catch (e) {

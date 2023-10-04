@@ -270,8 +270,6 @@ export class AuthController {
     }
   }
 
-  //TODO fake login route for testing
-  // comment out if needed
   @Post('login')
   async login(
     @Req() req: any,
@@ -294,4 +292,28 @@ export class AuthController {
       twoFaEnabled: false
     }
   }
+  //TODO fake login route for testing
+  // comment out if needed
+//   @Post('login')
+//   async login(
+//     @Req() req: any,
+//     @Body('userid') userId: number,
+//     @Res({ passthrough: true }) res: Response
+//   ) {
+//     const jwtToken = this.authService.getAccessToken(+userId, false)
+//     res.cookie('auth-cookie', jwtToken, {
+//       httpOnly: true,
+//       expires: new Date(new Date().getTime() + 86409000)
+//     })
+//     const jwtRefreshToken = this.authService.getRefreshToken(+userId)
+//     res.cookie('refresh-cookie', jwtRefreshToken, {
+//       httpOnly: true,
+//       expires: new Date(new Date().getTime() + 86409000)
+//     })
+//     await this.authService.updateRefreshToken(+userId, jwtRefreshToken)
+//     return {
+//       userId: userId,
+//       twoFaEnabled: false
+//     }
+//   }
 }
