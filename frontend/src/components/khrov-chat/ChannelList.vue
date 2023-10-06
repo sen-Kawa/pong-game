@@ -335,6 +335,9 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
 
 <template>
   <div class="Channel-list">
+    <p class="Empty-channel-list" v-if="chList.channConn.length===0">
+      No Channel Conversations to display!
+    </p>
     <div
       class="Chl-item Chl-box"
       :class="{ ChlActive: chList.chlItemActive }"
@@ -639,6 +642,14 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
 
 .Channel-list::-webkit-scrollbar {
   display: none;
+}
+
+.Empty-channel-list {
+  text-align: center;
+  padding-top: 10px;
+  color: #009900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 
 .Chl-box {

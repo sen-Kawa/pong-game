@@ -189,6 +189,9 @@
             }"
           />
       </div>
+      <div v-if='cList.chiChatConnsApiOk&&datas.length===0'>
+        <p class="Empty-chat-list">No Chat Conversations to display!</p>
+      </div>
       <div v-if='!cList.chiChatConnsApiOk' class="Awaiting-chat-list"></div>
     </div>
 
@@ -380,7 +383,13 @@
   background-repeat: no-repeat;
   background-size: 30%;
   background-position: center;
-
+}
+.Empty-chat-list {
+  text-align: center;
+  padding-top: 10px;
+  color: #009900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 
 .Single-conversation {
