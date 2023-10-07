@@ -65,6 +65,7 @@ export class MatchService {
   }
 
   async create(data: Prisma.MatchCreateInput) {
+    console.debug({ data })
     const match = await this.prisma.match.create({
       data,
       include: { players: { include: { player: true } } }

@@ -57,6 +57,11 @@ const router = createRouter({
       path: '/user/firsttime',
       name: 'firsttime',
       component: () => import('../components/user/FirstTime.vue')
+    },
+    {
+      path: '/game/queue',
+      name: 'queue',
+      component: () => import('../components/match/WaitingRoom.vue')
     }
   ]
 })
