@@ -1,10 +1,9 @@
-import { defineStore } from 'pinia'
-import axios from 'axios'
 import { useStorage } from '@vueuse/core'
-import router from '../router'
-import { ref, computed } from 'vue'
+import axios, { AxiosError } from 'axios'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 import jwtInterceptor from '../interceptor/jwtInterceptor'
-import { AxiosError } from 'axios'
+import router from '../router'
 
 const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 const baseUrlUser = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/`
@@ -85,9 +84,8 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
-  
+
   async function getuserProfile() {
-    
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
@@ -158,7 +156,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   async function setDisplayName2(displayName: string, returnRoute: string) {
     const body = { displayName: displayName }
-    console.log("disp2", body)
+    console.log('disp2', body)
     try {
       const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
         headers: {
@@ -180,6 +178,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  //TODO fake login for chat testing
+  async function login(username: string) {
+    console.log(username)
+    const body = { userid: username }
+    try {
+      await axios.post(baseUrlauth + 'login', body, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      })
+      loginStatus.value = true
+      router.push('/leader')
+    } catch (error: any) {
+      //TODO improve error handling
+      console.log(error)
+      //return error.response.data.message;
+    }
+  }
+
   return {
     getUserName,
     getName,
@@ -195,6 +213,7 @@ export const useAuthStore = defineStore('auth', () => {
     setLoginStatus,
     setDisplayName,
     setDisplayName2,
-    getDisplayName
+    getDisplayName,
+    login
   }
 })
