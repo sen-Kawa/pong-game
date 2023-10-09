@@ -20,8 +20,6 @@
     let fieldHeight = 0
     // let ballVectorX = 1
     // let ballVectorY = 0
-    let ballVectorX = 1.5
-    let ballVectorY = -1.5
     const ballRadius = 8
 
     const props = defineProps(['match', 'player_number']);
@@ -37,9 +35,11 @@
                     vector: 0
                 }
             },
-            ballPos: {
+            ball: {
                     xPos: 100,
-                    yPos: 100
+                    yPos: 100,
+                    xVec: 1.5,
+                    yVec: -1.5
             },
             score: {
                 player0: 0,
@@ -215,50 +215,50 @@
         // check for boundary
 
 
-        if ( state.ballPos.xPos >= c.width && ballVectorX > 0 ) {
-            ballVectorX = -1
+        if ( state.ball.xPos >= c.width && state.ball.xVec > 0 ) {
+            state.ball.xVec = -1
             // beep()
             state.score.player0 += 1
         }
             
-        if ( state.ballPos.xPos <= 0 && ballVectorX > 0 ) {
-            ballVectorX = 1
+        if ( state.ball.xPos <= 0 && state.ball.xVec > 0 ) {
+            state.ball.xVec = 1
             // beep()
             state.score.player1 += 1
         }
 
         // bounce paddle left player
-        if ( state.ballPos.xPos <= 0 + paddleWidth && 
-                state.ballPos.yPos <= state.players[0].pos + paddleHeight/2 &&
-                state.ballPos.yPos >= state.players[0].pos - paddleHeight/2 ) {
-            ballVectorX = ballVectorX * -1.4
-            ballVectorY = ballVectorY * 1.4
+        if ( state.ball.xPos <= 0 + paddleWidth && 
+                state.ball.yPos <= state.players[0].pos + paddleHeight/2 &&
+                state.ball.yPos >= state.players[0].pos - paddleHeight/2 ) {
+                state.ball.xVec = state.ball.xVec * -1.4
+                state.ball.yVec = state.ball.yVec * 1.4
 
             beep()
         }
 
         // bounce paddle right player
-        if ( state.ballPos.xPos >= c.width - paddleWidth && 
-                state.ballPos.yPos <= state.players[1].pos + paddleHeight/2 &&
-                state.ballPos.yPos >= state.players[1].pos - paddleHeight/2 ) {
-            ballVectorX = ballVectorX * -2
+        if ( state.ball.xPos >= c.width - paddleWidth && 
+                state.ball.yPos <= state.players[1].pos + paddleHeight/2 &&
+                state.ball.yPos >= state.players[1].pos - paddleHeight/2 ) {
+                state.ball.xVec = state.ball.xVec * -2
             beep()
         }
 
         // bounce upper or lower wall
 
-        if (state.ballPos.yPos - ballRadius <= 0) {
-            ballVectorY = ballVectorY * -1
+        if (state.ball.yPos - ballRadius <= 0) {
+            state.ball.yVec = state.ball.yVec * -1
         }
 
-        if (state.ballPos.yPos + ballRadius >= c.height) {
-            ballVectorY = ballVectorY * -1
+        if (state.ball.yPos + ballRadius >= c.height) {
+            state.ball.yVec = state.ball.yVec * -1
         }
 
 
         // update ball position
-        state.ballPos.xPos += ballVectorX
-        state.ballPos.yPos += ballVectorY
+        state.ball.xPos += state.ball.xVec
+        state.ball.yPos += state.ball.yVec
 
         state.players[0].pos += state.players[0].vector
         if (state.players[0].pos <= 0)
@@ -276,7 +276,7 @@
         drawScore(state.score.player0, state.score.player1, ctx)
         drawPaddle(0, state.players[0].pos - paddleHeight/2, ctx)
         drawPaddle(c.width - 1 - paddleWidth,state.players[1].pos - paddleHeight/2, ctx)
-        drawBall(state.ballPos.xPos, state.ballPos.yPos, ctx)
+        drawBall(state.ball.xPos, state.ball.yPos, ctx)
     }
 
     

@@ -3,21 +3,10 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
-// import { Player, GameUpdate } from 'common-types'
+import { Player, GameUpdate } from 'common-types'
 import { SocketService } from 'src/socket/socket.service'
 
-export interface Player {
-    pos: number;
-    vector: number;
-}
-
-export interface GameUpdate {
-    player: Player;
-    gameid: number;
-}
-
-
-export interface Game {
+interface Game {
   players: {
     0: {
       player: Player

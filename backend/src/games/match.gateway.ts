@@ -10,18 +10,7 @@ import { Server } from 'socket.io'
 import { Logger, UseGuards } from '@nestjs/common'
 import { MatchService } from './match.service'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
-// import { GameUpdate } from 'common-types'
-import { OnGatewayConnection } from '@nestjs/websockets'
-
-export interface Player {
-    pos: number;
-    vector: number;
-}
-
-export interface GameUpdate {
-    player: Player;
-    gameid: number;
-}
+import { GameUpdate } from 'common-types'
 
 @WebSocketGateway({
   cors: {
@@ -33,7 +22,6 @@ export interface GameUpdate {
 @UseGuards(JwtAuthGuard)
 export class MatchGateway {
   constructor(
-    private socketService: SocketService,
     private matchService: MatchService
   ) {}
 
