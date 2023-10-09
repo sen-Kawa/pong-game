@@ -90,6 +90,7 @@
     function makeMove(newVec: number) {
         const update: GameUpdate = {
             player: game_state.value.game.players[props.player_number as 0 | 1],
+            ball: game_state.value.game.ball,
             gameid: props.match.id
         };
         const update2 = {

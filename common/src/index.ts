@@ -1,1 +1,1 @@
-export { Player, GameUpdate } from './types'
+export { Player, GameUpdate, Ball } from './types'
