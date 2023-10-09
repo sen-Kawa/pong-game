@@ -29,10 +29,6 @@ export class MatchGateway {
 
   private logger: Logger = new Logger('MatchGatewxay')
 
-  /**
-   *
-   * @param update
-   */
   @SubscribeMessage('move')
   game_update(@MessageBody() update: GameUpdate, @ConnectedSocket() client: any) {
     this.matchService.makeMove(

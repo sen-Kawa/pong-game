@@ -1,4 +1,6 @@
 <template>
+	<div>
+
   <nav id="header" v-if="authStore.isLoggedIn">
     <div class="menu-item"><router-link to="/">Home</router-link></div>
     <div class="menu-item"><router-link to="/game">Game</router-link></div>
@@ -11,6 +13,8 @@
   <nav id="header" v-else>
     <div class="menu-item"><router-link to="/">Home</router-link></div>
   </nav>
+		<h1 class="title">TRANSCENDENCE</h1>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -22,4 +26,5 @@ const authStore = useAuthStore()
 
 <style>
 @import '../assets/header.css';
+@import '../assets/styles.css';
 </style>

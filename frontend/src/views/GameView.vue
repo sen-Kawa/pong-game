@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center">this is the game tap</div>
+  <div class="component-title">Game</div>
   <button v-if="!matchStore.currentMatch" @click="createNewGame">New Game</button>
   <GameComponent v-if="matchStore.currentMatch" :match="matchStore.currentMatch" :player_number="matchStore.player_number" />
   <SearchMatch :join-game="matchStore.joinMatch" v-else />

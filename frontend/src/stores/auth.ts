@@ -37,6 +37,10 @@ export const useAuthStore = defineStore('auth', () => {
   const getEmail = computed(() => userProfile.value.email)
   const getId = computed(() => userProfile.value.id)
 
+  const setLoginStatus = (newStatus: boolean) => {
+    loginStatus.value = newStatus
+  }
+
   function setUserProfile(date: any) {
     // console.log(date.id);
     // console.log(date.name);
@@ -210,6 +214,7 @@ export const useAuthStore = defineStore('auth', () => {
     deactivate2FA,
     activate2FA,
     logout,
+    setLoginStatus,
     setDisplayName,
     setDisplayName2,
     getDisplayName,

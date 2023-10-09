@@ -31,6 +31,12 @@ model User {
   matches                       PlayersOnMatch[]
   avatar                        UserAvatar       @relation(fields: [avatarId], references: [id])
   avatarId                      Int              @default(1)
+  profile_pics                  Profile_pic[]
+  chat_union1                   Chat_union[]       @relation("Client1")
+  chat_union2                   Chat_union[]       @relation("Client2")
+  channel_links                 Channel_link[]
+  channel_historys              Channel_history[]
+  channel_pendings              Channel_pending[]
 }
 
 model PlayersOnMatch {
@@ -56,3 +62,81 @@ model UserAvatar {
   private  Boolean @default(true)
   filename String  @unique
 }
+
+
+// *************************************************************************
+// ********************** KHROV-CHAT TABLES BEGINS *************************
+// *************************************************************************
+model Profile_pic {
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId       Int        @id
+  avatar       String     @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHoAAAB6CAMAAABHh7fWAAABI1BMVEX////mOx/W4+v0qYEdGDjjjGHOdU3lLADsPB73q4IAFTkAADEAADP/sYbmNxgAAC/lMQwAEzoYFTcSFzjjiFrkGQAACDTV6PHI1t7q8fXh6vDINSWCJy8HDDWZa163f2nEiG5yUFCNY1r75OH2w7/yqKLwmZXthHzse27sdGfrbV/nQSf40M352tfvj4fpW0pjIjOXKyz99PNzJDHQNiPooHw5KT6vMCksIDthREvkgFfVlHXztbDQgGLodku4ydDkgk7nTDtDHTZPHjWlLitVO0ZIM0K8Mie4d1ltREPqWDfmakaaYE2ncmCAUklLUGQfKkt/dH5ZODrSycoAABEAAAAHCybtz8N3ZnSQUUbroovQnY3krp/ljXC7a0rSaUHctbHaqTPmAAAIKUlEQVRoge2aC1faSBTHJWEIIQmEkABaw9OigmKrBnn4QFtsq2t3W3a3W9ft8v0/xd5JAqLM3ATFPXvO8j9HjeQkv9yZO/cxYWVlqaWWWmqp/5eqG69rm1vb9fr21mbt9Ub1X6IebzYsS5J0XU+C4I8kWVZj8/iF+TvNhi7pyciMkvBxo7nzUtxq7VySGNgJXpLOay9h+862jnHHdH1rd9HguqUHcT3pVn2R8GrdCjR4ynSrvr8ocnMesAevLQS805DmA1NJjQV4ezPYuZiGS81ngvf3WCbHJ8IM33vWjO9GGH4dj7x6v/4GdLB+dOg9B5OtN57h6hsM/4o31tvpRCJDlUikMxdv1t/CE7D4SWnjqeRji2HyUToRnZb3BOn2wdvGLNw6fhr5NYv8Ph1lK5NIH0Rm4NbrJ5EZDhZ/leCQqRIXjZkrpCewj5mr+V0GQUcT72avmH++dxmjDcONGU3ZbxnzPaef70eYgeQCNZqyZ69JRuZb33usPBX/EGA0oN/Pmq3X5yE3mRMdx2eaKnPACC/zJJMNdsI4nJANw5jQDFtRlPG/mXesyCaFziX758yJjh/4420o7cHAUFTbptTLcrFYGKg++oKFTp4/c7gPfbJyWXRk0SkVyuVyodgTNU3WxIKKWB2RQg55lbWuAL3uoZWKqImiKMsalSyLrrSCwp1ryg5XLtbZCTqe8cmayJLWovOdWOdkse0w5B2O0Ydu9LY7bLIoF+mQs2KKq1CBZY9j9JE73iobTM2mXs9FJ0Msbo7Rkfhbis5yhpuiyzbMNWfAQ5m9zam3PbTdk3lod8Qzb3hofTOIXOWVn27qMNoOd8Dlns0O4r4CnbzGRX8ANzNaXKNF0WnDZKc/8MwOytycQEZ16KJhqt0FPf0I/gfu8mLlD0/JPRzNc7KIt66NgSZqvUqnUymKY3/TxCL9oKdpFYgqiSNugSzhjsaOoR76IBO1y5rYSVEpdsVHV7KK+0lH7IGfpV/x0Xg05Y83LGzVhrVVqJRKpeJN+bLso8stiOTwUeVGvjQMlXt9wIjvYk1O4+OnVBGm1IveMMWTFe3GckgiRaV1coWwMR9n14L+hdfkJ9Vd1r2bQvEeDEelwo17wol+Jl3+HdAKcRPp35On5KNCCV9/ziq/fHHGbNn58ouS/fkrPVJ+IgRBYx1gAxvwLqCLslwarv1q/LYynBj9beV34/f88COcSn0kZLYWnzw8UjHso5sWXXKigIfL4reB8Ud1al1XvxiDb5C4YXWh6IiOeBnaxAM66kaz8c/9ZPs/HfsERSOxlFMO+sN1Sk7aSPqAqY5SNHILxM8wB6ceTtpqgZs0IXUpUUJMDM1vPJvYXFN0y27x0VrHBjSyuLAMgq0tCCmEXBoqd8TlnmG0CTlFFonOX128MsG/kJCBwa3NwL+zRosQJJpF9C0umlOL+gI/gyFNccyWe0rUuCQE29lB6lJORThWg3y24fYTdIyIjjkxemBH7a/kGrsFUhsGoJNX37NRz2zZqxYgjoyPnBRUbp+wmUatxgfcL4ghmIpQHVQKN8VCpwD9VgXqBhjvFC2F8RsgaNzN6FYKFEmpkixXUlkoDtR2p63C32yqI3tobmHmo/luhi+uiNfmpiBntQ31RiRmn/T7hBSzRtSRZUBn+CWKh+YvLjSkUDUuYEJlmFeldPtn6YSqV7o7yUIypc1HG4nfVEhIQQMpVfxNBlofrZRqa93R2urq2trq2vBWG6SKmqZymutpND+QounDRUMLYnd6Fdpunv51e3d3d/vXKdEKqbIDbQ+vzbxH89MHnjSpGrT5UQ3lBry8e0rVJbTlMRTacB0GXI0kTbxUcM32tguzXgIjIHHc32IluC+kVMALpDHbbwVATs9twbwek9/yjIVuqQSuLropfZGgIQ1CmHyZalFyj3Yd7cMgMl4WBvoZZUfWE0ZUKTiao0SVnubcZA0jwdgVnkVjxXA11HuO+FErG1XbA2jvjPagrUSzLW6T90Bom4s0PlO6in03bG/bDn4b9ucYlqXHCmg1kXbvATr246tte/t32cGPWCh0QLuHNLkP0RSuZu20OvjRhX+uw6ADdlMCUrar5DVFx7qx75+/x7rucQh0UGvP39CYvsnfscf6O/iJA19FcLdxptUlM+gQDxy4V7kVHFWgKibmI3ZAugyzecV+6fHw8a9o7H5keKCLh9mpDHS0ZJeQGbgZMFjJMPuzQWbr12SiMRgOT3G2FWpXuo7eBBqBBzJN0zs4TWItD78gnBZnK969g3RlEp7MusR96JBb8bxompQiWyM+mfSF4VaE/aI97AsI9m6lLp3Xhrkcn0wcIXc2rJ0zvjIT/rXLys4js5O6FGmOcrl8PnfHNdsc5YS8kMsNm43H35wJ/7IJwqk1hbUs196cIAhngtDnot3TAsBzYLtl3Rs/3/c1XC9PSpKl12sjwcVSgVUjDrv/LeehPbwwqtV1yzV/vheL9HWqRKlDITfhCq7ZOYc55ObtFNk3Pjcc1bZ1qTHn1yV2reZQeED1zM4LAottOt65R4Ib5Dfn/rJEdQbrm81iU/JDo+81Lxi0yr4TBdyZD+Cmeccnrz4BjbBzQ6c/gZv93jC3WDKfDXMKHtwz+yCzN6Lg/GLJXHbehVMXyvsL4GzWw55HBrHvKJxNs/JnHJOf4mFTWuPcFXh5V2c8i59L5g46pbvinn7OYAeyUS2AvMIf9BcHPwG+tjDwnPDFgueALx5MFcLhFjfHM3CUvvpyYB/PHPm1l8be81fpLiUVPfq3qEsttdRSS/1X9A+mIvsiAzYcUgAAAABJRU5ErkJggg==")
+}
+model Chat_union { 
+  unionId                 Int       @default(autoincrement()) @id  
+  unionIdOther            Int        
+  client1                 User      @relation("Client1", fields: [client1Id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  client1Id               Int 
+  client2                 User      @relation("Client2", fields: [client2Id], references: [id], onDelete: Cascade, onUpdate: Cascade)    
+  client2Id               Int
+  blockStatus             Boolean   @default(false)
+  allowedToUnblock        Boolean   @default(false)
+  unreadCount             Int       @default(0)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  chat_historys           Chat_history[]
+}
+model Chat_history {
+  id                Int                 @default(autoincrement()) @id
+  union             Chat_union          @relation(fields: [unionId], references: [unionId], onDelete: Cascade, onUpdate: Cascade)
+  unionId           Int
+  outgoing          String?
+  incoming          String?
+  time              DateTime            @default(now())
+  deliveryStatus    String              @default("sent") @db.VarChar(16)
+}
+model Channel {
+  id                Int                 @default(autoincrement()) @id
+  name              String              @db.VarChar(32) @unique
+  desc              String              @db.VarChar(128)
+  visibility        String              @db.VarChar(16)
+  password          String?             @db.VarChar(128)  // this is assuming the question mark will allow us use this table as a type if we exclude password frm the db return 
+  channel_links     Channel_link[]
+  channel_historys  Channel_history[]
+  channel_pendings  Channel_pending[]
+}
+model Channel_link {
+  id                Int                 @default(autoincrement()) @id
+  ch                Channel             @relation(fields: [chId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chId              Int
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)    
+  userId            Int
+  role              String              @db.VarChar(16)
+  linkStatus        String              @db.VarChar(16)
+  mutedUntil        DateTime?
+  unreadCount       Int                 @default(0)
+  updatedAt         DateTime            @updatedAt
+  channel_historys  Channel_history[]
+}
+model Channel_history {
+  id                Int                 @default(autoincrement()) @id
+  ch                Channel             @relation(fields: [chId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chId              Int
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)    
+  userId            Int
+  outgoing          String
+  deliveryStatus    String              @db.VarChar(8) @default("sent")
+  createdAt         DateTime            @default(now())
+  channel_links     Channel_link[]
+}
+model Channel_pending {
+  id                Int                 @default(autoincrement()) @id
+  ch                Channel             @relation(fields: [chId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chId              Int
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)    
+  userId            Int
+  createdAt         DateTime            @default(now())
+}
+// *************************************************************************
+// ********************** KHROV-CHAT TABLES ENDS ***************************
+// *************************************************************************

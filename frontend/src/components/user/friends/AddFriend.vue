@@ -2,7 +2,7 @@
   <ButtonApp
     @btn-click="addFriend()"
     :text="isAdded ? 'Added' : 'Add Friend'"
-    :color="isAdded ? 'Green' : 'LightGray'"
+    :color="isAdded ? 'Black' : 'LightGray'"
   />
   <div v-if="message" :class="messageType">{{ message }}</div>
 </template>
@@ -22,7 +22,7 @@ export default {
     return {
       message: '',
       messageType: '',
-      isAdded: false
+      isAdded: false,
     }
   },
   components: {
@@ -31,18 +31,17 @@ export default {
   emits: ['friendAdded'],
   methods: {
     async addFriend() {
-      const responseData = await postAddFriend(this.friendName)
-
-      if (responseData === undefined) {
-        this.isAdded = true
-        this.message = `Successfully added ${this.friendName} to your friend list!`
-        this.messageType = 'success'
-        this.$emit('friendAdded')
-      } else {
-        this.message =
-          responseData.message || `Failed to add ${this.friendName} to your friend list.`
-        this.messageType = 'error'
-      }
+	try {
+      await postAddFriend(this.friendName)
+      this.isAdded = true
+      this.message = `Successfully added ${this.friendName} to your friend list!`
+      this.messageType = 'success'
+      this.$emit('friendAdded')
+	} 
+	catch(error) {
+      this.message = `Failed to add ${this.friendName} to your friend list.`
+      this.messageType = 'error'
+	} 
       setTimeout(() => {
         this.message = ''
       }, 5000)

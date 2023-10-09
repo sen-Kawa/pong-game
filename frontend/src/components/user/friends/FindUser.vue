@@ -1,21 +1,27 @@
 <template>
-  <div>
-    <h2>Find User</h2>
+  <div class="find-user">
+    <h2 class="component-title">Find User</h2>
     <form @submit.prevent="findUser">
-      <label for="name">User's Name: </label>
+      <label class="component-subtitle" for="name">User's Name: </label>
       <input v-model="name" type="text" id="name" />
-      <button type="submit">Find</button>
+      <button class="search" type="submit">Search</button>
     </form>
-    <div v-if="foundUser.length > 0">
-      <h3>User details</h3>
-      <li v-for="userData in foundUser" :key="userData['userName']">
-        <p>
-          {{ userData['displayName'] }} {{ userData['userName'] }}
-          <AddFriend :friendName="userData['displayName']" @friendAdded="onFriendAdded" />
-        </p>
-      </li>
+    <div v-if="foundUser && foundUser.length > 0">
+      <h3 class="component-title user-details">User details</h3>
+    <table>
+		<tr>
+			<th class="component-subtitle">Name</th>
+			<th class="component-subtitle">User Name</th>
+			<th></th>
+		</tr>
+      <tr v-for="userData in foundUser" :key="userData['userName']">
+		  <td class="details">{{ userData['displayName'] }}</td>
+		  <td class="details">{{ userData['userName'] }}</td>
+		  <td><AddFriend :friendName="userData['displayName']" @friendAdded="onFriendAdded" /></td>
+      </tr>
+    </table>
     </div>
-    <div v-if="message" :class="messageType">{{ message }}</div>
+    <div class="message" v-if="message" :class="messageType">{{ message }}</div>
   </div>
 </template>
 
@@ -29,8 +35,8 @@ export default {
       name: '',
       message: '',
       messageType: '',
-      foundUser: []
-    }
+	  foundUser: [] as { displayName: string; userName: string; }[],
+	}
   },
   components: {
     AddFriend
@@ -44,22 +50,32 @@ export default {
         alert('Add name to search')
         return
       }
-      const userData = await postFindUser(this.name)
-
-      if (userData.length === 0) {
-        this.message = `${this.name} not found.`
-        this.messageType = 'error'
-      } else {
-        this.foundUser = userData
-        this.message = `Found ${this.name}`
-        this.messageType = 'success'
-      }
+	  try {
+	  	const response = await postFindUser(this.name)
+      	this.foundUser = response.data
+   	   if (!this.foundUser || this.foundUser.length === 0 || this.foundUser.length === undefined) {
+    	    this.message = `${this.name} not found.`
+    	 	 this.messageType = 'error'
+     	} else {
+       	 this.message = `Found ${this.name}`
+       	 this.messageType = 'success'
+      	}
+	} catch(error: any) {
+		console.error('Error making the request in FindUser', error);
+			if (error.response.data.statusCode === 400) {
+        		this.message = error.response.data.message[0]
+			}
+			else {
+        		this.message = error.response.data.statusText
+			}
+    		this.messageType = 'error'
+	 	 }
       this.name = ''
       setTimeout(() => {
         this.message = ''
       }, 5000)
       setTimeout(() => {
-        this.foundUser = []
+		this.foundUser = []
       }, 10000)
     }
   }
@@ -73,4 +89,36 @@ export default {
 .error {
   color: red;
 }
+.search {
+	margin-left: 10px;
+}
+.find-user {
+	border: 1px solid black;
+	max-width: 600px;
+	margin: 0 auto;
+	padding-bottom: 20px;
+	margin-top: 60px;
+	padding-top: 20px;
+	box-shadow: 10px 10px;
+	transition: transform .2s;
+}
+.find-user:hover {
+	transform: scale(1.1);
+}
+input {
+	height: 35px;
+}
+table, th, td {
+	margin: 0 auto;
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 10px;
+	box-shadow: 2px 2px;
+}
+.message {
+	margin-top: 10px;
+}
+	.user-details {
+		padding-top: 40px;
+	}
 </style>

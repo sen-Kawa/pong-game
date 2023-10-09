@@ -1,13 +1,14 @@
 <template>
-  <div class="friend-item">
-    <span class="friend-name">{{ friend.displayName }}</span>
-    <button>Status</button>
-    <button @click="removeFriend">Remove Friend</button>
-  </div>
+	<tr>
+		<td class="displayName details">{{ friend.displayName }}</td>
+		<td class="userName details">{{ friend.userName }}</td>
+		<td class="status details">{{ friend.currentStatus }}</td>
+		<td><button @click="removeFriend">Remove Friend</button></td>
+	</tr>
 </template>
 
 <script lang="ts">
-import { deleteFriend } from './api/friendship.api.js'
+import { deleteFriend } from './api/friendship.api'
 
 export default {
   props: {
@@ -18,23 +19,21 @@ export default {
   },
   methods: {
     async removeFriend() {
+	try {
       await deleteFriend(this.friend.displayName)
       this.$emit('friendRemoved', this.friend.id)
+	} catch (error) {
+		console.error('Failed to remove friend');
+	}
     }
   }
 }
 </script>
 
 <style scoped>
-.friend-item {
-  display: flex;
-}
-.friend-name {
-  font-weight: bold;
-  margin-right: 10px;
-  font-size: 20px;
-}
-div.friends {
-  align-items: center;
+td {
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding: 10px;
 }
 </style>

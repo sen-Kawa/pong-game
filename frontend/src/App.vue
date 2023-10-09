@@ -1,5 +1,6 @@
 <template>
   <div>
+    <ChatBuilder />
     <Header />
     <main>
       <router-view />
@@ -10,7 +11,9 @@
 
 <script setup lang="ts">
 import Header from './components/HeaderComp.vue'
-import Footer from './components/FooterComp.vue'
+import Footer from './components/Footer.vue'
+import ChatBuilder from '@/components/khrov-chat/ChatBuilder.vue'
+
 </script>
 
 <style>
