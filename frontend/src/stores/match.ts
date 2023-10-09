@@ -116,8 +116,8 @@ export const useMatchStore = defineStore('match', () => {
           throw new Error(response.statusText)
         }
         console.log("TryBlock4")
-        const newMatch = transformMatchDTO(response)
-        console.log("TryBlock5", response.data)
+        const newMatch = transformMatchDTO(response.data as MatchDTO)
+        console.log("TryBlock5", response)
         currentMatch.value = newMatch
         player_number.value = 1
     } catch (e) {
