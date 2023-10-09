@@ -132,6 +132,29 @@ export class MatchService {
     return match
   }
 
+  playerConnected(player_token: string, connection: string, update: GameUpdate)  {
+    console.log("Player connected", this.matches)
+    const match = this.matches.get(update.gameid)
+    if (!match) {
+      console.log("Match not found")
+      return undefined
+    }
+    console.log("Player 1 token:", match.players[0].player_token, "Player 2 token:", match.players[1].player_token)
+    if (match.players[0].player_token === player_token) {
+      match.players[0].connection = connection
+    } else if (match.players[1].player_token === player_token) {
+      match.players[1].connection = connection
+    }
+
+    const other_player_number = match.players[0].connection === connection ? 1 : 0
+    const other_player = match.players[other_player_number]
+    console.log("Player 1:", connection,"Player 2:", other_player.connection)
+    if (other_player.connection != '') {
+      this.socketService.socket.to(other_player.connection).emit('start_game', update)
+      this.socketService.socket.to(connection).emit('start_game', update)
+    }
+  }
+
   moveHandler(match: Game, player_number: number, update: GameUpdate, connection: string) {
     match.players[player_number].player.pos = update.player.pos
     match.players[player_number].player.vector = update.player.vector

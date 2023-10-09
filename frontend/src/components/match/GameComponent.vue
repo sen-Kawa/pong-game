@@ -18,13 +18,12 @@
     const paddleHeight = 70
     let fieldWidth = 0
     let fieldHeight = 0
-    // let ballVectorX = 1
-    // let ballVectorY = 0
     const ballRadius = 8
 
     const props = defineProps(['match', 'player_number']);
     const game_state = ref({
         game: {
+            started: false,
             players: {
                 0: {
                     pos: 0,
@@ -41,6 +40,8 @@
                     xVec: 1.5,
                     yVec: -1.5
             },
+            is_turn: props.player_number == 0 ? true : false,
+            turn_change: false,
             score: {
                 player0: 0,
                 player1: 0
@@ -58,40 +59,60 @@
         keyDown = 'l'
     }
 
-    // socket.on("game_update", (update: GameUpdate) => {
-    //     const player_number = props.player_number == 0 ? 1 : 0;
-    //     if (update && props.match.id == update.gameid)
-    //         game_state.value.game.players[player_number] = update.player;
-    // })
-
-
-    socket.on("game_update2", (update2) => {
-        // const player_number = props.player_number == 0 ? 1 : 0;
-        // const player_number = props.player_number == 0 ? 1 : 0;
-        // const player_number = props.player_number == 0 ? 1 : 0;
-        // console.log("Update:", update2)
-
-        if (update2[0].playerId !== props.player_number) {
-            const player_number = update2[0].playerId == 0 ? 0 : 1
-            console.log("Update:", update2)
-            // let a: string = string(update2[0].playerId)
-            game_state.value.game.players[player_number].pos = update2[0].paddlePos
-
-
+    socket.on("game_update", (update: GameUpdate) => {
+        console.log("got update:", update)
+        const player_number = props.player_number == 0 ? 1 : 0;
+        if (update && props.match.id == update.gameid) {
+            game_state.value.game.players[player_number] = update.player;
+            if (game_state.value.game.is_turn) {
+                game_state.value.game.ball = update.ball;
+            }
+            if (update.turn_change) {
+                game_state.value.game.is_turn = !game_state.value.game.is_turn;
+                game_state.value.game.turn_change = false;
+            }
         }
-            
-        // if (update && props.match.id == update.gameid) {
-        //     game_state.value.game.players[player_number] = update.player;
-        //     console.log("Update:", update)
-        // }      
     })
+
+    socket.on("start_game", (game: GameUpdate) => {
+        console.log("Game started")
+        game_state.value.game.started = true;
+        const player_number = props.player_number == 1 ? 1 : 0;
+        game_state.value.game.players[player_number] = game.player;
+        if (player_number == 1) {
+            game_state.value.game.ball = game.ball;
+        }
+        interval = setInterval(drawGame, 1000/ 50)
+    })
+
+    // socket.on("game_update2", (update2) => {
+    //     // const player_number = props.player_number == 0 ? 1 : 0;
+    //     // const player_number = props.player_number == 0 ? 1 : 0;
+    //     // const player_number = props.player_number == 0 ? 1 : 0;
+    //     // console.log("Update:", update2)
+
+    //     if (update2[0].playerId !== props.player_number) {
+    //         const player_number = update2[0].playerId == 0 ? 0 : 1
+    //         console.log("Update:", update2)
+    //         // let a: string = string(update2[0].playerId)
+    //         game_state.value.game.players[player_number].pos = update2[0].paddlePos
+
+
+    //     }
+            
+    //     // if (update && props.match.id == update.gameid) {
+    //     //     game_state.value.game.players[player_number] = update.player;
+    //     //     console.log("Update:", update)
+    //     // }      
+    // })
 
 
     function makeMove(newVec: number) {
         const update: GameUpdate = {
             player: game_state.value.game.players[props.player_number as 0 | 1],
             ball: game_state.value.game.ball,
-            gameid: props.match.id
+            gameid: props.match.id,
+            turn_change: game_state.value.game.turn_change
         };
         const update2 = {
             gameId: props.match.id,
@@ -101,8 +122,8 @@
 
         update.player.vector = newVec;
         update.player.pos += newVec;
-        // socket.emit("move", update);
-        socket.emit("move2", update2)
+        socket.emit("move", update);
+        // socket.emit("move2", update2)
 
     }
 
@@ -164,10 +185,10 @@
     }
 
     const gameInit = () => {
-        console.log(" Player number ==> ", props.player_number)
-        console.log("Props: ", props)
-        console.log("matchid: ", props.match.id)
-        console.log("match (all): ", props.match)
+        // console.log(" Player number ==> ", props.player_number)
+        // console.log("Props: ", props)
+        // console.log("matchid: ", props.match.id)
+        // console.log("match (all): ", props.match)
         // change the key and info if player is on the right side (maybe put it to a setup function later)
         if (props.player_number === 1) {
             playerInfo.value = 'Control your player with [p] for up and [l] for down.'
@@ -175,6 +196,15 @@
         }
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
+
+        let uptdate: GameUpdate = {
+            player: game_state.value.game.players[props.player_number as 0 | 1],
+            ball: game_state.value.game.ball,
+            gameid: props.match.id,
+            turn_change: false
+        }
+        console.log("Update: ", uptdate)
+        socket.emit("player_connected", uptdate)
     }
 
     function drawGame() {
@@ -234,7 +264,9 @@
                 state.ball.yPos >= state.players[0].pos - paddleHeight/2 ) {
                 state.ball.xVec = state.ball.xVec * -1.4
                 state.ball.yVec = state.ball.yVec * 1.4
-
+                if (props.player_number === 0) {
+                    game_state.value.game.turn_change = true;
+                }
             beep()
         }
 
@@ -243,6 +275,9 @@
                 state.ball.yPos <= state.players[1].pos + paddleHeight/2 &&
                 state.ball.yPos >= state.players[1].pos - paddleHeight/2 ) {
                 state.ball.xVec = state.ball.xVec * -2
+                if (props.player_number === 1) {
+                    game_state.value.game.turn_change = true;
+                }
             beep()
         }
 
@@ -284,7 +319,7 @@
 
     gameInit()
     const userStore = useAuthStore()
-    const interval = setInterval(drawGame, 1000/ 50);
+    let interval: any;
 </script>
 
 

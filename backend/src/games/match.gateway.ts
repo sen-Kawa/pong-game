@@ -38,6 +38,11 @@ export class MatchGateway {
     )
   }
 
+  @SubscribeMessage('player_connected')
+  player_connected(@ConnectedSocket() client: any, @MessageBody() update: GameUpdate) {
+    this.matchService.playerConnected(client.user.refreshToken, client.id, (update as any)[0])
+  }
+
   @SubscribeMessage('move2')
   game_update2(@MessageBody() update: GameUpdate, @ConnectedSocket() client: any) {
     this.server.emit("game_update2", update)
