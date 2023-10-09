@@ -46,7 +46,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
 function parseCookie(cookie: string) {
   const cookies = cookie.split(';')
-  const cookieMap = new Map<string, any>()
+  const cookieMap = []
   cookies.map((cookie) => {
     const split = cookie.split('=')
     cookieMap[split[0].trim()] = split[1]
