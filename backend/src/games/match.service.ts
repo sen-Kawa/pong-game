@@ -132,25 +132,6 @@ export class MatchService {
     return match
   }
 
-  buildResponseMatch(match: Game) {
-    const player0 = match.players[0].player
-    const player1 = match.players[1].player
-
-    return {
-      players: {
-        0: {
-          pos: player0.pos,
-          vector: player0.vector
-        },
-        1: {
-          pos: player1.pos,
-          vector: player1.vector
-        }
-      },
-      gameid: match.gameid
-    }
-  }
-
   moveHandler(match: Game, player_number: number, update: GameUpdate, connection: string) {
     match.players[player_number].player.pos = update.player.pos
     match.players[player_number].player.vector = update.player.vector
