@@ -6,7 +6,13 @@ nav {
   justify-content: center;
 }
 nav .menu-item {
-  color: #fff;
+  background-image: linear-gradient(180deg, #725A92 20%, #b7d198 50%, #d7bf7c 60%, #bc4f4c 66%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  color: transparent;
+  font-family: space;
+  font-size: 25px;
   padding: 25px 5px;
   position: relative;
   text-align: center;
@@ -27,4 +33,13 @@ nav .menu-item a {
   display: inline-block;
   height: 100%;
   width: 100%;
+}
+.title {
+	font-family: alternity;
+	font-size: 80px;
+	background-image: linear-gradient(180deg, #725A92 20%, #b7d198 50%, #d7bf7c 60%, #bc4f4c 66%);
+	background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+	color: transparent;
 }

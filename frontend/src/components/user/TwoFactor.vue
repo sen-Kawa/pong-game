@@ -1,9 +1,9 @@
 <template>
   <div v-if="!activated2FA">
-    <button type="button" class="change2fa" @click="change2fa">activate 2fa</button>
+    <button type="button" class="change2fa" @click="change2fa">Activate 2fa</button>
   </div>
   <div v-if="activated2FA">
-    <button type="button" class="change2fa" @click="change2fa">deactivate 2fa</button>
+    <button type="button" class="change2fa" @click="change2fa">Deactivate 2fa</button>
   </div>
   <div v-if="url != ''">
     <br /><img :src="url" /> <br />
@@ -72,3 +72,6 @@ const verify2FA = () => {
     })
 }
 </script>
+
+<style scoped>
+</style>

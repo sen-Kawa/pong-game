@@ -127,7 +127,7 @@ const APItest = async () => {
 #ChatIcon-container {
   display: block;
   position: fixed;
-  bottom: 15px;
+  bottom: 85px;
   right: 15px;
   height: 60px;
   aspect-ratio: 1/1;
