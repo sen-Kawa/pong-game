@@ -10,18 +10,6 @@ export class ModifyChannelDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
-    description: 'Should be a user ID of an admin of the channel chId',
-    example: 1
-  })
-  readonly adminId: number
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
     description: 'ID of a channel where adminId is an admin',
     example: 1
   })

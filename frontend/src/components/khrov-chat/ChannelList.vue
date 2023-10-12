@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { toRef } from 'vue'
-import { onMounted } from 'vue'
+import { reactive, onMounted, watch } from 'vue'
 import ChannelListItem from '@/components/khrov-chat/ChannelListItem.vue'
 import ChannelListItemMsg from '@/components/khrov-chat/ChannelListItemMsg.vue'
 import ChannelListItemPendings from '@/components/khrov-chat/ChannelListItemPendings.vue'
 import type { ChnListOfflineCache } from '@/components/khrov-chat/interface/khrov-chat'
-import { useChatsStore } from '@/stores/chatsAll'
+import { useChatsStore } from '@/stores/chats'
 import { socket } from '@/sockets/sockets'
 
-const props = defineProps<{
-  sTemp: number
-}>()
-
 const chatsStore = useChatsStore();
-const $_: any = toRef(() => props.sTemp)
 const channCache: any = reactive({})
 const offlineCache: ChnListOfflineCache[] = []
 
@@ -72,6 +65,7 @@ interface ChList {
   notifModifyMsg: string
   getPendingsObj: ChnListPendingList[]
   getPendingsObjRef: number
+  notifDiff: number
 }
 
 const chList: ChList = reactive({
@@ -106,17 +100,35 @@ const chList: ChList = reactive({
   modModifyPwd: '',
   notifModifyMsg: '',
   getPendingsObj: [],
-  getPendingsObjRef: 0
+  getPendingsObjRef: 0,
+  notifDiff: 0
 })
 
+const calculateChannNotif = (channConn: ChnListChannConn[]): number => {
+  let total: number = 0;
+  for (let key in channConn) {
+    const oneChann = channConn[key];
+    total += oneChann.unreadCount;
+  }
+  return total ;
+}
+
+watch(() => chList.notifDiff, async (curr, expired) => {
+  if (curr > expired) {
+    let there_be_sounds = new Audio(chatsStore.getKhrovCelestial);  
+    there_be_sounds.play();
+    chatsStore.manageAllNotifCounter(0, curr);
+  }
+})
 const getChannelPreviews = async () => {
-  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/${$_.value}`, 'GET', {});
+  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/get`, 'GET', {});
   if (response) {
     try {
       if (!response.ok) throw response;
       const jsonObj = await response.json();
       if (JSON.stringify(jsonObj) != JSON.stringify(chList.channConn)) {
         chList.channConn = jsonObj
+        chList.notifDiff = calculateChannNotif(chList.channConn);
       }
       if (chList.chlIdOfFocus != 0) {
         getFocusedChannelHistory()
@@ -126,7 +138,7 @@ const getChannelPreviews = async () => {
 }
 
 const getFocusedChannelHistory = async () => {
-  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/${$_.value}/${chList.chlIdOfFocus}`, 'GET', {});
+  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/chann/${chList.chlIdOfFocus}`, 'GET', {});
   if (response) {
     try {
       if (!response.ok) {
@@ -143,7 +155,8 @@ const getFocusedChannelHistory = async () => {
 }
 
 const submitChannMsg = async () => {
-  if (chList.chlMsgInput && chList.chlMsgInput.length == 0) {
+  if ( !chList.chlMsgInput ||
+     ( chList.chlMsgInput && (chList.chlMsgInput.trimStart()).length == 0) ) {
     return
   }
   const offlineAppend = {
@@ -156,7 +169,6 @@ const submitChannMsg = async () => {
   }
   channCache[chList.chlIdOfFocus] = [offlineAppend, ...channCache[chList.chlIdOfFocus]]
   const tmp = {
-    userId: $_.value,
     chId: chList.chlIdOfFocus,
     msg: chList.chlMsgInput as string,
     time: new Date().toISOString()
@@ -169,9 +181,8 @@ const submitChannMsg = async () => {
       offlineCache.length = 0;
 }
 
-const setSeen = async (userId: number, chId: number) => {
+const setSeen = async (chId: number) => {
   const tmp = {
-    userId: userId,
     chId: chId
   }
   await chatsStore.fetchForKhrov(`/channels/put/set-seen`, 'PUT', tmp);
@@ -216,7 +227,7 @@ const getUserID = async (userNameInput: string) => {
     chList.notifMsg = 'Input in "userName" must be more than 3 chars'
     return
   }
-  const response = await chatsStore.fetchForKhrov(`/channels/?adminId=${$_.value}&chId=${chList.chlIdOfFocus}&userName=${userNameInput}`, 'GET', {});
+  const response = await chatsStore.fetchForKhrov(`/channels/?chId=${chList.chlIdOfFocus}&userName=${userNameInput}`, 'GET', {});
   if (response) {
     try {
       if (!response.ok) throw response;
@@ -250,7 +261,6 @@ const moderateMembers = async () => {
   const mutedUntil = new Date(currentTime.getTime() + 1000 * 60 * muteTime)
 
   const tmp = {
-    adminId: $_.value,
     chId: chList.chlIdOfFocus,
     userId: parseInt(chList.modModerMemberId),
     action: chList.modModerSelectAction,
@@ -289,7 +299,6 @@ const modifyChannel = async () => {
   const passTmp = chList.modModifySelectVisi === 'password' ? chList.modModifyPwd : 'Abc123'
 
   const tmp = {
-    adminId: $_.value,
     chId: chList.chlIdOfFocus,
     newVisibility: chList.modModifySelectVisi,
     password: passTmp
@@ -310,7 +319,7 @@ const modifyChannel = async () => {
 const getAllPending = async () => {
   chList.getPendingsObj.length = 0
 
-  const response = await chatsStore.fetchForKhrov(`/channels/get/channel/moderate/${$_.value}/${chList.chlIdOfFocus}`, 'GET', {});
+  const response = await chatsStore.fetchForKhrov(`/channels/get/channel/moderate/true/${chList.chlIdOfFocus}`, 'GET', {});
   if (response) {
     try {
       if (!response.ok) throw response;
@@ -323,7 +332,6 @@ const getAllPending = async () => {
 
 const approveOrReject = async (choice: boolean, memberId: number) => {
   const tmp = {
-    adminId: $_.value,
     chId: chList.chlIdOfFocus,
     memberId: memberId,
     action: choice
@@ -371,7 +379,8 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
             changeActiveBox('Chl-msgs');
 
             getChannelPreviews();
-            setSeen($_, chList.chlIdOfFocus);
+            setSeen(chList.chlIdOfFocus);
+            chatsStore.manageAllNotifCounter(0, 0, 'channel');
 
           }"
       />
@@ -384,7 +393,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
 
               chList.chlMsgOrModerate = true;
 
-              setSeen($_, chList.chlIdOfFocus);
+              setSeen(chList.chlIdOfFocus);
             }
           "
           >&#11164;</span

@@ -2,10 +2,9 @@
 import { reactive } from 'vue'
 import type { ChatBlockedItem } from '@/components/khrov-chat/interface/khrov-chat'
 import { layer } from '@layui/layer-vue'
-import { useChatsStore } from '@/stores/chatsAll'
+import { useChatsStore } from '@/stores/chats'
 
 defineProps<{
-  myId: number
   theirId: number
   displayName: string
   profileDp: string
@@ -16,9 +15,8 @@ const cbItem: ChatBlockedItem = reactive({
   cbiBlockPanelHeight: '0px'
 })
 
-const unblockUser = async (blocker: number, blocked: number, partner: string) => {
+const unblockUser = async (blocked: number, partner: string) => {
   const tmp = {
-    blockerId: blocker,
     blockedId: blocked
   }
   const response = await chatsStore.fetchForKhrov('/chats/block/user/unblock', 'PUT', tmp);
@@ -58,7 +56,7 @@ const unblockUser = async (blocker: number, blocked: number, partner: string) =>
         @click="
           {
             cbItem.cbiBlockPanelHeight = '0px';
-            unblockUser(myId, theirId, displayName);
+            unblockUser(theirId, displayName);
           }
         "
       >

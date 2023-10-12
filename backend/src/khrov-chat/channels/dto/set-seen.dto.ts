@@ -10,18 +10,6 @@ export class SetSeenDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
-    description: 'Should be an ID of a user that is a member of channel chId',
-    example: 1
-  })
-  userId: number
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
     description: 'Should be an ID of a channel where userId is a member',
     example: 1
   })

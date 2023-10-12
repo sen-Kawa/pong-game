@@ -2,10 +2,9 @@
 import { reactive } from 'vue'
 import type { ChatInviteItem } from '@/components/khrov-chat/interface/khrov-chat'
 import { layer } from '@layui/layer-vue'
-import { useChatsStore } from '@/stores/chatsAll'
+import { useChatsStore } from '@/stores/chats'
 
 const props = defineProps<{
-  myId: number
   theirId: number
   displayName: string
   profileDp: string
@@ -24,7 +23,6 @@ const sendNewMsg = async () => {
     return
   }
   const tmp = {
-    senderId: props.myId,
     receiverId: props.theirId,
     msg: ciItem.ciiMsgInput
   }
@@ -42,9 +40,8 @@ const sendNewMsg = async () => {
     }
 }
 
-const blockUser = async (blocker: number, blocked: number, partner: string) => {
+const blockUser = async (blocked: number, partner: string) => {
   const tmp = {
-    blockerId: blocker,
     blockedId: blocked
   }
   const response = await chatsStore.fetchForKhrov('/chats/block/user', 'PUT', tmp);
@@ -107,7 +104,7 @@ const blockUser = async (blocker: number, blocked: number, partner: string) => {
         @click="
           {
             ciItem.ciiBlockPanelHeight = '0px';
-            blockUser(myId, theirId, displayName);
+            blockUser(theirId, displayName); //
           }
         "
       >

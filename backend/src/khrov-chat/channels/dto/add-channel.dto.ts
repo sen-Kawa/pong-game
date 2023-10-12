@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber, IsNotEmpty, IsPositive, Matches } from 'class-validator'
-import { Transform } from 'class-transformer'
+import { Matches } from 'class-validator'
 
 export class AddChannelDto {
   @Matches(/^[a-zA-Z\d]{3,15}$/)
@@ -30,18 +29,6 @@ export class AddChannelDto {
     example: 'Abc123'
   })
   readonly password: string
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
-    description: 'User ID of the user creating the channel',
-    example: 1
-  })
-  readonly userId: number
 }
 
 export class AddChannelResultDto {
