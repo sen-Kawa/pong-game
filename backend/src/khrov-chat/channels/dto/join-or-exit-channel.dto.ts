@@ -10,18 +10,6 @@ export class JoinOrExitChannelDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
-    description: 'Should be an ID of a user that exists in the User table',
-    example: 1
-  })
-  readonly userId: number
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
     description: 'Should be an ID of a channel that exists in the Channel table',
     example: 1
   })

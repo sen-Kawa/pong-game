@@ -1,15 +1,8 @@
 <script setup lang="ts">
-import { toRef } from 'vue'
 import { reactive } from 'vue'
 import ChannelNewItem from '@/components/khrov-chat/ChannelNewItem.vue'
 import { layer } from '@layui/layer-vue'
-import { useChatsStore } from '@/stores/chatsAll'
-
-const props = defineProps<{
-  sTemp: number
-}>()
-
-const $_: any = toRef(() => props.sTemp)
+import { useChatsStore } from '@/stores/chats'
 
 const chatsStore = useChatsStore();
 
@@ -128,7 +121,6 @@ const requestChannelCreation = async () => {
     name: chNew.chnNameInput,
     desc: chNew.chnDescInput,
     visibility: chNew.chnVisiSelect,
-    userId: $_.value,
     password: ''
   }
   tmp.password = chNew.chnVisiSelect === 'password' ? chNew.chnPassInput : 'Aa1234'
@@ -149,7 +141,7 @@ const requestChannelCreation = async () => {
   }
 }
 
-const searchChannels = async (myId: number, key: string) => {
+const searchChannels = async (key: string) => {
   chNew.renderSearchOutput = true
   chNew.searchOutput = []
   chNew.searchOutputRef += 1
@@ -157,10 +149,10 @@ const searchChannels = async (myId: number, key: string) => {
   if (key.length === 1) {
     return
   } else if (key.length === 0) {
-    suggestedChannels(myId)
+    suggestedChannels()
     return
   }
-  const response = await chatsStore.fetchForKhrov(`/channels/${myId}/${key}`, 'GET', {});
+  const response = await chatsStore.fetchForKhrov(`/channels/me/${key}`, 'GET', {});
   if (response) {
     try {
       chNew.chnSearchLoading = false
@@ -172,10 +164,10 @@ const searchChannels = async (myId: number, key: string) => {
   }
 }
 
-const suggestedChannels = async (myId: number) => {
+const suggestedChannels = async () => {
   chNew.renderSearchOutput = false
   chNew.chnSearchLoading = true
-  const response = await chatsStore.fetchForKhrov(`/channels/${myId}`, 'GET', {});
+  const response = await chatsStore.fetchForKhrov(`/channels/suggestions`, 'GET', {});
   if (response) {
     try {
       chNew.chnSearchLoading = false
@@ -186,8 +178,7 @@ const suggestedChannels = async (myId: number) => {
     } catch {/* Do nothing */}
   }
 }
-
-suggestedChannels($_.value)
+suggestedChannels()
 </script>
 
 <template>
@@ -205,8 +196,8 @@ suggestedChannels($_.value)
         <input
           class="Ch-nf-search-bar"
           placeholder="Search for Channels"
-          @keyup="searchChannels($_, chNew.chnSearchInput)"
-          @keyup.enter="searchChannels($_, chNew.chnSearchInput)"
+          @keyup="searchChannels(chNew.chnSearchInput)"
+          @keyup.enter="searchChannels(chNew.chnSearchInput)"
           v-model="chNew.chnSearchInput"
         />
         <div
@@ -218,13 +209,12 @@ suggestedChannels($_.value)
           <ChannelNewItem
             v-for="item in chNew.searchOutput"
             v-bind:key="item.id"
-            :userId="$_"
             :channelId="item.id"
             :channelName="item.name"
             :desc="item.desc"
             :visibility="item.visibility"
             :memberOr="item.role"
-            @join-or-exit-complete="searchChannels($_, chNew.chnSearchInput)"
+            @join-or-exit-complete="searchChannels(chNew.chnSearchInput)"
           />
         </div>
         <div
@@ -236,13 +226,12 @@ suggestedChannels($_.value)
           <ChannelNewItem
             v-for="item in chNew.suggestionsOutput"
             v-bind:key="item.id"
-            :userId="$_"
             :channelId="item.id"
             :channelName="item.name"
             :desc="item.desc"
             :visibility="item.visibility"
             :memberOr="item.role"
-            @join-or-exit-complete="suggestedChannels($_)"
+            @join-or-exit-complete="suggestedChannels()"
           />
         </div>
         <img
