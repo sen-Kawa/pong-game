@@ -289,7 +289,7 @@ export class AuthController {
     })
     await this.authService.updateRefreshToken(+userId, jwtRefreshToken)
     return {
-      userId: userId,
+      userId: +userId,
       twoFaEnabled: false
     }
   }

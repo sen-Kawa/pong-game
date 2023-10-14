@@ -1,7 +1,11 @@
-import { Logger, Req, UseGuards } from '@nestjs/common'
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets'
+import { Logger } from '@nestjs/common'
+import {
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer
+} from '@nestjs/websockets'
 import { Server } from 'http'
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { MatchService } from './match.service'
 import { QueueService } from './queue.service'
 
@@ -12,7 +16,6 @@ import { QueueService } from './queue.service'
   },
   transports: ['websocket', 'polling']
 })
-@UseGuards(JwtAuthGuard)
 export class QueueGateway {
   constructor(
     private queueService: QueueService,
@@ -23,23 +26,22 @@ export class QueueGateway {
   private logger: Logger = new Logger('MatchGateWay')
 
   @SubscribeMessage('joinQueue')
-  joinQueue(@Req() request: any) {
-    console.debug({ request })
-    this.queueService.addPlayer(request.user.id)
-    this.logger.log(`User ${request.user.id} joined the queue`)
-    this.server.emit('player_joined', request.user.id)
+  joinQueue(@MessageBody('userId') userId: number) {
+    this.queueService.addPlayer(userId)
+    this.logger.log(`User ${userId} joined the queue`)
+    this.server.emit('player_joined', userId)
     this.logger.debug(this.queueService.queue)
 
-    if (this.queueService.queue.length > 0) {
+    if (this.queueService.queue.length > 1) {
       this.createMatch()
     }
   }
 
   @SubscribeMessage('leaveQueue')
-  leaveQueue(@Req() request: any) {
-    this.queueService.removePlayer(request.user.id)
-    this.logger.log(`User ${request.user.id} left the queue`)
-    this.server.emit('player_left', request.user.id)
+  leaveQueue(@MessageBody('userId') userId: number) {
+    this.queueService.removePlayer(userId)
+    this.logger.log(`User ${userId} left the queue`)
+    this.server.emit('player_left', userId)
     this.logger.debug(this.queueService.queue)
   }
 
@@ -47,12 +49,17 @@ export class QueueGateway {
     const player1 = this.queueService.queue.shift()
     const player2 = this.queueService.queue.shift()
 
-    const match = await this.matchService.create({
-      players: {
-        create: [{ playerId: player1 }, { playerId: player2 }]
-      }
-    })
+    try {
+      const match = await this.matchService.create({
+        players: {
+          create: [{ playerId: player1 }, { playerId: player2 }]
+        }
+      })
+      console.log(`created new match ${match.id} for players ${player1} and ${player2}`)
 
-    this.server.emit('newGame', match.id)
+      this.server.emit('newGame', match.id)
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

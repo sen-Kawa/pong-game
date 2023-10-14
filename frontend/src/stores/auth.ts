@@ -30,6 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
+  const getUserId = computed(() => userProfile.value.id)
   const getUserName = computed(() => userProfile.value.userName)
   const getDisplayName = computed(() => userProfile.value.displayName)
   const getName = computed(() => userProfile.value.name)
@@ -183,12 +184,14 @@ export const useAuthStore = defineStore('auth', () => {
     console.log(username)
     const body = { userid: username }
     try {
-      await axios.post(baseUrlauth + 'login', body, {
+      const response = await axios.post(baseUrlauth + 'login', body, {
         headers: {
           'Content-Type': 'application/json'
         },
         withCredentials: true
       })
+      console.debug({ response })
+      userProfile.value.id = response.data.userId
       loginStatus.value = true
       router.push('/leader')
     } catch (error: any) {
@@ -199,6 +202,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
+    getUserId,
     getUserName,
     getName,
     getEmail,

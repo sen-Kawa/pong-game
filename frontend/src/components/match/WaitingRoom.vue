@@ -12,4 +12,8 @@ function leaveQueue() {
   socket.emit('leaveQueue')
   router.back()
 }
+
+socket.on('newGame', (matchId: number) => {
+  console.log(`joining match ${matchId}`)
+})
 </script>

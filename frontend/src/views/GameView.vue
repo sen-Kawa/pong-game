@@ -9,10 +9,12 @@
 import SearchMatch from '@/components/match/SearchMatch.vue'
 import router from '@/router'
 import { socket } from '@/sockets/sockets'
+import { useAuthStore } from '@/stores/auth'
 import { useMatchStore } from '@/stores/match'
 import { onMounted } from 'vue'
 
 const matchStore = useMatchStore()
+const authStore = useAuthStore()
 
 matchStore.init()
 matchStore.pagination.pageSize.value = 10
@@ -28,7 +30,8 @@ async function createNewGame() {
 }
 
 function joinQueue() {
-  socket.emit('joinQueue')
+  console.log(authStore.getUserId)
+  socket.emit('joinQueue', { userId: authStore.getUserId })
   router.push('game/queue')
 }
 </script>
