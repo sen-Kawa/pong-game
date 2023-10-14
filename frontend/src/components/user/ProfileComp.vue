@@ -1,34 +1,36 @@
 <template>
     <div class="profile row">
-        
-
-        <div class="column">
-            <h1>User Profile</h1>
-            <p>Full name  : {{ authStore.getName }}</p>
-            <p>42 User name  : {{ authStore.getUserName }}</p>
-            <p>
-                Player name: {{ authStore.getDisplayName }}
-            </p>
-            <!-- <p>
-                <input type="text" placeholder="new display name" v-model="nameInput" />
-                <button @click="handleDisplayNameChange">Change display name</button>
-            </p> -->
-            <p>Email      : {{ authStore.getEmail }}</p>
-            <!-- <p>Avatar     : <img id="avatar" src="http://localhost:3000/users/userImage" width="50" height="60"><br></p> -->
-            <p>Avatar     : <img v-bind:src="avatar2" width="50" height="60"><br></p>
-            <p>
-                <FileUpload></FileUpload>
-            </p>
-            <p>Two-Factor Authentication enabled: {{ authStore.activated2FA }} </p>
-            <Twofactor></Twofactor>
+		<div class="column-container">
+       <div class="column">
+           <h1 class="component-title">User Profile</h1>
+           <h2 class="component-subtitle">Full name: </h2>
+           <p class="details">{{ authStore.getName }}</p>
+           <h2 class="component-subtitle">42 Username: </h2>
+           <p class="details">{{ authStore.getUserName }}</p>
+           <h2 class="component-subtitle">Player name: </h2>
+           <p class="details">{{ authStore.getDisplayName }}</p>
+           <!-- <p>
+               <input type="text" placeholder="new display name" v-model="nameInput" />
+               <button @click="handleDisplayNameChange">Change display name</button>
+           </p> -->
+           <h2 class="component-subtitle">Email: </h2>
+           <p class="details">{{ authStore.getEmail }}</p>
+           <!-- <p>Avatar     : <img id="avatar" src="http://localhost:3000/users/userImage" width="50" height="60"><br></p> -->
+           <h2 class="component-subtitle">Avatar</h2>
+           <img class="avatar" v-bind:src="avatar2">
+           <h2 class="component-subtitle">Two Factor Authentication</h2>
+           <p class="details">{{ authStore.activated2FA }} </p>
+       </div>
+       <div class="column">
+           <h1 class="component-title">User Statistics</h1>
+           <h2 class="component-subtitle">Number of games played: </h2>
+           <p class="details">{{ numberOfGames }}</p>
+           <h2 class="component-subtitle">Wins and losses: </h2>
+           <p class="details">{{ wins }} win(s), {{ losses }} loss(es)</p>
+           <h2 class="component-subtitle">Ladder level: </h2>
+           <p class="details">{{ position }} of {{ numberOfPlayers  }} </p>
         </div>
-        <div class="column">
-            <h1>User Statistics</h1>
-            <p>Number of games played: {{ numberOfGames }}</p>
-            <p>Wins & losses: {{ wins }} win(s), {{ losses }} loss(es)</p>
-            <p>Ladder level : {{ position }} of {{ numberOfPlayers  }} </p>
-            
-        </div>
+		</div>
     </div>
 </template>
 
@@ -93,9 +95,6 @@
     getAvatar()
 </script>
 
-<style>
-    .column {
-        float: left;
-        width: 50%;
-    }
+<style scoped>
+
 </style>

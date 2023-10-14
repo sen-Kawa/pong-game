@@ -41,7 +41,7 @@ describe('Unit test of the TwoFactor Component', () => {
     await waitForExpect(() => {
       expect(wrapper.exists()).toBe(true)
       expect(wrapper.findAll('button').length).toEqual(1)
-      expect(wrapper.findAll('button').at(0).text()).toBe('deactivate 2fa')
+      expect(wrapper.findAll('button').at(0).text()).toBe('Deactivate 2fa')
     })
   })
   it('renders the component with deactivated 2fa', async () => {
@@ -49,7 +49,7 @@ describe('Unit test of the TwoFactor Component', () => {
     await waitForExpect(() => {
       expect(wrapper.exists()).toBe(true)
       expect(wrapper.findAll('button').length).toEqual(1)
-      expect(wrapper.findAll('button').at(0).text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0).text()).toBe('Activate 2fa')
     })
   })
 
@@ -59,7 +59,7 @@ describe('Unit test of the TwoFactor Component', () => {
     await waitForExpect(() => {
       expect(wrapper.exists()).toBe(true)
       expect(wrapper.findAll('button').length).toEqual(2)
-      expect(wrapper.findAll('button').at(0).text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0).text()).toBe('Activate 2fa')
       expect(wrapper.findAll('button').at(1).text()).toBe('Send code')
     })
   })
@@ -86,7 +86,7 @@ describe('Integration Test of the Validation2FA Component', () => {
   it('renders the component', () => {
     expect(wrapper.exists()).toBe(true)
     expect(wrapper.findAll('button').length).toEqual(1)
-    expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+    expect(wrapper.findAll('button').at(0)?.text()).toBe('Activate 2fa')
   })
 
   it('clicking the activate 2fa creates an qr image', async () => {
@@ -95,7 +95,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     await flushPromises()
     await waitForExpect(() => {
       expect(wrapper.findAll('button').length).toEqual(2)
-      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('Activate 2fa')
       expect(wrapper.findAll('button').at(1)?.text()).toBe('Send code')
       expect(wrapper.findAll('img').length).toEqual(1)
       expect(wrapper.findAll('img').at(0)?.element.src).toBe(fakeBaseUrl + '/TestUrl')
@@ -204,7 +204,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     await waitForExpect(() => {
       expect(spy).toBeCalledTimes(1)
       expect(wrapper.findAll('button').length).toEqual(1)
-      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('Activate 2fa')
       expect(wrapper.findAll('img').length).toEqual(0)
       // @ts-ignore
       expect(wrapper.vm.error).toBe('')
@@ -223,7 +223,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     await flushPromises()
     await waitForExpect(() => {
       expect(wrapper.findAll('button').length).toEqual(1)
-      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('Activate 2fa')
       expect(wrapper.findAll('img').length).toEqual(0)
       // @ts-ignore
       expect(wrapper.vm.error).toBe('Unknown error, contact an admin')
@@ -246,7 +246,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     await waitForExpect(() => {
       expect(spy).toBeCalledTimes(1)
       expect(wrapper.findAll('button').length).toEqual(1)
-      expect(wrapper.findAll('button').at(0)?.text()).toBe('deactivate 2fa')
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('Deactivate 2fa')
       expect(wrapper.findAll('img').length).toEqual(0)
       // @ts-ignore
       expect(wrapper.vm.url).toBe('')
@@ -269,7 +269,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     await waitForExpect(() => {
       expect(spy).toBeCalledTimes(0)
       expect(wrapper.findAll('button').length).toEqual(2)
-      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('Activate 2fa')
       expect(wrapper.findAll('button').at(1)?.text()).toBe('Send code')
       expect(wrapper.findAll('img').length).toEqual(1)
       // @ts-ignore
@@ -304,7 +304,7 @@ describe('Integration Test of the Validation2FA Component', () => {
       expect(window.alert).toBeCalledTimes(1)
       expect(window.alert).toBeCalledWith('Unauthorized, you need to log in')
       expect(wrapper.findAll('button').length).toEqual(2)
-      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('Activate 2fa')
       expect(wrapper.findAll('button').at(1)?.text()).toBe('Send code')
       expect(wrapper.findAll('img').length).toEqual(1)
       // @ts-ignore
@@ -329,7 +329,7 @@ describe('Integration Test of the Validation2FA Component', () => {
     await waitForExpect(() => {
       expect(spy).toBeCalledTimes(0)
       expect(wrapper.findAll('button').length).toEqual(2)
-      expect(wrapper.findAll('button').at(0)?.text()).toBe('activate 2fa')
+      expect(wrapper.findAll('button').at(0)?.text()).toBe('Activate 2fa')
       expect(wrapper.findAll('button').at(1)?.text()).toBe('Send code')
       expect(wrapper.findAll('img').length).toEqual(1)
       // @ts-ignore

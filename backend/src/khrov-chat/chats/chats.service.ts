@@ -4,11 +4,11 @@ import { ChatHistoryResultDto } from './dto/chat-history.dto'
 import { UpdateChatDto } from './dto/update-chat.dto'
 import { NewChatDto } from './dto/new-chat.dto'
 import { SetSeenDto } from './dto/set-seen.dto'
-import { BlockingDto } from './dto/blocking.dto'
 import { ChatConnectionsResultDto } from './dto/chat-connections.dto'
 import { GetBlockedResultDto } from './dto/get-blocked.dto'
-import { SearchUsersDto, SearchUsersResultDto } from './dto/search-users.dto'
+import { SearchUsersResultDto } from './dto/search-users.dto'
 import { ChatsGateway } from './chats.gateway'
+import * as fs from 'fs'
 
 @Injectable()
 export class ChatsService {
@@ -95,6 +95,7 @@ export class ChatsService {
     }
 
     const filterRegex = /[^a-zA-Z\d?@!üöäßÜÖÄ ,.'^\n]/gi
+    if (singleChatObject.outgoing.replace(filterRegex, '').length === 0) return false
     await this.prisma.chat_history.createMany({
       data: [
         {
@@ -135,11 +136,11 @@ export class ChatsService {
     this.gateway.emitToAll('new-chat-event', singleChatObject.unionId)
   }
 
-  async newChat(newChat: NewChatDto): Promise<boolean> {
+  async newChat(newChat: NewChatDto, senderId: number): Promise<boolean> {
     try {
       await this.prisma.user.findUniqueOrThrow({
         where: {
-          id: newChat.senderId
+          id: senderId
         }
       })
       await this.prisma.user.findUniqueOrThrow({
@@ -157,7 +158,7 @@ export class ChatsService {
     await this.prisma.chat_union
       .findMany({
         where: {
-          client1Id: newChat.senderId,
+          client1Id: senderId,
           client2Id: newChat.receiverId
         },
         select: {
@@ -177,7 +178,7 @@ export class ChatsService {
       .findMany({
         where: {
           client1Id: newChat.receiverId,
-          client2Id: newChat.senderId
+          client2Id: senderId
         },
         include: {}
       })
@@ -195,7 +196,7 @@ export class ChatsService {
       await this.prisma.chat_union
         .create({
           data: {
-            client1Id: newChat.senderId,
+            client1Id: senderId,
             client2Id: newChat.receiverId,
             unionIdOther: 0
           },
@@ -210,7 +211,7 @@ export class ChatsService {
       await this.prisma.chat_union
         .create({
           data: {
-            client2Id: newChat.senderId,
+            client2Id: senderId,
             client1Id: newChat.receiverId,
             unionIdOther: senderIdUnionId
           },
@@ -233,6 +234,7 @@ export class ChatsService {
     }
 
     const filterRegex = /[^a-zA-Z\d?@!üöäßÜÖÄ ,.'^\n]/gi
+    if (newChat.msg.replace(filterRegex, '').length === 0) return false
     const chatToObject: UpdateChatDto = {
       outgoing: newChat.msg.replace(filterRegex, ''),
       time: new Date().toISOString(),
@@ -396,15 +398,15 @@ export class ChatsService {
     })
   }
 
-  async blockUser(blockDetails: BlockingDto): Promise<boolean> {
-    if ((await this.verifyUserIDs(blockDetails)) === false) {
+  async blockUser(blockedId: number, blockerId: number): Promise<boolean> {
+    if ((await this.verifyUserIDs(blockedId, blockerId)) === false) {
       return false
     }
 
-    let [blockerUnionId, blockedUnionId] = await this.verifyUnionIDs(blockDetails)
+    let [blockerUnionId, blockedUnionId] = await this.verifyUnionIDs(blockedId, blockerId)
 
     if (!blockerUnionId || !blockedUnionId) {
-      ;[blockerUnionId, blockedUnionId] = await this.createUnionIDs(blockDetails)
+      ;[blockerUnionId, blockedUnionId] = await this.createUnionIDs(blockedId, blockerId)
 
       if (!blockerUnionId || !blockedUnionId) {
         return false
@@ -434,12 +436,12 @@ export class ChatsService {
       return true
     }
   }
-  async unblockUser(blockDetails: BlockingDto): Promise<boolean> {
-    if ((await this.verifyUserIDs(blockDetails)) === false) {
+  async unblockUser(blockedId: number, blockerId: number): Promise<boolean> {
+    if ((await this.verifyUserIDs(blockedId, blockerId)) === false) {
       return false
     }
 
-    const [blockerUnionId, blockedUnionId] = await this.verifyUnionIDs(blockDetails)
+    const [blockerUnionId, blockedUnionId] = await this.verifyUnionIDs(blockedId, blockerId)
 
     if (!blockerUnionId || !blockedUnionId) {
       return false
@@ -473,15 +475,15 @@ export class ChatsService {
     }
   }
 
-  private async createUnionIDs(blockDetails: BlockingDto): Promise<number[]> {
+  private async createUnionIDs(blockedId: number, blockerId: number): Promise<number[]> {
     try {
       let blockerUnionId: number = 0
       let blockedUnionId: number = 0
       await this.prisma.chat_union
         .create({
           data: {
-            client1Id: blockDetails.blockerId,
-            client2Id: blockDetails.blockedId,
+            client1Id: blockerId,
+            client2Id: blockedId,
             unionIdOther: 0
           },
           select: {
@@ -494,8 +496,8 @@ export class ChatsService {
       await this.prisma.chat_union
         .create({
           data: {
-            client2Id: blockDetails.blockerId,
-            client1Id: blockDetails.blockedId,
+            client2Id: blockerId,
+            client1Id: blockedId,
             unionIdOther: blockerUnionId
           },
           select: {
@@ -520,15 +522,15 @@ export class ChatsService {
     }
   }
 
-  private async verifyUnionIDs(blockDetails: BlockingDto): Promise<number[]> {
+  private async verifyUnionIDs(blockedId: number, blockerId: number): Promise<number[]> {
     let blockerUnionId: number = 0
     let blockedUnionId: number = 0
     try {
       await this.prisma.chat_union
         .findFirstOrThrow({
           where: {
-            client1Id: blockDetails.blockerId,
-            client2Id: blockDetails.blockedId
+            client1Id: blockerId,
+            client2Id: blockedId
           },
           select: {
             unionId: true,
@@ -545,16 +547,16 @@ export class ChatsService {
     }
   }
 
-  private async verifyUserIDs(blockDetails: BlockingDto): Promise<boolean> {
+  private async verifyUserIDs(blockedId: number, blockerId: number): Promise<boolean> {
     try {
       await this.prisma.user.findUniqueOrThrow({
         where: {
-          id: blockDetails.blockerId
+          id: blockerId
         }
       })
       await this.prisma.user.findUniqueOrThrow({
         where: {
-          id: blockDetails.blockedId
+          id: blockedId
         }
       })
     } catch (error) {
@@ -562,9 +564,9 @@ export class ChatsService {
     }
   }
 
-  async searchUsers(details: SearchUsersDto): Promise<SearchUsersResultDto[]> {
+  async searchUsers(key: string, searcherId: number): Promise<SearchUsersResultDto[]> {
     const searchKeyFilterRegex = /[^a-zA-Z\d]/gi
-    const searchKey = details.key.replace(searchKeyFilterRegex, '')
+    const searchKey = key.replace(searchKeyFilterRegex, '')
 
     const output: SearchUsersResultDto[] = await this.prisma.user.findMany({
       where: {
@@ -589,7 +591,7 @@ export class ChatsService {
           }
         ],
         NOT: {
-          id: details.searcherId
+          id: searcherId
         }
       },
       // orderBy: {
@@ -615,7 +617,7 @@ export class ChatsService {
       try {
         await this.prisma.chat_union.findFirstOrThrow({
           where: {
-            client1Id: details.searcherId,
+            client1Id: searcherId,
             client2Id: otherId,
             blockStatus: true
           },
@@ -628,5 +630,51 @@ export class ChatsService {
     }
 
     return output
+  }
+
+  private async chatAvatarHealth() {
+    const allUsers = await this.prisma.user.findMany({
+      where: {},
+      orderBy: { id: 'desc' },
+      take: 100, // last 100 users will be checked // MIGHT CONSIDER REDUCING THIS NUMMBER IN FUTURE
+      select: {
+        id: true
+      }
+    })
+    for (const key in allUsers) {
+      const oneUser = allUsers[key]
+      try {
+        await this.prisma.profile_pic.findFirstOrThrow({
+          where: { userId: oneUser.id }
+        })
+      } catch (error) {
+        await this.prisma.profile_pic.create({ data: { userId: oneUser.id } })
+      }
+    }
+  }
+  async chatHealth(avatarId: number, userId: number) {
+    const avatarPath = await this.prisma.userAvatar
+      .findFirst({
+        where: { id: avatarId },
+        select: { filename: true }
+      })
+      .then((data) => {
+        return data != null ? data.filename : null
+      })
+    if (avatarPath != null) {
+      const fullPath = './files/' + avatarPath
+      const base64 = `data:image/gif;base64, ${fs.readFileSync(fullPath, { encoding: 'base64' })}`
+      await this.prisma.profile_pic.upsert({
+        where: { userId: userId },
+        update: { avatar: base64 },
+        create: {
+          userId: userId,
+          avatar: base64
+        }
+      })
+    }
+    const totalUsers = await this.prisma.user.count()
+    const chatAppUsers = await this.prisma.profile_pic.count()
+    if (totalUsers > chatAppUsers) this.chatAvatarHealth()
   }
 }

@@ -30,7 +30,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h2>{{ Scope[scope] }} MatchHistory</h2>
+  <h2 class="component-title">{{ Scope[scope] }} MatchHistory</h2>
   <button @click="toggleScope">Switch Scope</button>
   <LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
     <MatchList :matches="matchStore.matches" />

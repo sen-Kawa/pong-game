@@ -2,7 +2,7 @@
   <ButtonApp
     @btn-click="addFriend()"
     :text="isAdded ? 'Added' : 'Add Friend'"
-    :color="isAdded ? 'Green' : 'LightGray'"
+    :color="isAdded ? 'Black' : 'LightGray'"
   />
   <div v-if="message" :class="messageType">{{ message }}</div>
 </template>

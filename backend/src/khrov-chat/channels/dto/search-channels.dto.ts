@@ -1,20 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber, IsNotEmpty, IsPositive } from 'class-validator'
-import { Transform } from 'class-transformer'
+import { IsNotEmpty } from 'class-validator'
 
 export class SearchChannelsDto {
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
-    description: 'Should be an ID of a user that exists in the User table',
-    example: 1
-  })
-  readonly userId: number
-
   @IsNotEmpty()
   @ApiProperty({
     description: 'Search key. Minimum 2 characters ',

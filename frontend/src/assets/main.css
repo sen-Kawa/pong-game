@@ -46,7 +46,7 @@ a,
   -moz-osx-font-smoothing: grayscale;
   text-align: center; /* This line needs to be removed*/
   color: #2c3e50;
-  background-color: aqua;
+  background-color: black;
   height: 100%;
   width: 100%;
   line-height: 1.6;
@@ -55,6 +55,23 @@ body {
   background-color: #fff;
   margin: 0;
   font-size: 15px; /* This line needs to be ADDED*/
+}
+.component-title {
+	font-family: space;
+	color: #B7D198;
+  font-size: 35px;
+  margin-bottom: 20px;
+}
+.component-subtitle {
+	font-family: space;
+	color: #725A92;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+.details {
+	color: white;
+	font-family: Helvetica;
+  font-size: 25px;
 }
 
 main {
@@ -74,6 +91,47 @@ main {
 
 #header {
   position: sticky;
-  height: 10vh;
+  height: 7vh;
   top: 0;
+}
+.avatar {
+	height: 120px;
+	object-fit: cover;
+}
+
+button {
+	font-size: 20px;
+	border-radius: 12px;
+	transition-duration: 0.4s;
+	padding: 10px 10px;
+	color: #bc4f4c;
+	background-color: transparent;
+	box-shadow: 5px 2px;
+	font-family: Helvetica;
+	margin-top: 10px;
+	margin-bottom: 15px;
+}
+
+.file-upload-form {
+	text-align: center;
+	font-size: 20px;
+}
+
+.column {
+	border: 1px white solid;
+	padding: 20px;
+	box-shadow: 10px 10px;
+	transition: transform .2s;
+}
+
+.column:hover {
+	transform: scale(1.1);
+}
+
+.column-container {
+	display: flex;
+	justify-content: space-evenly;
+ 	 max-width: 1500px;
+ 	 margin: 0 auto;
+	 margin-top: 20px;
 }
