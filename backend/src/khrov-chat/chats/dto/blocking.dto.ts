@@ -10,18 +10,6 @@ export class BlockingDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
-    description: 'userId of the user who wants to block the other',
-    example: 1
-  })
-  readonly blockerId: number
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
     description: 'userId of the user about to get blocked',
     example: 2
   })

@@ -22,6 +22,7 @@ export class AuthService {
   ) {}
 
   getAccessToken(userid: number, twoFactor: boolean) {
+    // Cookie user.id spoofing point for testing alternate perceptions of clients' realities
     const payload: JwtPayload = { userId: userid, isTwoFaAuth: twoFactor }
     return this.jwtService.sign(payload, {
       secret: this.config.get<string>('ACCESS_SECRET'),

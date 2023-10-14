@@ -6,6 +6,7 @@ import {
   Put,
   Get,
   Query,
+  Req,
   UseGuards,
   ParseArrayPipe,
   HttpException,
@@ -15,11 +16,11 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { ChannelsService } from './channels.service'
 import { AddChannelDto, AddChannelResultDto } from './dto/add-channel.dto'
-import { SuggestedChannelsDto, SuggestedChannelsResultDto } from './dto/suggested-channels.dto'
+import { SuggestedChannelsResultDto } from './dto/suggested-channels.dto'
 import { SearchChannelsDto, SearchChannelsResultDto } from './dto/search-channels.dto'
 import { ErrorValue } from './enums/error-value.enum'
 import { JoinOrExitChannelDto, JoinOrExitChannelResultDto } from './dto/join-or-exit-channel.dto'
-import { ChannConnectionsDto, ChannConnectionsResultDto } from './dto/chann-connections.dto'
+import { ChannConnectionsResultDto } from './dto/chann-connections.dto'
 import { ChannHistoryDto, ChannHistoryResultDto } from './dto/chann-history.dto'
 import { UpdateChannDto } from './dto/update-chann.dto'
 import { SetSeenDto } from './dto/set-seen.dto'
@@ -43,10 +44,10 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @ApiResponse({ status: 404, description: 'Unable To Find User ID!' })
-  @Get('/:userId')
-  async suggestedChannels(@Param() user: SuggestedChannelsDto) {
+  @Get('/suggestions')
+  async suggestedChannels(@Req() req) {
     const response: SuggestedChannelsResultDto[] | ErrorValue =
-      await this.channelsService.suggestedChannels(user.userId)
+      await this.channelsService.suggestedChannels(req.user.id)
     if (response === ErrorValue.NO_USER) {
       throw new HttpException('Unable To Find {userId}!', HttpStatus.NOT_FOUND)
     }
@@ -60,9 +61,9 @@ export class ChannelsController {
     description:
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
-  @Put('/:userId')
-  async joinOrExitChannel(@Body() requestProps: JoinOrExitChannelDto) {
-    const response: string = await this.channelsService.joinOrExitChannel(requestProps)
+  @Put('/change')
+  async joinOrExitChannel(@Body() requestProps: JoinOrExitChannelDto, @Req() req) {
+    const response: string = await this.channelsService.joinOrExitChannel(requestProps, req.user.id)
     return JSON.stringify({ message: response })
   }
 
@@ -76,10 +77,10 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @ApiResponse({ status: 404, description: 'Unable To Find {UserId}!' })
-  @Get('/:userId/:key')
-  async searchChannels(@Param() details: SearchChannelsDto) {
+  @Get('/me/:key')
+  async searchChannels(@Param() details: SearchChannelsDto, @Req() req) {
     const response: SearchChannelsResultDto[] | ErrorValue =
-      await this.channelsService.searchChannels(details)
+      await this.channelsService.searchChannels(details.key, req.user.id)
     if (response === ErrorValue.NO_USER) {
       throw new HttpException('Unable To Find {userId}!', HttpStatus.NOT_FOUND)
     }
@@ -97,8 +98,8 @@ export class ChannelsController {
   @ApiResponse({ status: 406, description: 'Channel Name Already Taken!' })
   @ApiResponse({ status: 417, description: 'Unable To Create Channel!' })
   @Post()
-  async addChannel(@Body() addChannelDto: AddChannelDto) {
-    const response: ErrorValue = await this.channelsService.addChannel(addChannelDto)
+  async addChannel(@Body() addChannelDto: AddChannelDto, @Req() req) {
+    const response: ErrorValue = await this.channelsService.addChannel(addChannelDto, req.user.id)
     // Send back API JSON response
     switch (response) {
       case ErrorValue.NO_USER:
@@ -123,10 +124,10 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @ApiResponse({ status: 404, description: 'Unable To Find {userId}!' })
-  @Get('/get/connections/:userId')
-  async channConnections(@Param() user: ChannConnectionsDto) {
+  @Get('/get/connections/get')
+  async channConnections(@Req() req) {
     const response: ChannConnectionsResultDto[] | ErrorValue =
-      await this.channelsService.channConnections(user.userId)
+      await this.channelsService.channConnections(req.user.id)
     if (response === ErrorValue.NO_USER) {
       throw new HttpException('Unable To Find {userId}!', HttpStatus.NOT_FOUND)
     }
@@ -142,10 +143,11 @@ export class ChannelsController {
     description:
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
-  @Get('/get/connections/:userId/:chId')
-  async channHistory(@Param() channel: ChannHistoryDto) {
+  @Get('/get/connections/chann/:chId')
+  async channHistory(@Param() channel: ChannHistoryDto, @Req() req) {
     const response: ChannHistoryResultDto[] | boolean = await this.channelsService.channHistory(
-      channel
+      req.user.id,
+      channel.chId
     )
     if (response === false) {
       throw new HttpException(
@@ -171,9 +173,10 @@ export class ChannelsController {
   @ApiBody({ type: [UpdateChannDto] })
   @Put()
   async updateChanns(
-    @Body(new ParseArrayPipe({ items: UpdateChannDto })) channPayload: UpdateChannDto[]
+    @Body(new ParseArrayPipe({ items: UpdateChannDto })) channPayload: UpdateChannDto[],
+    @Req() req
   ) {
-    await this.channelsService.updateChanns(channPayload)
+    await this.channelsService.updateChanns(channPayload, req.user.id)
   }
 
   @ApiOperation({
@@ -190,8 +193,8 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @Put('/put/set-seen')
-  async setSeen(@Body() channDetails: SetSeenDto) {
-    await this.channelsService.setSeen(channDetails)
+  async setSeen(@Body() channDetails: SetSeenDto, @Req() req) {
+    await this.channelsService.setSeen(channDetails, req.user.id)
   }
 
   @ApiOperation({ summary: 'Endpoint for getting user id with their userName as Query' })
@@ -202,8 +205,8 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @Get()
-  async getMemberId(@Query() getMemberId: GetMemberIdDto) {
-    const response: string = await this.channelsService.getMemberId(getMemberId)
+  async getMemberId(@Query() channel: GetMemberIdDto, @Req() req) {
+    const response: string = await this.channelsService.getMemberId(channel, req.user.id)
     return JSON.stringify({ message: response })
   }
 
@@ -218,10 +221,10 @@ export class ChannelsController {
     status: 412,
     description: 'Only The channel Admin or Owner can Request this Data'
   })
-  @Get('/get/channel/moderate/:adminId/:chId')
-  async pendingApprovals(@Param() pendingProp: PendingApprovalsDto) {
+  @Get('/get/channel/moderate/true/:chId')
+  async pendingApprovals(@Param() pendingProp: PendingApprovalsDto, @Req() req) {
     const response: PendingApprovalsResultDto[] | null =
-      await this.channelsService.pendingApprovals(pendingProp)
+      await this.channelsService.pendingApprovals(pendingProp, req.user.id)
     if (!response) {
       throw new HttpException(
         'Only The channel Admin or Owner can Request this Data',
@@ -239,8 +242,8 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @Put('/put/channel/moderate')
-  async moderateUsers(@Body() moderateProp: ModerateUsersDto) {
-    const response: string = await this.channelsService.moderateUsers(moderateProp)
+  async moderateUsers(@Body() moderateProp: ModerateUsersDto, @Req() req) {
+    const response: string = await this.channelsService.moderateUsers(moderateProp, req.user.id)
     return JSON.stringify({ message: response })
   }
 
@@ -254,8 +257,8 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @Put('/put/channel/moderate/modify')
-  async modifyChannel(@Body() newChannelProp: ModifyChannelDto) {
-    const response: string = await this.channelsService.modifyChannel(newChannelProp)
+  async modifyChannel(@Body() newChannelProp: ModifyChannelDto, @Req() req) {
+    const response: string = await this.channelsService.modifyChannel(newChannelProp, req.user.id)
     return JSON.stringify({ message: response })
   }
 
@@ -267,8 +270,8 @@ export class ChannelsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @Put('/put/channel/moderate/pending/decide')
-  async approveOrReject(@Body() moderateProp: ApproveOrRejectDto) {
-    const response: string = await this.channelsService.approveOrReject(moderateProp)
+  async approveOrReject(@Body() moderateProp: ApproveOrRejectDto, @Req() req) {
+    const response: string = await this.channelsService.approveOrReject(moderateProp, req.user.id)
     return JSON.stringify({ message: response })
   }
 }

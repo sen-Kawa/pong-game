@@ -10,18 +10,6 @@ export class UpdateChannDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
-    description: 'Should be an ID of a user that is posting the message into channel chId',
-    example: 1
-  })
-  userId: number
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
     description: 'Should be an ID of a channel where userId is a member and posting message to',
     example: 1
   })

@@ -5,11 +5,9 @@ import ChatList from '@/components/khrov-chat/ChatList.vue'
 import ChatInvite from '@/components/khrov-chat/ChatInvite.vue'
 import ChannelNew from '@/components/khrov-chat/ChannelNew.vue'
 import ChannelList from '@/components/khrov-chat/ChannelList.vue'
+import { useChatsStore } from '@/stores/chats'
 
-defineProps<{
-  sTemp: number
-}>()
-
+const chatsStore = useChatsStore();
 const cWd: ChatWindow = reactive({
   chnList: 'Chats-tab'
 })
@@ -29,7 +27,10 @@ const changeActiveTab = (class_name: string) => {
         <li
           class="Chats-tab Li-tabs"
           :class="{ cwActive: cWd.chnList == 'Chats-tab' }"
-          @click="changeActiveTab('Chats-tab')"
+          @click="{
+                    changeActiveTab('Chats-tab');
+                    chatsStore.manageAllNotifCounter(0, 0, 'chat');
+                  }"
         >
           Chats
         </li>
@@ -45,7 +46,10 @@ const changeActiveTab = (class_name: string) => {
         <li
           class="Channels-tab Li-tabs"
           :class="{ cwActive: cWd.chnList == 'Channels-tab' }"
-          @click="changeActiveTab('Channels-tab')"
+          @click="{
+                    changeActiveTab('Channels-tab');
+                    chatsStore.manageAllNotifCounter(0, 0, 'channel');
+                  }"
         >
           Channels
         </li>
@@ -59,21 +63,21 @@ const changeActiveTab = (class_name: string) => {
         </li>
         <!-- For creating and inviting users -->
       </ul>
-      <p class="Cwd-chat-count">+N</p>
-      <p class="Cwd-channel-count">+N</p>
+      <p class="Cwd-chat-count" v-if="chatsStore.getChatNotifCnt">{{ (chatsStore.getChatNotifCnt <= 9) ? chatsStore.getChatNotifCnt : '>9'}}</p>
+      <p class="Cwd-channel-count" v-if="chatsStore.getChannNotifCnt">{{ (chatsStore.getChannNotifCnt <= 9) ? chatsStore.getChannNotifCnt : '>9'}}</p>
     </div>
     <div id="Output-boxes">
       <div class="Chats-tab Output-box" :class="{ cwActive: cWd.chnList == 'Chats-tab' }">
-        <ChatList :sTemp="sTemp" />
+        <ChatList />
       </div>
       <div class="Chatinv-tab Output-box" :class="{ cwActive: cWd.chnList == 'Chatinv-tab' }">
-        <ChatInvite :sTemp="sTemp" />
+        <ChatInvite />
       </div>
       <div class="Channels-tab Output-box" :class="{ cwActive: cWd.chnList == 'Channels-tab' }">
-        <ChannelList :sTemp="sTemp" />
+        <ChannelList />
       </div>
       <div class="ChannCreat-tab Output-box" :class="{ cwActive: cWd.chnList == 'ChannCreat-tab' }">
-        <ChannelNew :sTemp="sTemp" />
+        <ChannelNew />
       </div>
     </div>
   </div>

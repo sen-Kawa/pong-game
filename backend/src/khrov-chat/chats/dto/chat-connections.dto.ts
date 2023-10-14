@@ -1,21 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber, IsNotEmpty, IsPositive } from 'class-validator'
-import { Transform } from 'class-transformer'
-
-export class ChatConnectionsDto {
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
-    description:
-      'userId of the user requesting to fetch a preview of all their existing chat conversations',
-    example: 1
-  })
-  readonly userId: number
-}
 
 class Chat_historysType {
   @ApiProperty({

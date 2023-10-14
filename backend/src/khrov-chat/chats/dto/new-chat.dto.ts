@@ -10,18 +10,6 @@ export class NewChatDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
-    description: 'user Id of the User sending this message ',
-    example: 1
-  })
-  senderId: number
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
     description: 'user Id of the User to whom this message is intended',
     example: 2
   })
