@@ -179,27 +179,24 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
-
-  //TODO fake login for chat testing
-  // async function login(username: string) {
-  //   console.log(username)
-  //   const body = { userid: username }
-  //   try {
-  //     await axios.post(baseUrlauth + 'login', body, {
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       withCredentials: true
-  //     })
-  //     loginStatus.value = true
-  //     router.push('/leader')
-  //   } catch (error: any) {
-  //     //TODO improve error handling
-  //     console.log(error)
-  //     //return error.response.data.message;
-  //   }
-  // }
-
+  async function login(username: string) {
+    console.log(username)
+    const body = { userid: username }
+    try {
+    await axios.post(baseUrlauth + 'login', body, {
+    headers: {
+    'Content-Type': 'application/json'
+    },
+    withCredentials: true
+    })
+    loginStatus.value = true
+    router.push('/leader')
+    } catch (error: any) {
+    //TODO improve error handling
+    console.log(error)
+    //return error.response.data.message;
+    }
+    }
   return {
     getUserName,
     getName,
@@ -216,6 +213,6 @@ export const useAuthStore = defineStore('auth', () => {
     setDisplayName,
     setDisplayName2,
     getDisplayName,
-    //login
+    login
   }
 })

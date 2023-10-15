@@ -41,15 +41,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
         const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
         if (token) {
           const test = await this.authService.verifyJwt(token)
-          console.log(test)
           if (!test) return client.disconnect()
+          client.data.userId = test.userId
           this.appService.connectedUser(test.userId)
           args
           this.logger.log('Client connected ' + client.id)
         }
       } catch (error) {
         client.disconnect()
-        console.log(error)
       }
     }
   }
