@@ -140,7 +140,7 @@ export class AuthService {
       if (!validToken) throw new UnauthorizedException()
       return validToken
     } catch (error) {
-      console.log(error)
+      //console.log(error)
       // throw new InternalServerErrorException('verifyJwt')
     }
   }

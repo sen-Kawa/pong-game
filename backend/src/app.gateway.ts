@@ -35,19 +35,26 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleConnection(client: Socket, ...args: any[]) {
     //TODO error handling
+    //TODO run via refresh if auth token invalid
     if (!client.handshake.headers.cookie) client.disconnect()
     else {
       try {
         const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
         if (token) {
           const test = await this.authService.verifyJwt(token)
-          if (!test) return client.disconnect()
+          if (!test) 
+          {
+            this.server.emit('failed_con')
+            return client.disconnect()
+          }
           client.data.userId = test.userId
           this.appService.connectedUser(test.userId)
           args
           this.logger.log('Client connected ' + client.id)
         }
       } catch (error) {
+        console.log(error)
+        this.server.emit('failed_con')
         client.disconnect()
       }
     }
@@ -55,15 +62,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleDisconnect(client: Socket) {
     //TODO error handling
-    try {
-      const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
-      if (token) {
-        const test = await this.authService.verifyJwt(token)
-        this.appService.disconnectedUser(test.userId)
-        this.logger.log('Client disconnected ' + client.id)
+    if(client.data.userId)
+    {
+        this.appService.disconnectedUser(client.data.userId)
+        this.logger.log('Client disconnected ' + client.data.userId)
       }
-    } catch (error) {
-      console.log(error)
+      else
+        this.logger.log('Unknown Client disconnected ' + client.id)
+      client.disconnect()
     }
-  }
 }
