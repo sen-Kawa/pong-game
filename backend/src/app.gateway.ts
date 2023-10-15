@@ -42,13 +42,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
         const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
         if (token) {
           const test = await this.authService.verifyJwt(token)
-          if (!test) 
-          {
+          if (!test) {
             this.server.emit('failed_con')
             return client.disconnect()
           }
           client.data.userId = test.userId
-          this.appService.connectedUser(test.userId)
+          this.appService.connectedUser(test.userId, client.id)
           args
           this.logger.log('Client connected ' + client.id)
         }
@@ -62,13 +61,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleDisconnect(client: Socket) {
     //TODO error handling
-    if(client.data.userId)
-    {
-        this.appService.disconnectedUser(client.data.userId)
-        this.logger.log('Client disconnected ' + client.data.userId)
-      }
-      else
-        this.logger.log('Unknown Client disconnected ' + client.id)
-      client.disconnect()
-    }
+    if (client.data.userId) {
+      this.appService.disconnectedUser(client.data.userId)
+      this.logger.log('Client disconnected ' + client.data.userId)
+    } else this.logger.log('Unknown Client disconnected ' + client.id)
+    client.disconnect()
+  }
 }

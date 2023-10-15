@@ -18,7 +18,6 @@ import axios from 'axios'
 const baseUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 
 socket.on('failed_con', async () => {
-  console.log('i was here')
   const response = await axios.get(baseUrl + 'refresh', {
     headers: {
       'Content-Type': 'application/json'
