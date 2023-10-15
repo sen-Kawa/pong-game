@@ -1,20 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber, IsNotEmpty, IsPositive } from 'class-validator'
-import { Transform } from 'class-transformer'
+import { IsNotEmpty } from 'class-validator'
 
 export class SearchUsersDto {
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
-    description: 'User Id of the User performing the search operation',
-    example: 2
-  })
-  readonly searcherId: number
-
   @IsNotEmpty()
   @ApiProperty({
     description: 'Search key',

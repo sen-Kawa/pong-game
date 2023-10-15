@@ -10,24 +10,12 @@ export class GetMemberIdDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty({
-    description: 'Should be a user ID of an admin of the channel chId',
-    example: 1
-  })
-  readonly adminId: number
-
-  @Transform(({ value }) => {
-    return Number(value)
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty({
     description: 'ID of a channel where adminId is an admin',
     example: 1
   })
   readonly chId: number
 
-  @Matches(/^[a-zA-Z\d?@ ,.'^\n]{3,16}$/)
+  @Matches(/^[a-zA-Z\d?@ ,.'^\n]{3,17}$/)
   @ApiProperty({
     description: 'userName of the user whose userId is being requested',
     example: 'mamcee'

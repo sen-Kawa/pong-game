@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center">this is the game tap</div>
+  <div class="component-title">Game</div>
   <button @click="createNewGame">New Game</button>
   <SearchMatch />
 </template>

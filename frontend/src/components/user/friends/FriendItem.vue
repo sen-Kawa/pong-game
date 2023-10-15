@@ -1,8 +1,8 @@
 <template>
 	<tr>
-		<td class="displayName">{{ friend.displayName }}</td>
-		<td class="userName">{{ friend.userName }}</td>
-		<td class="status">{{ friend.currentStatus }}</td>
+		<td class="displayName details">{{ friend.displayName }}</td>
+		<td class="userName details">{{ friend.userName }}</td>
+		<td class="status details">{{ friend.currentStatus }}</td>
 		<td><button @click="removeFriend">Remove Friend</button></td>
 	</tr>
 </template>

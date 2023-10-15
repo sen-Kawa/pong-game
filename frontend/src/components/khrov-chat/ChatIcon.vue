@@ -1,12 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useChatsStore } from '@/stores/chats'
 
+const chatsStore = useChatsStore();
+</script>
 <template>
   <div id="Icon-container">
-    <p class="Chat-count">+N</p>
+    <p class="Chat-count" v-if="chatsStore.getIconNotifCnt>0">{{ (chatsStore.getIconNotifCnt <= 9) ? chatsStore.getIconNotifCnt : '>9'}}</p>
     <img id="Chat-icon" alt="Chat Icon" src="/khrov-chat-media/chat-icon.svg" />
   </div>
 </template>
-
 <style scoped>
 #Icon-container {
   position: relative;

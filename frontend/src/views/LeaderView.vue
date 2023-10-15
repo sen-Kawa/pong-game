@@ -1,3 +1,3 @@
 <template>
-  <div class="text-center">this is the leaderboard</div>
+  <div class="component-title">Leaderboard</div>
 </template>

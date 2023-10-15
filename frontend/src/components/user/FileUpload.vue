@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-8">
       <label class="btn btn-default p-0">
-        <input type="file" accept="image/*" ref="file" @change="selectImage" />
+        <input class="file-upload-form" type="file" accept="image/*" ref="file" @change="selectImage"/>
       </label>
     </div>
 

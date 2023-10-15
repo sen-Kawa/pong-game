@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { layer } from '@layui/layer-vue'
-import { useChatsStore } from '@/stores/chatsAll'
+import { useChatsStore } from '@/stores/chats'
 
 const props = defineProps<{
-  userId: number
   channelId: number
   channelName: string
   desc: string
@@ -46,13 +45,12 @@ const changeMembership = async (joinOrExit: boolean) => {
     return
   }
   const tmp = {
-    userId: props.userId,
     chId: props.channelId,
     password: cnItem.cniPwdInput,
     joinOrExit: joinOrExit
   }
   cnItem.cniPwdInput = ''
-  const response = await chatsStore.fetchForKhrov(`/channels/${props.userId}`, 'PUT', tmp);
+  const response = await chatsStore.fetchForKhrov(`/channels/change`, 'PUT', tmp);
   if (response) {
     try {
       const jsonObj = await response.json();
