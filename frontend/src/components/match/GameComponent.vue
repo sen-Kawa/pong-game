@@ -221,30 +221,18 @@
             return;
         }
         const state = game_state.value.game;
-     
-
-        // check for point
-
-        // if (props.player_number === 0 && state.ballPos.xPos <= 0) {
-        //     console.log("Point for player 0")
-        // }
-        // if (props.player_number === 1 && state.ballPos.xPos >= c.width) {
-        //     console.log("Point for player 1")
-        // }
         
-        // check for boundary
-
-
-        if ( state.ball.xPos >= c.width && state.ball.xVec > 0 ) {
-            state.ball.xVec = -1
-            state.ball.yVec = -1
-            // beep()
-            state.score.player0 += 1
-            state.ball.xPos = c.width - ballRadius - paddleWidth - 1
-            state.ball.yPos = state.players[1].pos
-        }
-            
-        if ( state.ball.xPos <= 0 && state.ball.xVec < 0 ) {
+        // bounce paddle left player and check for point
+        if ( state.ball.xPos <= 0 + paddleWidth && 
+                state.ball.yPos <= state.players[0].pos + paddleHeight/2 &&
+                state.ball.yPos >= state.players[0].pos - paddleHeight/2 ) {
+                
+            if (props.player_number === 1 && state.ball.xVec < 0) {
+                state.ball.xVec = state.ball.xVec * -1.4
+                state.ball.yVec = state.ball.yVec * 1.4
+            }
+            beep()
+        } else  if ( state.ball.xPos <= 0 && state.ball.xVec < 0 ) {
             state.ball.xVec = 1
             state.ball.yVec = -1
             // beep()
@@ -253,25 +241,21 @@
             state.ball.yPos = state.players[0].pos
         }
 
-        // bounce paddle left player
-        if ( state.ball.xPos <= 0 + paddleWidth && 
-                state.ball.yPos <= state.players[0].pos + paddleHeight/2 &&
-                state.ball.yPos >= state.players[0].pos - paddleHeight/2 ) {
-                
-            if (props.player_number === 0) {
-                state.ball.xVec = state.ball.xVec * -1.4
-                state.ball.yVec = state.ball.yVec * 1.4
-            }
-            beep()
-        }
-
-        // bounce paddle right player
+        // bounce paddle right player and check for point
         if ( state.ball.xPos >= c.width - paddleWidth && 
                 state.ball.yPos <= state.players[1].pos + paddleHeight/2 &&
                 state.ball.yPos >= state.players[1].pos - paddleHeight/2 ) {
-            if (props.player_number === 1)
+            if (props.player_number === 0 && state.ball.xVec > 0) {
                 state.ball.xVec = state.ball.xVec * -2
+            }
             beep()
+        } else if ( state.ball.xPos >= c.width && state.ball.xVec > 0 ) {
+            state.ball.xVec = -1
+            state.ball.yVec = -1
+            // beep()
+            state.score.player0 += 1
+            state.ball.xPos = c.width - ballRadius - paddleWidth - 1
+            state.ball.yPos = state.players[1].pos
         }
 
         // bounce upper or lower wall
