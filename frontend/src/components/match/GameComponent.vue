@@ -40,8 +40,6 @@
                     xVec: 1.5,
                     yVec: -1.5
             },
-            is_turn: props.player_number == 0 ? true : false,
-            turn_change: false,
             score: {
                 player0: 0,
                 player1: 0
@@ -60,16 +58,23 @@
     }
 
     socket.on("game_update", (update: GameUpdate) => {
-        const player_number = props.player_number == 0 ? 1 : 0;
-        if (update && props.match.id == update.gameid) {
+        const player_number = props.player_number === 0 ? 1 : 0;
+        if (update && props.match.id === update.gameid) {
             game_state.value.game.players[player_number] = update.player;
-            if (!game_state.value.game.is_turn) {
-                game_state.value.game.ball = update.ball;
-            }
-            if (update.turn_change) {
-                console.log("Turn change")
-                game_state.value.game.is_turn = !game_state.value.game.is_turn;
-                game_state.value.game.turn_change = false;
+            switch (props.player_number) {
+                case 0:
+                    if (update.ball.xVec > 0) {
+                        game_state.value.game.ball = update.ball;
+                        console.log("receiving ball update to the right")
+                    }
+                    break;
+
+                case 1:
+                    if (update.ball.xVec < 0) {
+                        game_state.value.game.ball = update.ball;
+                        console.log("receiving ball update to the left")
+                    }
+                    break;
             }
         }
     })
@@ -108,29 +113,9 @@
 
 
     function makeMove(newVec: number) {
-        const update: GameUpdate = {
-            player: game_state.value.game.players[props.player_number as 0 | 1],
-            ball: game_state.value.game.ball,
-            gameid: props.match.id,
-            turn_change: game_state.value.game.turn_change
-        };
-        const update2 = {
-            gameId: props.match.id,
-            playerId: props.player_number,
-            paddlePos: game_state.value.game.players[props.player_number as 0 | 1].pos
-        }
-
-        // if (game_state.value.game.turn_change) {
-        //     console.log("Turn change")
-        //     game_state.value.game.is_turn = !game_state.value.game.is_turn;
-        //     game_state.value.game.turn_change = false;
-        // }
-
-        update.player.vector = newVec;
-        update.player.pos += newVec;
-        // socket.emit("move", update);
-        // socket.emit("move2", update2)
-
+        const player = game_state.value.game.players[props.player_number as 0 | 1];
+        player.vector = newVec;
+        player.pos += newVec;
     }
 
     function moveUp() { makeMove(-3) }
@@ -206,10 +191,8 @@
         let uptdate: GameUpdate = {
             player: game_state.value.game.players[props.player_number as 0 | 1],
             ball: game_state.value.game.ball,
-            gameid: props.match.id,
-            turn_change: false
+            gameid: props.match.id
         }
-        console.log("Update: ", uptdate)
         socket.emit("player_connected", uptdate)
     }
 
@@ -257,36 +240,28 @@
             state.ball.yVec = -1
             // beep()
             state.score.player0 += 1
-            if (props.player_number === 0) {
-                state.ball.xPos = c.width - ballRadius - paddleWidth - 1
-                state.ball.yPos = state.players[1].pos
-                state.turn_change = true;
-                makeMove(0)
-            }
+            state.ball.xPos = c.width - ballRadius - paddleWidth - 1
+            state.ball.yPos = state.players[1].pos
         }
             
-        if ( state.ball.xPos <= 0 && state.ball.xVec > 0 ) {
+        if ( state.ball.xPos <= 0 && state.ball.xVec < 0 ) {
             state.ball.xVec = 1
             state.ball.yVec = -1
             // beep()
             state.score.player1 += 1
-            if (props.player_number === 1) {
-                state.ball.xPos = ballRadius + paddleWidth + 1
-                state.ball.yPos = state.players[0].pos
-                state.turn_change = true;
-                makeMove(0)
-            }
+            state.ball.xPos = ballRadius + paddleWidth + 1
+            state.ball.yPos = state.players[0].pos
         }
 
         // bounce paddle left player
         if ( state.ball.xPos <= 0 + paddleWidth && 
                 state.ball.yPos <= state.players[0].pos + paddleHeight/2 &&
                 state.ball.yPos >= state.players[0].pos - paddleHeight/2 ) {
+                
+            if (props.player_number === 0) {
                 state.ball.xVec = state.ball.xVec * -1.4
                 state.ball.yVec = state.ball.yVec * 1.4
-                if (props.player_number === 1) {
-                    state.turn_change = true;
-                }
+            }
             beep()
         }
 
@@ -294,10 +269,8 @@
         if ( state.ball.xPos >= c.width - paddleWidth && 
                 state.ball.yPos <= state.players[1].pos + paddleHeight/2 &&
                 state.ball.yPos >= state.players[1].pos - paddleHeight/2 ) {
+            if (props.player_number === 1)
                 state.ball.xVec = state.ball.xVec * -2
-                if (props.player_number === 0) {
-                    state.turn_change = true;
-                }
             beep()
         }
 
@@ -312,9 +285,8 @@
         }
 
 
-        console.log("Is turn: ", state.is_turn)
         // update ball position
-        if (state.is_turn) {
+        if ((state.ball.xVec > 0 && props.player_number === 1) || (state.ball.xVec < 0 && props.player_number === 0)) {
             state.ball.xPos += state.ball.xVec
             state.ball.yPos += state.ball.yVec
         }
@@ -340,9 +312,9 @@
         const update: GameUpdate = {
             player: game_state.value.game.players[props.player_number as 0 | 1],
             ball: game_state.value.game.ball,
-            gameid: props.match.id,
-            turn_change: game_state.value.game.turn_change
+            gameid: props.match.id
         };
+        console.log("ball:", state.ball.xPos, state.ball.yPos, state.ball.xVec, state.ball.yVec)
         socket.emit("move", update);
     }
 
