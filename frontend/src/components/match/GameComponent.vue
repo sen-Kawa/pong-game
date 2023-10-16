@@ -9,6 +9,7 @@
     import { ref } from 'vue';
     import {type GameUpdate } from 'common-types'
     import { useAuthStore } from '@/stores/auth';
+import Validate2FA from '../user/Validate2FA.vue';
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
@@ -21,6 +22,7 @@
     const ballRadius = 8
 
     const props = defineProps(['match', 'player_number']);
+    const pre_bounce = ref(0)
     const game_state = ref({
         game: {
             started: false,
@@ -63,16 +65,14 @@
             game_state.value.game.players[player_number] = update.player;
             switch (props.player_number) {
                 case 0:
-                    if (update.ball.xVec > 0) {
+                    if (update.ball.xVec > 0 && update.ball.xPos != pre_bounce.value) {
                         game_state.value.game.ball = update.ball;
-                        console.log("receiving ball update to the right")
                     }
                     break;
 
                 case 1:
-                    if (update.ball.xVec < 0) {
+                    if (update.ball.xVec < 0  && update.ball.xPos != pre_bounce.value) {
                         game_state.value.game.ball = update.ball;
-                        console.log("receiving ball update to the left")
                     }
                     break;
             }
@@ -226,8 +226,10 @@
         if ( state.ball.xPos <= 0 + paddleWidth && 
                 state.ball.yPos <= state.players[0].pos + paddleHeight/2 &&
                 state.ball.yPos >= state.players[0].pos - paddleHeight/2 ) {
-                
-            if (props.player_number === 1 && state.ball.xVec < 0) {
+                state.ball.xPos = 0 + paddleWidth + 1
+                pre_bounce.value = state.ball.xVec
+
+            if (state.ball.xVec < 0) {
                 state.ball.xVec = state.ball.xVec * -1.4
                 state.ball.yVec = state.ball.yVec * 1.4
             }
@@ -245,7 +247,10 @@
         if ( state.ball.xPos >= c.width - paddleWidth && 
                 state.ball.yPos <= state.players[1].pos + paddleHeight/2 &&
                 state.ball.yPos >= state.players[1].pos - paddleHeight/2 ) {
-            if (props.player_number === 0 && state.ball.xVec > 0) {
+                state.ball.xPos = c.width - paddleWidth - 1
+                pre_bounce.value = state.ball.xVec
+
+            if (state.ball.xVec > 0) {
                 state.ball.xVec = state.ball.xVec * -2
             }
             beep()
@@ -298,7 +303,6 @@
             ball: game_state.value.game.ball,
             gameid: props.match.id
         };
-        console.log("ball:", state.ball.xPos, state.ball.yPos, state.ball.xVec, state.ball.yVec)
         socket.emit("move", update);
     }
 
