@@ -14,4 +14,5 @@ export interface GameUpdate {
     player: Player;
     ball: Ball;
     gameid: number;
+    scores: [number, number];
 }

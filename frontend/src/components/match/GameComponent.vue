@@ -6,10 +6,9 @@
 
 <script setup lang="ts">
     import { socket } from '@/sockets/sockets';
-    import { ref } from 'vue';
+    import { ref, onUnmounted } from 'vue';
     import {type GameUpdate } from 'common-types'
     import { useAuthStore } from '@/stores/auth';
-import Validate2FA from '../user/Validate2FA.vue';
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
@@ -42,10 +41,7 @@ import Validate2FA from '../user/Validate2FA.vue';
                     xVec: 1.5,
                     yVec: -1.5
             },
-            score: {
-                player0: 0,
-                player1: 0
-            }
+            score: [0, 0]
         }
     });
 
@@ -67,12 +63,16 @@ import Validate2FA from '../user/Validate2FA.vue';
                 case 0:
                     if (update.ball.xVec > 0 && update.ball.xPos != pre_bounce.value) {
                         game_state.value.game.ball = update.ball;
+                        pre_bounce.value = 0;
+                        game_state.value.game.score = update.scores;
                     }
                     break;
 
                 case 1:
                     if (update.ball.xVec < 0  && update.ball.xPos != pre_bounce.value) {
                         game_state.value.game.ball = update.ball;
+                        pre_bounce.value = 0;
+                        game_state.value.game.score = update.scores;
                     }
                     break;
             }
@@ -111,6 +111,10 @@ import Validate2FA from '../user/Validate2FA.vue';
     //     // }      
     // })
 
+    onUnmounted(() => {
+        console.log("Unmounted")
+        clearInterval(interval);
+    })
 
     function makeMove(newVec: number) {
         const player = game_state.value.game.players[props.player_number as 0 | 1];
@@ -191,7 +195,8 @@ import Validate2FA from '../user/Validate2FA.vue';
         let uptdate: GameUpdate = {
             player: game_state.value.game.players[props.player_number as 0 | 1],
             ball: game_state.value.game.ball,
-            gameid: props.match.id
+            gameid: props.match.id,
+            scores: [0, 0]
         }
         socket.emit("player_connected", uptdate)
     }
@@ -200,7 +205,6 @@ import Validate2FA from '../user/Validate2FA.vue';
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
             console.log("cant get canvas");
-            clearInterval(interval);
             document.removeEventListener("keydown", (event) => {
                 keyUpHandler(event)
             });
@@ -238,7 +242,7 @@ import Validate2FA from '../user/Validate2FA.vue';
             state.ball.xVec = 1
             state.ball.yVec = -1
             // beep()
-            state.score.player1 += 1
+            state.score[1] += 1
             state.ball.xPos = ballRadius + paddleWidth + 1
             state.ball.yPos = state.players[0].pos
         }
@@ -258,7 +262,7 @@ import Validate2FA from '../user/Validate2FA.vue';
             state.ball.xVec = -1
             state.ball.yVec = -1
             // beep()
-            state.score.player0 += 1
+            state.score[0] += 1
             state.ball.xPos = c.width - ballRadius - paddleWidth - 1
             state.ball.yPos = state.players[1].pos
         }
@@ -293,15 +297,16 @@ import Validate2FA from '../user/Validate2FA.vue';
             state.players[1].pos = 449
         ctx.clearRect(0, 0, c.width, c.height)
         drawNet(ctx)
-        drawScore(state.score.player0, state.score.player1, ctx)
+        drawScore(state.score[0], state.score[1], ctx)
         drawPaddle(0, state.players[0].pos - paddleHeight/2, ctx)
         drawPaddle(c.width - 1 - paddleWidth,state.players[1].pos - paddleHeight/2, ctx)
         drawBall(state.ball.xPos, state.ball.yPos, ctx)
 
         const update: GameUpdate = {
-            player: game_state.value.game.players[props.player_number as 0 | 1],
-            ball: game_state.value.game.ball,
-            gameid: props.match.id
+            player: state.players[props.player_number as 0 | 1],
+            ball: state.ball,
+            gameid: props.match.id,
+            scores: state.score as [number, number]
         };
         socket.emit("move", update);
     }
