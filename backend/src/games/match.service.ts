@@ -126,19 +126,19 @@ export class MatchService {
     return match
   }
 
-  playerConnected(connection: string, update: GameUpdate)  {
+  playerConnected(connection: string, userId: number, update: GameUpdate)  {
     const match = this.matches.get(update.gameid)
     if (!match) {
       console.log("Match not found")
       return undefined
     }
 
+    console.log("Player connected", userId)
     let other_player = ""
-    const playerId = this.socketService.getUserId(connection)
-    if (match.players[0].id === playerId) {
+    if (match.players[0].id === userId) {
       match.players[0].connected = true
       other_player = this.socketService.getSocketId(match.players[1].id)
-    } else if (match.players[1].id === playerId) {
+    } else if (match.players[1].id === userId) {
       match.players[1].connected = true
       other_player = this.socketService.getSocketId(match.players[0].id)
     }
@@ -160,15 +160,15 @@ export class MatchService {
     this.socketService.socket.to(other_player).emit('game_update', update)
   }
 
-  makeMove(update: GameUpdate, connection: string) {
+  makeMove(update: GameUpdate, connection: string, userId: number) {
     const match = this.matches.get(update.gameid)
     if (!match) {
       return undefined
     }
-    const playerId = this.socketService.getUserId(connection)
-    if (match.players[0].id === playerId) {
+
+    if (match.players[0].id === userId) {
       this.moveHandler(match, 0, update, connection)
-    } else if (match.players[1].id === playerId) {
+    } else if (match.players[1].id === userId) {
       this.moveHandler(match, 1, update, connection)
     }
   }

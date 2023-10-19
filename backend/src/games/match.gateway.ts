@@ -33,21 +33,14 @@ export class MatchGateway {
   game_update(@MessageBody() update: GameUpdate, @ConnectedSocket() client: any) {
     this.matchService.makeMove(
       (update as any)[0],
-      client.id
+      client.id,
+      client.data.userId
     )
   }
 
   @SubscribeMessage('player_connected')
   player_connected(@ConnectedSocket() client: any, @MessageBody() update: GameUpdate) {
     console.log("Player connected: ")
-    this.matchService.playerConnected(client.id, (update as any)[0])
-  }
-
-  @SubscribeMessage('move2')
-  game_update2(@MessageBody() update: GameUpdate, @ConnectedSocket() client: any) {
-    this.server.emit("game_update2", update)
-    console.log("Got move 0: ", update)
-    const game_update = this.matchService.makeMove((update as any)[0], client.id)
-    console.log("Got move: ", update)
+    this.matchService.playerConnected(client.id, client.data.userId, (update as any)[0])
   }
 }
