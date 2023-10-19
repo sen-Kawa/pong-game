@@ -10,15 +10,13 @@ interface Game {
   players: {
     0: {
       player: Player
-      player_token: string
       id: number
-      connection: string
+      connected: boolean
     }
     1: {
       player: Player
-      player_token: string
       id: number
-      connection: string
+      connected: boolean
     }
   }
   gameid: number
@@ -65,9 +63,7 @@ export class MatchService {
 
   matches: Map<number, Game>
 
-  async join(matchId: number, playerId: number, player_token: string) {
-    console.log("Service, matchId", matchId)
-    console.log("Matches: ", this.matches)
+  async join(matchId: number, playerId: number) {
     const match = this.matches.get(matchId)
     // const match = this.matches[matchId]
     if (match === undefined) {
@@ -75,14 +71,8 @@ export class MatchService {
       return undefined
     }
 
-    if (playerId == match.players[0].id) {
-      const session_id = player_token
-      match.players[0].player_token = session_id
-      console.log('Player joined as 1')
-    } else if (playerId == match.players[1].id || match.players[1].id === undefined) {
-      const session_id = player_token
+    if (playerId == match.players[1].id || match.players[1].id === undefined) {
       match.players[1].id = playerId
-      match.players[1].player_token = session_id
       await this.addPlayer(matchId, playerId)
       console.log('Player joined as 2')
     }
@@ -93,6 +83,12 @@ export class MatchService {
     })
 
     return db_match
+  }
+
+  gameTick() {
+    this.matches.forEach((game, key) => {
+
+    })
   }
 
   async create(data: Prisma.MatchCreateInput, playerToken?: string) {
@@ -112,8 +108,7 @@ export class MatchService {
             vector: 0
           },
           id: players[0].playerId,
-          player_token: playerToken ? playerToken : '',
-          connection: ''
+          connected: false
         },
         {
           player: {
@@ -121,8 +116,7 @@ export class MatchService {
             vector: 0
           },
           id: playerTwoId,
-          player_token: '',
-          connection: ''
+          connected: false
         }
       ],
       gameid: match.id,
@@ -132,26 +126,26 @@ export class MatchService {
     return match
   }
 
-  playerConnected(player_token: string, connection: string, update: GameUpdate)  {
-    console.log("Player connected", this.matches)
+  playerConnected(connection: string, update: GameUpdate)  {
     const match = this.matches.get(update.gameid)
     if (!match) {
       console.log("Match not found")
       return undefined
     }
-    console.log("Player 1 token:", match.players[0].player_token, "Player 2 token:", match.players[1].player_token)
-    if (match.players[0].player_token === player_token) {
-      match.players[0].connection = connection
-    } else if (match.players[1].player_token === player_token) {
-      match.players[1].connection = connection
+
+    let other_player = ""
+    const playerId = this.socketService.getUserId(connection)
+    if (match.players[0].id === playerId) {
+      match.players[0].connected = true
+      other_player = this.socketService.getSocketId(match.players[1].id)
+    } else if (match.players[1].id === playerId) {
+      match.players[1].connected = true
+      other_player = this.socketService.getSocketId(match.players[0].id)
     }
 
-    const other_player_number = match.players[0].connection === connection ? 1 : 0
-    const other_player = match.players[other_player_number]
-    console.log("Player 1:", connection,"Player 2:", other_player.connection)
-    if (other_player.connection != '') {
-      this.socketService.socket.to(other_player.connection).emit('start_game', update)
+    if (match.players[0].connected && match.players[1].connected) {
       this.socketService.socket.to(connection).emit('start_game', update)
+      this.socketService.socket.to(other_player).emit('start_game', update)
     }
   }
 
@@ -162,19 +156,19 @@ export class MatchService {
     match.last_modified = new Date()
 
     const other_player_number = player_number == 0 ? 1 : 0
-    const other_player = match.players[other_player_number]
-    this.socketService.socket.to(other_player.connection).emit('game_update', update)
+    const other_player = this.socketService.getSocketId(match.players[other_player_number].id)
+    this.socketService.socket.to(other_player).emit('game_update', update)
   }
 
-  makeMove(update: GameUpdate, player_token: string, connection: string) {
+  makeMove(update: GameUpdate, connection: string) {
     const match = this.matches.get(update.gameid)
     if (!match) {
       return undefined
     }
-
-    if (match.players[0].player_token === player_token) {
+    const playerId = this.socketService.getUserId(connection)
+    if (match.players[0].id === playerId) {
       this.moveHandler(match, 0, update, connection)
-    } else if (match.players[1].player_token === player_token) {
+    } else if (match.players[1].id === playerId) {
       this.moveHandler(match, 1, update, connection)
     }
   }
