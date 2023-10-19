@@ -9,14 +9,6 @@ export class SocketService {
     return this.connectedClients.get(userId)
   }
 
-  getUserId(socketId: string) {
-    let sockId = 0
-    this.connectedClients.forEach((value, key) => {
-      if (value === socketId) sockId = key
-    })
-    return sockId
-  }
-
   addClient(userId: number, socketId: string) {
     this.connectedClients.set(userId, socketId)
   }

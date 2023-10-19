@@ -29,12 +29,30 @@ export class MatchGateway {
 
   private logger: Logger = new Logger('MatchGateway')
 
-  @SubscribeMessage('move')
-  game_update(@MessageBody() update: GameUpdate, @ConnectedSocket() client: any) {
+  @SubscribeMessage('move_up')
+  move_up(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
     this.matchService.makeMove(
-      (update as any)[0],
-      client.id,
-      client.data.userId
+      client.data.userId,
+      -3,
+      gameid[0]
+    )
+  }
+  
+  @SubscribeMessage('move_down')
+  move_down(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
+    this.matchService.makeMove(
+      client.data.userId,
+      3,
+      gameid[0]
+    )
+  }
+  
+  @SubscribeMessage('stop')
+  stop(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
+    this.matchService.makeMove(
+      client.data.userId,
+      0,
+      gameid[0]
     )
   }
 

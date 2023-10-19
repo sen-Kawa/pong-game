@@ -1,5 +1,5 @@
 <template>
-	<canvas id="game-canvas" width="600" height="450" style="background-color: black; border: 1px solid grey;"></canvas>
+	<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: black; border: 1px solid grey;"></canvas>
     <h3>{{ playerInfo }}</h3>
 </template>
 
@@ -7,24 +7,23 @@
 <script setup lang="ts">
     import { socket } from '@/sockets/sockets';
     import { ref, onUnmounted } from 'vue';
-    import {type GameUpdate } from 'common-types'
+    import { type GameUpdate } from 'common-types'
     import { useAuthStore } from '@/stores/auth';
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
     const playerInfo = ref('Control your player with [w] for up and [s] for down.')
     const elementColor:string = 'white'
+
     const paddleWidth = 15
     const paddleHeight = 70
-    let fieldWidth = 0
-    let fieldHeight = 0
     const ballRadius = 8
+    const fieldWidth = 600
+    const fieldHeight = 450
 
     const props = defineProps(['match', 'player_number']);
-    const pre_bounce = ref(0)
     const game_state = ref({
         game: {
-            started: false,
             players: {
                 0: {
                     pos: 0,
@@ -56,37 +55,11 @@
     }
 
     socket.on("game_update", (update: GameUpdate) => {
-        const player_number = props.player_number === 0 ? 1 : 0;
-        if (update && props.match.id === update.gameid) {
-            game_state.value.game.players[player_number] = update.player;
-            switch (props.player_number) {
-                case 0:
-                    if (update.ball.xVec > 0 && update.ball.xPos != pre_bounce.value) {
-                        game_state.value.game.ball = update.ball;
-                        pre_bounce.value = 0;
-                        game_state.value.game.score = update.scores;
-                    }
-                    break;
-
-                case 1:
-                    if (update.ball.xVec < 0  && update.ball.xPos != pre_bounce.value) {
-                        game_state.value.game.ball = update.ball;
-                        pre_bounce.value = 0;
-                        game_state.value.game.score = update.scores;
-                    }
-                    break;
-            }
-        }
+        game_state.value.game = update;
     })
 
     socket.on("start_game", (game: GameUpdate) => {
         console.log("Game started")
-        game_state.value.game.started = true;
-        const player_number = props.player_number == 1 ? 1 : 0;
-        game_state.value.game.players[player_number] = game.player;
-        if (player_number == 1) {
-            game_state.value.game.ball = game.ball;
-        }
         interval = setInterval(drawGame, 1000/ 50)
     })
 
@@ -116,17 +89,11 @@
         clearInterval(interval);
     })
 
-    function makeMove(newVec: number) {
-        const player = game_state.value.game.players[props.player_number as 0 | 1];
-        player.vector = newVec;
-        player.pos += newVec;
-    }
+    function moveUp() { socket.emit("move_up", props.match.id) }
 
-    function moveUp() { makeMove(-3) }
+    function moveDown() { socket.emit("move_down", props.match.id) }
 
-    function moveDown() { makeMove(3) }
-
-    function reset() { makeMove(0) }
+    function stop() { socket.emit("stop", props.match.id) }
 
     function keyDownHandler(event: any) {
         if (event.key == keyDown) {
@@ -138,7 +105,7 @@
 
     function keyUpHandler(event: any) {
         if (event.key == keyDown || event.key == keyUp) {
-            reset();
+            stop();
         }
     }
 
@@ -192,13 +159,7 @@
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
 
-        let uptdate: GameUpdate = {
-            player: game_state.value.game.players[props.player_number as 0 | 1],
-            ball: game_state.value.game.ball,
-            gameid: props.match.id,
-            scores: [0, 0]
-        }
-        socket.emit("player_connected", uptdate)
+        socket.emit("player_connected", props.match.id)
     }
 
     function drawGame() {
@@ -219,96 +180,13 @@
             clearInterval(interval);
             return;
         }
-        if (props.match === undefined) {
-            console.log("Not in a match");
-            clearInterval(interval);
-            return;
-        }
         const state = game_state.value.game;
-        
-        // bounce paddle left player and check for point
-        if ( state.ball.xPos <= 0 + paddleWidth && 
-                state.ball.yPos <= state.players[0].pos + paddleHeight/2 &&
-                state.ball.yPos >= state.players[0].pos - paddleHeight/2 ) {
-                state.ball.xPos = 0 + paddleWidth + 1
-                pre_bounce.value = state.ball.xVec
-
-            if (state.ball.xVec < 0) {
-                state.ball.xVec = state.ball.xVec * -1.4
-                state.ball.yVec = state.ball.yVec * 1.4
-            }
-            beep()
-        } else  if ( state.ball.xPos <= 0 && state.ball.xVec < 0 ) {
-            state.ball.xVec = 1
-            state.ball.yVec = -1
-            // beep()
-            state.score[1] += 1
-            state.ball.xPos = ballRadius + paddleWidth + 1
-            state.ball.yPos = state.players[0].pos
-        }
-
-        // bounce paddle right player and check for point
-        if ( state.ball.xPos >= c.width - paddleWidth && 
-                state.ball.yPos <= state.players[1].pos + paddleHeight/2 &&
-                state.ball.yPos >= state.players[1].pos - paddleHeight/2 ) {
-                state.ball.xPos = c.width - paddleWidth - 1
-                pre_bounce.value = state.ball.xVec
-
-            if (state.ball.xVec > 0) {
-                state.ball.xVec = state.ball.xVec * -2
-            }
-            beep()
-        } else if ( state.ball.xPos >= c.width && state.ball.xVec > 0 ) {
-            state.ball.xVec = -1
-            state.ball.yVec = -1
-            // beep()
-            state.score[0] += 1
-            state.ball.xPos = c.width - ballRadius - paddleWidth - 1
-            state.ball.yPos = state.players[1].pos
-        }
-
-        // bounce upper or lower wall
-
-        if (state.ball.yPos - ballRadius <= 0) {
-            state.ball.yVec = state.ball.yVec * -1
-        }
-
-        if (state.ball.yPos + ballRadius >= c.height) {
-            state.ball.yVec = state.ball.yVec * -1
-        }
-
-
-        // update ball position
-        if ((state.ball.xVec > 0 && props.player_number === 1) || (state.ball.xVec < 0 && props.player_number === 0)) {
-            state.ball.xPos += state.ball.xVec
-            state.ball.yPos += state.ball.yVec
-        }
-
-        state.players[0].pos += state.players[0].vector
-        if (state.players[0].pos <= 0)
-            state.players[0].pos = 0
-        if (state.players[0].pos >= 449)
-            state.players[0].pos = 449
-
-        state.players[1].pos += state.players[1].vector
-        if (state.players[1].pos <= 0)
-            state.players[1].pos = 0
-        if (state.players[1].pos >= 449)
-            state.players[1].pos = 449
         ctx.clearRect(0, 0, c.width, c.height)
         drawNet(ctx)
         drawScore(state.score[0], state.score[1], ctx)
         drawPaddle(0, state.players[0].pos - paddleHeight/2, ctx)
         drawPaddle(c.width - 1 - paddleWidth,state.players[1].pos - paddleHeight/2, ctx)
         drawBall(state.ball.xPos, state.ball.yPos, ctx)
-
-        const update: GameUpdate = {
-            player: state.players[props.player_number as 0 | 1],
-            ball: state.ball,
-            gameid: props.match.id,
-            scores: state.score as [number, number]
-        };
-        socket.emit("move", update);
     }
 
     
