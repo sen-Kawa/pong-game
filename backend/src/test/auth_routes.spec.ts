@@ -85,7 +85,7 @@ describe('Test for diffrent routes', () => {
       const { status, body } = await request(app.getHttpServer())
         .get('/auth/user-profile')
         .set('Accept', 'application/json')
-      expect(body).toStrictEqual({ id: 1 })
+      expect(body).toStrictEqual({ id: 1, userName: 'testUser' })
       expect(status).toBe(200)
     })
     // [GET] /auth/logout

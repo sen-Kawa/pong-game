@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
-import { PrismaService } from './../prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
 import { UserEntity } from '../users/entities/user.entity'
 import { authenticator } from 'otplib'
@@ -140,7 +140,7 @@ export class AuthService {
       if (!validToken) throw new UnauthorizedException()
       return validToken
     } catch (error) {
-      console.log(error)
+      //console.log(error)
       // throw new InternalServerErrorException('verifyJwt')
     }
   }

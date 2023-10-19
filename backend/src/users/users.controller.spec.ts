@@ -15,9 +15,12 @@ describe('UsersController Unit Tests', () => {
   let userController: UsersController
 
   const mockRequest = httpMocks.createRequest()
+  const mockRequestFile = httpMocks.createRequest()
   const mockResponse = httpMocks.createResponse()
 
   mockRequest.user = new UserEntity({ id: 1, avatarId: 2 })
+  mockRequestFile.user = new UserEntity({ id: 1, avatarId: 1, userName: 'testname' })
+
   const mockDtoFindUser = new FindUserDto()
   mockDtoFindUser.name = 'FindUserTest'
 
@@ -161,7 +164,7 @@ describe('UsersController Unit Tests', () => {
 
   it('uploadedFile should be called and called with the right value', async () => {
     const spy = jest.spyOn(mockUsersService, 'updateAvatar')
-    await userController.uploadedFile(file, mockRequest)
+    await userController.uploadedFile(file, mockRequestFile)
     expect(spy).toBeCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(1, 'AvatarUrlString')
   })

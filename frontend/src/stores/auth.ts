@@ -88,7 +88,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function getuserProfile() {
-
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
@@ -159,7 +158,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   async function setDisplayName2(displayName: string, returnRoute: string) {
     const body = { displayName: displayName }
-    console.log("disp2", body)
+    console.log('disp2', body)
     try {
       const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
         headers: {
@@ -180,8 +179,6 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
-
-  //TODO fake login for chat testing
   async function login(username: string) {
     console.log(username)
     const body = { userid: username }
@@ -200,7 +197,6 @@ export const useAuthStore = defineStore('auth', () => {
       //return error.response.data.message;
     }
   }
-
   return {
     getUserName,
     getName,

@@ -11,6 +11,9 @@ import { Logger } from '@nestjs/common'
 import { parse } from 'cookie'
 import { AuthService } from './auth/auth.service'
 import { AppService } from './app.service'
+import { parse } from 'cookie'
+import { AuthService } from './auth/auth.service'
+import { AppService } from './app.service'
 
 @WebSocketGateway({
   cors: {
@@ -22,8 +25,8 @@ import { AppService } from './app.service'
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private socketService: SocketService,
-    // private authService: AuthService,
-    // private appService: AppService
+    private authService: AuthService,
+    private appService: AppService
   ) {}
 
   @WebSocketServer() public server: Server
@@ -35,36 +38,36 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleConnection(client: Socket, ...args: any[]) {
     //TODO error handling
-    // if (!client.handshake.headers.cookie) client.disconnect()
-    // else {
-    //   try {
-    //     const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
-    //     if (token) {
-    //       // const test = await this.authService.verifyJwt(token)
-    //       // console.log(test)
-    //       if (!test) return client.disconnect()
-    //       // this.appService.connectedUser(test.userId)
-    //       args
-    //       this.logger.log('Client connected ' + client.id)
-    //     }
-    //   } catch (error) {
-    //     client.disconnect()
-    //     console.log(error)
-    //   }
-    // }
+    //TODO run via refresh if auth token invalid
+    if (!client.handshake.headers.cookie) client.disconnect()
+    else {
+      try {
+        const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
+        if (token) {
+          const test = await this.authService.verifyJwt(token)
+          if (!test) {
+            this.server.emit('failed_con')
+            return client.disconnect()
+          }
+          client.data.userId = test.userId
+          this.appService.connectedUser(test.userId, client.id)
+          args
+          this.logger.log('Client connected ' + client.id)
+        }
+      } catch (error) {
+        console.log(error)
+        this.server.emit('failed_con')
+        client.disconnect()
+      }
+    }
   }
 
   async handleDisconnect(client: Socket) {
     //TODO error handling
-    // try {
-    //   const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
-    //   if (token) {
-    //     // const test = await this.authService.verifyJwt(token)
-    //     // this.appService.disconnectedUser(test.userId)
-    //     this.logger.log('Client disconnected ' + client.id)
-    //   }
-    // } catch (error) {
-    //   console.log(error)
-    // }
+    if (client.data.userId) {
+      this.appService.disconnectedUser(client.data.userId)
+      this.logger.log('Client disconnected ' + client.data.userId)
+    } else this.logger.log('Unknown Client disconnected ' + client.id)
+    client.disconnect()
   }
 }
