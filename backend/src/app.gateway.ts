@@ -11,9 +11,6 @@ import { Logger } from '@nestjs/common'
 import { parse } from 'cookie'
 import { AuthService } from './auth/auth.service'
 import { AppService } from './app.service'
-import { parse } from 'cookie'
-import { AuthService } from './auth/auth.service'
-import { AppService } from './app.service'
 
 @WebSocketGateway({
   cors: {
