@@ -60,7 +60,7 @@
         game_state.value.game = update;
     })
 
-    socket.on("start_game", (game: GameUpdate) => {
+    socket.on("start_game", () => {
         console.log("Game started")
         interval = setInterval(drawGame, 1000/ 50)
     })
