@@ -10,6 +10,7 @@ import SearchMatch from '@/components/match/SearchMatch.vue'
 import { useMatchStore } from '@/stores/match'
 import { onMounted } from 'vue'
 import GameComponent from '../components/match/GameComponent.vue'
+import { socket } from '@/sockets/sockets'
 
 const matchStore = useMatchStore()
 
@@ -20,7 +21,10 @@ onMounted(async () => {
   // TODO: only await once
   await matchStore.getMatchesToJoin()
   await matchStore.getMatchesToSpectate()
+})
 
+socket.on('match_end', async () => {
+  matchStore.removeCurrentMatch()
 })
 
 async function createNewGame() {

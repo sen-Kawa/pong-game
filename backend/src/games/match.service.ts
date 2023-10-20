@@ -101,6 +101,20 @@ export class MatchService {
     return db_match
   }
 
+  private async matchEnd(game: Game) {
+    await this.addMatchResult(game.gameid, [{
+      playerId: game.players[0].id,
+      score: game.score[0]
+    },
+    {
+      playerId: game.players[1].id,
+      score: game.score[1]
+    }])
+    this.socketService.socket.to(this.socketService.getSocketId(game.players[0].id)).emit('match_end')
+    this.socketService.socket.to(this.socketService.getSocketId(game.players[1].id)).emit('match_end')
+    this.matches.delete(game.gameid)
+  }
+
   gameTick() {
     this.matches.forEach(async (game) => {
       if (!game.started) {
@@ -123,15 +137,7 @@ export class MatchService {
           state.ball.yVec = -1
           state.score[1] += 1
           if (state.score[1] >= 2) {
-            await this.addMatchResult(game.gameid, [{
-              playerId: state.players[0].id,
-              score: state.score[0]
-            },
-            {
-              playerId: state.players[1].id,
-              score: state.score[1]
-            }])
-            this.matches.delete(game.gameid)
+            this.matchEnd(game)
           }
           state.ball.xPos = ballRadius + paddleWidth + 1
           state.ball.yPos = state.players[0].player.pos
@@ -151,15 +157,7 @@ export class MatchService {
           state.ball.yVec = -1
           state.score[0] += 1
           if (state.score[0] >= 2) {
-            await this.addMatchResult(game.gameid, [{
-              playerId: state.players[0].id,
-              score: state.score[0]
-            },
-            {
-              playerId: state.players[1].id,
-              score: state.score[1]
-            }])
-            this.matches.delete(game.gameid)
+            this.matchEnd(game)
           }
           state.ball.xPos = fieldWidth - ballRadius - paddleWidth - 1
           state.ball.yPos = state.players[1].player.pos

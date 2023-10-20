@@ -10,7 +10,6 @@
     import { socket } from '@/sockets/sockets';
     import { ref, onUnmounted } from 'vue';
     import { type GameUpdate } from 'common-types'
-    import { useAuthStore } from '@/stores/auth';
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
@@ -23,6 +22,7 @@
     const fieldWidth = 600
     const fieldHeight = 450
 
+    let interval: any
     const props = defineProps(['match', 'player_number']);
     const game_state = ref({
         game: {
@@ -64,27 +64,6 @@
         console.log("Game started")
         interval = setInterval(drawGame, 1000/ 50)
     })
-
-    // socket.on("game_update2", (update2) => {
-    //     // const player_number = props.player_number == 0 ? 1 : 0;
-    //     // const player_number = props.player_number == 0 ? 1 : 0;
-    //     // const player_number = props.player_number == 0 ? 1 : 0;
-    //     // console.log("Update:", update2)
-
-    //     if (update2[0].playerId !== props.player_number) {
-    //         const player_number = update2[0].playerId == 0 ? 0 : 1
-    //         console.log("Update:", update2)
-    //         // let a: string = string(update2[0].playerId)
-    //         game_state.value.game.players[player_number].pos = update2[0].paddlePos
-
-
-    //     }
-            
-    //     // if (update && props.match.id == update.gameid) {
-    //     //     game_state.value.game.players[player_number] = update.player;
-    //     //     console.log("Update:", update)
-    //     // }      
-    // })
 
     onUnmounted(() => {
         console.log("Unmounted")
@@ -151,10 +130,6 @@
     }
 
     const gameInit = () => {
-        // console.log(" Player number ==> ", props.player_number)
-        // console.log("Props: ", props)
-        // console.log("matchid: ", props.match.id)
-        // console.log("match (all): ", props.match)
         // change the key and info if player is on the right side (maybe put it to a setup function later)
         if (props.player_number === 1) {
             playerInfo.value = 'Control your player with [p] for up and [l] for down.'
@@ -193,10 +168,7 @@
         drawBall(state.ball.xPos, state.ball.yPos, ctx)
     }
 
-    let interval: any
     gameInit()
-    const userStore = useAuthStore()
-    // interval = setInterval(drawGame, 1000/ 50)  // for testing remove & uncomment socket.on("start_game" ...) later
 </script>
 
 
