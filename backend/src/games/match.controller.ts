@@ -84,8 +84,7 @@ export class MatchController {
         players: {
           create: { playerId: request.user.id }
         }
-      },
-      request.user.refreshToken
+      }
     )
 
     session.current_match = match.id
