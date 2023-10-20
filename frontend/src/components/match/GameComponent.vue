@@ -1,4 +1,6 @@
 <template>
+    <h2>No. {{ match.id }}</h2>
+    <br>
 	<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: black; border: 1px solid grey;"></canvas>
     <h3>{{ playerInfo }}</h3>
 </template>
@@ -89,7 +91,9 @@
         clearInterval(interval);
     })
 
-    function moveUp() { socket.emit("move_up", props.match.id) }
+    function moveUp() { 
+        console.log("move up:", props.match.id)
+        socket.emit("move_up", props.match.id) }
 
     function moveDown() { socket.emit("move_down", props.match.id) }
 
@@ -189,11 +193,10 @@
         drawBall(state.ball.xPos, state.ball.yPos, ctx)
     }
 
-    
-
+    let interval: any
     gameInit()
     const userStore = useAuthStore()
-    let interval: any;
+    // interval = setInterval(drawGame, 1000/ 50)  // for testing remove & uncomment socket.on("start_game" ...) later
 </script>
 
 
