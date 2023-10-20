@@ -241,9 +241,11 @@ export class MatchService {
     if (match.players[0].id === userId) {
       match.players[0].connected = true
       other_player = this.socketService.getSocketId(match.players[1].id)
+      match.last_modified = new Date()
     } else if (match.players[1].id === userId) {
       match.players[1].connected = true
       other_player = this.socketService.getSocketId(match.players[0].id)
+      match.last_modified = new Date()
     }
 
     if (match.players[0].connected && match.players[1].connected) {
@@ -270,9 +272,11 @@ export class MatchService {
     switch (userId) {
       case match.players[0].id:
         match.players[0].player.vector = newVector
+        match.last_modified = new Date()
         break
       case match.players[1].id:
         match.players[1].player.vector = newVector
+        match.last_modified = new Date()
         break
     }
   }
