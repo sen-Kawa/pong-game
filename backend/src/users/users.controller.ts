@@ -269,4 +269,15 @@ export class UsersController {
     if (!image) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     return res.sendFile(image.avatar.filename, { root: './files' })
   }
+
+  //TODO only for testing here, shouldnt be called from outside ;)
+  /**
+   * test route for updating users on win/losses
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('/updateWinLosses')
+  async updateWinLosses(@Body() test: any) {
+    console.log(test)
+    this.usersService.updateWinLosses(test.winner, test.loser)
+  }
 }

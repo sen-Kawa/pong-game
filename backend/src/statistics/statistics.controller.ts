@@ -16,11 +16,7 @@ export class StatisticsController {
     const numberOfGames: number = await this.statisticsService.getUserGamesCount(req.user.id)
     const wins: number = await this.statisticsService.getWinCount(req.user.id)
     const losses: number = await this.statisticsService.getLossesCount(req.user.id)
-    let position: number = await this.statisticsService.ladderPosition(req.user.id)
-    if (position === -1) {
-      // if the player was not found set in the data set, set him to the last position
-      position = numberOfPlayers
-    }
+    const position: number = await this.statisticsService.ladderPosition(req.user.displayName)
     return [
       {
         wins: `${wins}`,
@@ -32,10 +28,9 @@ export class StatisticsController {
     ]
   }
 
-  // @Get('leaderboard')
-  // @UseGuards(JwtAuthGuard)
-  // async getLeaderboard(@Req() req: any): Promise<any> {
-  //     // return await this.statisticsService.generateLeaderboard()
-  //     return 'leaderboard'
-  // }
+  @Get('leaderboard')
+  @UseGuards(JwtAuthGuard)
+  async getLeaderboard(): Promise<any> {
+    return await this.statisticsService.generateLeaderboard()
+  }
 }
