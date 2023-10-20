@@ -91,7 +91,6 @@ export class MatchService {
     if (playerId == match.players[1].id || match.players[1].id === undefined) {
       match.players[1].id = playerId
       await this.addPlayer(matchId, playerId)
-      console.log('Player joined as 2')
     }
 
     const db_match = await this.findOne(matchId, {
@@ -103,7 +102,7 @@ export class MatchService {
   }
 
   gameTick() {
-    this.matches.forEach((game) => {
+    this.matches.forEach(async (game) => {
       if (!game.started) {
         return
       }
@@ -122,8 +121,18 @@ export class MatchService {
       } else  if ( state.ball.xPos <= 0 && state.ball.xVec < 0 ) {
           state.ball.xVec = 1
           state.ball.yVec = -1
-          // beep()
           state.score[1] += 1
+          if (state.score[1] >= 2) {
+            await this.addMatchResult(game.gameid, [{
+              playerId: state.players[0].id,
+              score: state.score[0]
+            },
+            {
+              playerId: state.players[1].id,
+              score: state.score[1]
+            }])
+            this.matches.delete(game.gameid)
+          }
           state.ball.xPos = ballRadius + paddleWidth + 1
           state.ball.yPos = state.players[0].player.pos
       }
@@ -140,8 +149,18 @@ export class MatchService {
       } else if ( state.ball.xPos >= fieldWidth && state.ball.xVec > 0 ) {
           state.ball.xVec = -1
           state.ball.yVec = -1
-          // beep()
           state.score[0] += 1
+          if (state.score[0] >= 2) {
+            await this.addMatchResult(game.gameid, [{
+              playerId: state.players[0].id,
+              score: state.score[0]
+            },
+            {
+              playerId: state.players[1].id,
+              score: state.score[1]
+            }])
+            this.matches.delete(game.gameid)
+          }
           state.ball.xPos = fieldWidth - ballRadius - paddleWidth - 1
           state.ball.yPos = state.players[1].player.pos
       }
@@ -229,14 +248,13 @@ export class MatchService {
     return match
   }
 
-  playerConnected(connection: string, userId: number, gameid: number)  {
+  async playerConnected(connection: string, userId: number, gameid: number)  {
     const match = this.matches.get(gameid)
     if (!match) {
       console.log("Match not found")
       return undefined
     }
 
-    console.log("Player connected", userId)
     let other_player = ""
     if (match.players[0].id === userId) {
       match.players[0].connected = true
@@ -257,6 +275,7 @@ export class MatchService {
         ball: match.ball,
         score: match.score as [number, number]
       }
+      await this.start(gameid)
       this.socketService.socket.to(connection).emit('start_game', update)
       this.socketService.socket.to(other_player).emit('start_game', update)
       match.started = true

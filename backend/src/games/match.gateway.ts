@@ -57,8 +57,7 @@ export class MatchGateway {
   }
 
   @SubscribeMessage('player_connected')
-  player_connected(@ConnectedSocket() client: any, @MessageBody() update: GameUpdate) {
-    console.log("Player connected: ")
-    this.matchService.playerConnected(client.id, client.data.userId, (update as any)[0])
+  async player_connected(@ConnectedSocket() client: any, @MessageBody() update: GameUpdate) {
+    await this.matchService.playerConnected(client.id, client.data.userId, (update as any)[0])
   }
 }
