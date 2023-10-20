@@ -3,13 +3,15 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
-import { Player, 
-  GameUpdate, 
-  paddleHeight, 
-  paddleWidth, 
+import {
+  Player,
+  GameUpdate,
+  paddleHeight,
+  paddleWidth,
   ballRadius,
   fieldHeight,
-  fieldWidth } from 'common-types'
+  fieldWidth
+} from 'common-types'
 import { SocketService } from 'src/socket/socket.service'
 
 interface Game {
@@ -26,10 +28,10 @@ interface Game {
     }
   }
   ball: {
-          xPos: number
-          yPos: number
-          xVec: number
-          yVec: number
+    xPos: number
+    yPos: number
+    xVec: number
+    yVec: number
   }
   score: [number, number]
   started: boolean
@@ -62,15 +64,15 @@ export class MatchService {
   ) {
     this.matches = new Map<number, Game>()
     setInterval(() => {
-      let remove: number[] = []
+      const remove: number[] = []
       this.matches.forEach((game, key) => {
         const diff = Date.now() - game.last_modified.getTime()
         if (diff > 1000 * 60 * 2) {
-          remove.push(key);
+          remove.push(key)
         }
       })
       remove.map((key) => {
-        this.matches.delete(key);
+        this.matches.delete(key)
       })
     }, 1000 * 60)
     setInterval(() => {
@@ -102,16 +104,22 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
-    await this.addMatchResult(game.gameid, [{
-      playerId: game.players[0].id,
-      score: game.score[0]
-    },
-    {
-      playerId: game.players[1].id,
-      score: game.score[1]
-    }])
-    this.socketService.socket.to(this.socketService.getSocketId(game.players[0].id)).emit('match_end')
-    this.socketService.socket.to(this.socketService.getSocketId(game.players[1].id)).emit('match_end')
+    await this.addMatchResult(game.gameid, [
+      {
+        playerId: game.players[0].id,
+        score: game.score[0]
+      },
+      {
+        playerId: game.players[1].id,
+        score: game.score[1]
+      }
+    ])
+    this.socketService.socket
+      .to(this.socketService.getSocketId(game.players[0].id))
+      .emit('match_end')
+    this.socketService.socket
+      .to(this.socketService.getSocketId(game.players[1].id))
+      .emit('match_end')
     this.matches.delete(game.gameid)
   }
 
@@ -120,90 +128,97 @@ export class MatchService {
       if (!game.started) {
         return
       }
-      const state = game;
-      
+      const state = game
+
       // bounce paddle left player and check for point
-      if ( state.ball.xPos <= 0 + paddleWidth && 
-        state.ball.yPos <= state.players[0].player.pos + paddleHeight/2 &&
-        state.ball.yPos >= state.players[0].player.pos - paddleHeight/2 ) {
+      if (
+        state.ball.xPos <= 0 + paddleWidth &&
+        state.ball.yPos <= state.players[0].player.pos + paddleHeight / 2 &&
+        state.ball.yPos >= state.players[0].player.pos - paddleHeight / 2
+      ) {
         state.ball.xPos = 0 + paddleWidth + 1
 
         if (state.ball.xVec < 0) {
-            state.ball.xVec = state.ball.xVec * -1.4
-            state.ball.yVec = state.ball.yVec * 1.4
+          state.ball.xVec = state.ball.xVec * -1.4
+          state.ball.yVec = state.ball.yVec * 1.4
         }
-      } else  if ( state.ball.xPos <= 0 && state.ball.xVec < 0 ) {
-          state.ball.xVec = 1
-          state.ball.yVec = -1
-          state.score[1] += 1
-          if (state.score[1] >= 2) {
-            this.matchEnd(game)
-          }
-          state.ball.xPos = ballRadius + paddleWidth + 1
-          state.ball.yPos = state.players[0].player.pos
+      } else if (state.ball.xPos <= 0 && state.ball.xVec < 0) {
+        state.ball.xVec = 1
+        state.ball.yVec = -1
+        state.score[1] += 1
+        if (state.score[1] >= 2) {
+          this.matchEnd(game)
+        }
+        state.ball.xPos = ballRadius + paddleWidth + 1
+        state.ball.yPos = state.players[0].player.pos
       }
 
       // bounce paddle right player and check for point
-      if ( state.ball.xPos >= fieldWidth - paddleWidth && 
-              state.ball.yPos <= state.players[1].player.pos + paddleHeight/2 &&
-              state.ball.yPos >= state.players[1].player.pos - paddleHeight/2 ) {
-              state.ball.xPos = fieldWidth - paddleWidth - 1
+      if (
+        state.ball.xPos >= fieldWidth - paddleWidth &&
+        state.ball.yPos <= state.players[1].player.pos + paddleHeight / 2 &&
+        state.ball.yPos >= state.players[1].player.pos - paddleHeight / 2
+      ) {
+        state.ball.xPos = fieldWidth - paddleWidth - 1
 
-          if (state.ball.xVec > 0) {
-              state.ball.xVec = state.ball.xVec * -2
-          }
-      } else if ( state.ball.xPos >= fieldWidth && state.ball.xVec > 0 ) {
-          state.ball.xVec = -1
-          state.ball.yVec = -1
-          state.score[0] += 1
-          if (state.score[0] >= 2) {
-            this.matchEnd(game)
-          }
-          state.ball.xPos = fieldWidth - ballRadius - paddleWidth - 1
-          state.ball.yPos = state.players[1].player.pos
+        if (state.ball.xVec > 0) {
+          state.ball.xVec = state.ball.xVec * -2
+        }
+      } else if (state.ball.xPos >= fieldWidth && state.ball.xVec > 0) {
+        state.ball.xVec = -1
+        state.ball.yVec = -1
+        state.score[0] += 1
+        if (state.score[0] >= 2) {
+          this.matchEnd(game)
+        }
+        state.ball.xPos = fieldWidth - ballRadius - paddleWidth - 1
+        state.ball.yPos = state.players[1].player.pos
       }
 
       // bounce upper or lower wall
 
       if (state.ball.yPos - ballRadius <= 0) {
-          state.ball.yVec = state.ball.yVec * -1
+        state.ball.yVec = state.ball.yVec * -1
       }
 
       if (state.ball.yPos + ballRadius >= fieldHeight) {
-          state.ball.yVec = state.ball.yVec * -1
+        state.ball.yVec = state.ball.yVec * -1
       }
 
-
       // update ball position
-          state.ball.xPos += state.ball.xVec
-          state.ball.yPos += state.ball.yVec
+      state.ball.xPos += state.ball.xVec
+      state.ball.yPos += state.ball.yVec
 
       state.players[0].player.pos += state.players[0].player.vector
       if (state.players[0].player.pos <= 0 + paddleHeight / 2)
-          state.players[0].player.pos = 0 + paddleHeight / 2
+        state.players[0].player.pos = 0 + paddleHeight / 2
       if (state.players[0].player.pos >= fieldHeight - paddleHeight / 2)
-          state.players[0].player.pos = fieldHeight - paddleHeight / 2
+        state.players[0].player.pos = fieldHeight - paddleHeight / 2
 
       state.players[1].player.pos += state.players[1].player.vector
       if (state.players[1].player.pos <= 0 + paddleHeight / 2)
-          state.players[1].player.pos = 0 + paddleHeight / 2
+        state.players[1].player.pos = 0 + paddleHeight / 2
       if (state.players[1].player.pos >= fieldHeight - paddleHeight / 2)
-          state.players[1].player.pos = fieldHeight - paddleHeight / 2
+        state.players[1].player.pos = fieldHeight - paddleHeight / 2
 
       const update: GameUpdate = {
-          players: {
-            0: state.players[0].player,
-            1: state.players[1].player
-          },
-          ball: state.ball,
-          score: state.score as [number, number]
-      };
-      this.socketService.socket.to(this.socketService.getSocketId(state.players[0].id)).emit('game_update', update)
-      this.socketService.socket.to(this.socketService.getSocketId(state.players[1].id)).emit('game_update', update)
+        players: {
+          0: state.players[0].player,
+          1: state.players[1].player
+        },
+        ball: state.ball,
+        score: state.score as [number, number]
+      }
+      this.socketService.socket
+        .to(this.socketService.getSocketId(state.players[0].id))
+        .emit('game_update', update)
+      this.socketService.socket
+        .to(this.socketService.getSocketId(state.players[1].id))
+        .emit('game_update', update)
     })
   }
 
-  async create(data: Prisma.MatchCreateInput, playerToken?: string) {
+  async create(data: Prisma.MatchCreateInput) {
     const match = await this.prisma.match.create({
       data,
       include: { players: { include: { player: true } } }
@@ -246,14 +261,14 @@ export class MatchService {
     return match
   }
 
-  async playerConnected(connection: string, userId: number, gameid: number)  {
+  async playerConnected(connection: string, userId: number, gameid: number) {
     const match = this.matches.get(gameid)
     if (!match) {
-      console.log("Match not found")
+      console.log('Match not found')
       return undefined
     }
 
-    let other_player = ""
+    let other_player = ''
     if (match.players[0].id === userId) {
       match.players[0].connected = true
       other_player = this.socketService.getSocketId(match.players[1].id)
@@ -285,7 +300,7 @@ export class MatchService {
     if (!match) {
       return undefined
     }
-    
+
     switch (userId) {
       case match.players[0].id:
         match.players[0].player.vector = newVector

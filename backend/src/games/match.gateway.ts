@@ -21,9 +21,7 @@ import { GameUpdate } from 'common-types'
   transports: ['websocket', 'polling']
 })
 export class MatchGateway {
-  constructor(
-    private matchService: MatchService
-  ) {}
+  constructor(private matchService: MatchService) {}
 
   @WebSocketServer() public server: Server
 
@@ -31,29 +29,17 @@ export class MatchGateway {
 
   @SubscribeMessage('move_up')
   move_up(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
-    this.matchService.makeMove(
-      client.data.userId,
-      -3,
-      gameid[0]
-    )
+    this.matchService.makeMove(client.data.userId, -3, gameid[0])
   }
-  
+
   @SubscribeMessage('move_down')
   move_down(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
-    this.matchService.makeMove(
-      client.data.userId,
-      3,
-      gameid[0]
-    )
+    this.matchService.makeMove(client.data.userId, 3, gameid[0])
   }
-  
+
   @SubscribeMessage('stop')
   stop(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
-    this.matchService.makeMove(
-      client.data.userId,
-      0,
-      gameid[0]
-    )
+    this.matchService.makeMove(client.data.userId, 0, gameid[0])
   }
 
   @SubscribeMessage('player_connected')
