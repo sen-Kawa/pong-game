@@ -53,7 +53,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
         }
       } catch (error) {
         console.log(error)
-        this.server.emit('failed_con')
         client.disconnect()
       }
     }

@@ -35,7 +35,8 @@ describe('MatchItemItem', () => {
               email: 'chelmerd@example.com'
             }
           ]
-        }
+        },
+        joinGame: (id: number) =>{}
       }
     })
 
@@ -53,7 +54,8 @@ describe('MatchItemItem', () => {
         match: {
           id: 1,
           players: []
-        }
+        },
+        joinGame: (id: number) =>{}
       }
     })
 
@@ -80,7 +82,8 @@ describe('MatchItemItem', () => {
               email: 'marty@example.com'
             }
           ]
-        }
+        },
+        joinGame: (id: number) =>{}
       }
     })
 
@@ -121,7 +124,8 @@ describe('MatchItemItem', () => {
               email: 'chelmerd@example.com'
             }
           ]
-        }
+        },
+        joinGame: (id: number) =>{}
       }
     })
 

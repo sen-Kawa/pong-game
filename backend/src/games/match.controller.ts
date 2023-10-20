@@ -79,13 +79,11 @@ export class MatchController {
    */
   @Post('me')
   async createMatchForCurrentUser(@Req() request, @Session() session: Record<string, any>) {
-    const match = await this.matchService.create(
-      {
-        players: {
-          create: { playerId: request.user.id }
-        }
+    const match = await this.matchService.create({
+      players: {
+        create: { playerId: request.user.id }
       }
-    )
+    })
 
     session.current_match = match.id
 
