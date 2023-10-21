@@ -205,7 +205,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file', multerOptions))
   async uploadedFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
     if (!file) throw new HttpException('missing file', HttpStatus.BAD_REQUEST)
-    await this.usersService.updateAvatar(req.user.id, file.filename)
+    if (req.user.avatarId == 1) await this.usersService.updateAvatar(req.user.id, file.filename)
+    else await this.usersService.updateAvatarFile(req.user.avatarId, file.filename)
   }
 
   //TODO checks for failure in database request

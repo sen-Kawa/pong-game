@@ -3,25 +3,40 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
-
-interface Player {
-  pos: number
-  vector: number
-  player_token: string
-  id: number
-}
-
-export interface GameUpdate {
-  player: Player
-  gameid: number
-}
+import {
+  Player,
+  GameUpdate,
+  paddleHeight,
+  paddleWidth,
+  ballRadius,
+  fieldHeight,
+  fieldWidth
+} from 'common-types'
+import { SocketService } from 'src/socket/socket.service'
 
 interface Game {
   players: {
-    0: Player
-    1: Player
+    0: {
+      player: Player
+      id: number
+      connected: boolean
+    }
+    1: {
+      player: Player
+      id: number
+      connected: boolean
+    }
   }
+  ball: {
+    xPos: number
+    yPos: number
+    xVec: number
+    yVec: number
+  }
+  score: [number, number]
+  started: boolean
   gameid: number
+  last_modified: Date
 }
 
 const matchWithScore = Prisma.validator<Prisma.MatchArgs>()({
@@ -43,25 +58,164 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
 
 @Injectable()
 export class MatchService {
-  constructor(private prisma: PrismaService) {
-    this.matches = {}
+  constructor(
+    private prisma: PrismaService,
+    private socketService: SocketService
+  ) {
+    this.matches = new Map<number, Game>()
+    setInterval(() => {
+      const remove: number[] = []
+      this.matches.forEach((game, key) => {
+        const diff = Date.now() - game.last_modified.getTime()
+        if (diff > 1000 * 60 * 2) {
+          remove.push(key)
+        }
+      })
+      remove.map((key) => {
+        this.matches.delete(key)
+      })
+    }, 1000 * 60)
+    setInterval(() => {
+      this.gameTick()
+    }, 1000 / 60)
   }
 
-  matches: { [id: number]: Game }
+  matches: Map<number, Game>
 
-  join(matchId: number, playerId: number, player_token: string) {
-    const match = this.matches[matchId]
-    if (playerId == match.players[0].id) {
-      const session_id = player_token
-      match.players[0].player_token = session_id
-      return 0
-    } else if (playerId == match.players[1].id) {
-      const session_id = player_token
-      match.players[1].player_token = session_id
-      return 1
+  async join(matchId: number, playerId: number) {
+    const match = this.matches.get(matchId)
+    // const match = this.matches[matchId]
+    if (match === undefined) {
+      console.log('Match is undefined')
+      return undefined
     }
 
-    return undefined
+    if (playerId == match.players[1].id || match.players[1].id === undefined) {
+      match.players[1].id = playerId
+      await this.addPlayer(matchId, playerId)
+    }
+
+    const db_match = await this.findOne(matchId, {
+      includePlayers: true,
+      includeScores: true
+    })
+
+    return db_match
+  }
+
+  private async matchEnd(game: Game) {
+    await this.addMatchResult(game.gameid, [
+      {
+        playerId: game.players[0].id,
+        score: game.score[0]
+      },
+      {
+        playerId: game.players[1].id,
+        score: game.score[1]
+      }
+    ])
+    this.socketService.socket
+      .to(this.socketService.getSocketId(game.players[0].id))
+      .emit('match_end')
+    this.socketService.socket
+      .to(this.socketService.getSocketId(game.players[1].id))
+      .emit('match_end')
+    this.matches.delete(game.gameid)
+  }
+
+  gameTick() {
+    this.matches.forEach(async (game) => {
+      if (!game.started) {
+        return
+      }
+      const state = game
+
+      // bounce paddle left player and check for point
+      if (
+        state.ball.xPos <= 0 + paddleWidth &&
+        state.ball.yPos <= state.players[0].player.pos + paddleHeight / 2 &&
+        state.ball.yPos >= state.players[0].player.pos - paddleHeight / 2
+      ) {
+        state.ball.xPos = 0 + paddleWidth + 1
+
+        if (state.ball.xVec < 0) {
+          state.ball.xVec = state.ball.xVec * -1.4
+          state.ball.yVec = state.ball.yVec * 1.4
+        }
+      } else if (state.ball.xPos <= 0 && state.ball.xVec < 0) {
+        state.ball.xVec = 1
+        state.ball.yVec = -1
+        state.score[1] += 1
+        if (state.score[1] >= 2) {
+          this.matchEnd(game)
+        }
+        state.ball.xPos = ballRadius + paddleWidth + 1
+        state.ball.yPos = state.players[0].player.pos
+      }
+
+      // bounce paddle right player and check for point
+      if (
+        state.ball.xPos >= fieldWidth - paddleWidth &&
+        state.ball.yPos <= state.players[1].player.pos + paddleHeight / 2 &&
+        state.ball.yPos >= state.players[1].player.pos - paddleHeight / 2
+      ) {
+        state.ball.xPos = fieldWidth - paddleWidth - 1
+
+        if (state.ball.xVec > 0) {
+          state.ball.xVec = state.ball.xVec * -2
+        }
+      } else if (state.ball.xPos >= fieldWidth && state.ball.xVec > 0) {
+        state.ball.xVec = -1
+        state.ball.yVec = -1
+        state.score[0] += 1
+        if (state.score[0] >= 2) {
+          this.matchEnd(game)
+        }
+        state.ball.xPos = fieldWidth - ballRadius - paddleWidth - 1
+        state.ball.yPos = state.players[1].player.pos
+      }
+
+      // bounce upper or lower wall
+
+      if (state.ball.yPos - ballRadius <= 0) {
+        state.ball.yVec = state.ball.yVec * -1
+      }
+
+      if (state.ball.yPos + ballRadius >= fieldHeight) {
+        state.ball.yVec = state.ball.yVec * -1
+      }
+
+      // update ball position
+      state.ball.xPos += state.ball.xVec
+      state.ball.yPos += state.ball.yVec
+
+      state.players[0].player.pos += state.players[0].player.vector
+      if (state.players[0].player.pos <= 0 + paddleHeight / 2)
+        state.players[0].player.pos = 0 + paddleHeight / 2
+      if (state.players[0].player.pos >= fieldHeight - paddleHeight / 2)
+        state.players[0].player.pos = fieldHeight - paddleHeight / 2
+
+      state.players[1].player.pos += state.players[1].player.vector
+      if (state.players[1].player.pos <= 0 + paddleHeight / 2)
+        state.players[1].player.pos = 0 + paddleHeight / 2
+      if (state.players[1].player.pos >= fieldHeight - paddleHeight / 2)
+        state.players[1].player.pos = fieldHeight - paddleHeight / 2
+
+      const update: GameUpdate = {
+        players: {
+          0: state.players[0].player,
+          1: state.players[1].player
+        },
+        ball: state.ball,
+        score: state.score as [number, number]
+      }
+      this.socketService.socket
+        .to(this.socketService.getSocketId(state.players[0].id))
+        .emit('game_update', update)
+      this.socketService.socket
+        .to(this.socketService.getSocketId(state.players[1].id))
+        .emit('game_update', update)
+    })
   }
 
   async create(data: Prisma.MatchCreateInput) {
@@ -71,68 +225,92 @@ export class MatchService {
     })
     const players = match.players
 
-    const playerTwoId = match.players.length == 2 ? players[1].playerId : 0
+    const playerTwoId = match.players.length == 2 ? players[1].playerId : undefined
 
-    this.matches[match.id] = {
+    this.matches.set(match.id, {
       players: [
         {
-          pos: 0,
-          vector: 0,
+          player: {
+            pos: 0,
+            vector: 0
+          },
           id: players[0].playerId,
-          player_token: ''
+          connected: false
         },
         {
-          pos: 0,
-          vector: 0,
+          player: {
+            pos: 0,
+            vector: 0
+          },
           id: playerTwoId,
-          player_token: ''
+          connected: false
         }
       ],
-      gameid: match.id
-    }
+      ball: {
+        xPos: 100,
+        yPos: 100,
+        xVec: 1.5,
+        yVec: -1.5
+      },
+      score: [0, 0],
+      started: false,
+      gameid: match.id,
+      last_modified: new Date()
+    })
 
     return match
   }
 
-  buildResponseMatch(match: Game) {
-    const player0 = match.players[0]
-    const player1 = match.players[1]
+  async playerConnected(connection: string, userId: number, gameid: number) {
+    const match = this.matches.get(gameid)
+    if (!match) {
+      console.log('Match not found')
+      return undefined
+    }
 
-    return {
-      players: {
-        0: {
-          pos: player0.pos,
-          vector: player0.vector
+    let other_player = ''
+    if (match.players[0].id === userId) {
+      match.players[0].connected = true
+      other_player = this.socketService.getSocketId(match.players[1].id)
+      match.last_modified = new Date()
+    } else if (match.players[1].id === userId) {
+      match.players[1].connected = true
+      other_player = this.socketService.getSocketId(match.players[0].id)
+      match.last_modified = new Date()
+    }
+
+    if (match.players[0].connected && match.players[1].connected) {
+      const update: GameUpdate = {
+        players: {
+          0: match.players[0].player,
+          1: match.players[1].player
         },
-        1: {
-          pos: player1.pos,
-          vector: player1.vector
-        }
-      },
-      gameid: match.gameid
+        ball: match.ball,
+        score: match.score as [number, number]
+      }
+      await this.start(gameid)
+      this.socketService.socket.to(connection).emit('start_game', update)
+      this.socketService.socket.to(other_player).emit('start_game', update)
+      match.started = true
     }
   }
 
-  makeMove(
-    update: { player: { pos: number; vector: number }; gameid: number },
-    player_token: string
-  ) {
-    console.log('update in make move:', update)
-    const match = this.matches[update.gameid]
-    console.log('Match in make move:', match, 'Match id is:', update.gameid)
+  makeMove(userId: number, newVector: number, gameid: number) {
+    const match = this.matches.get(gameid)
     if (!match) {
       return undefined
     }
 
-    if (match.players[0].player_token === player_token) {
-      match.players[0].pos = update.player.pos
-      match.players[0].vector = update.player.vector
-    } else if (match.players[1].player_token === player_token) {
-      match.players[1].pos = update.player.pos
-      match.players[1].vector = update.player.vector
+    switch (userId) {
+      case match.players[0].id:
+        match.players[0].player.vector = newVector
+        match.last_modified = new Date()
+        break
+      case match.players[1].id:
+        match.players[1].player.vector = newVector
+        match.last_modified = new Date()
+        break
     }
-
-    return this.buildResponseMatch(match)
   }
 
   /**

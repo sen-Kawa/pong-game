@@ -67,10 +67,9 @@ export class MatchController {
   }
 
   @Post('join')
-  joinMatch(@Req() request: any, @Session() session: Record<string, any>) {
-    const match_id = session.current_match
-
-    return this.matchService.join(match_id, request.user.id, request.user.refreshToken)
+  joinMatch(@Req() request: any) {
+    console.log('Join: ', request['body'].matchId)
+    return this.matchService.join(request['body'].matchId, request.user.id)
   }
 
   /**

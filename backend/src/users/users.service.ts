@@ -180,7 +180,7 @@ export class UsersService {
       try {
         avatar = await this.prisma.userAvatar.create({
           data: {
-            filename: profile.username + '.jpg'
+            filename: profile.username
           }
         })
       } catch (error) {
@@ -223,6 +223,21 @@ export class UsersService {
       })
     } catch (error) {
       throw new InternalServerErrorException('updateAvatar')
+    }
+  }
+
+  async updateAvatarFile(id: number, fileName: string) {
+    try {
+      await this.prisma.userAvatar.update({
+        where: {
+          id: id
+        },
+        data: {
+          filename: fileName
+        }
+      })
+    } catch (error) {
+      throw new InternalServerErrorException('updateAvatarFile')
     }
   }
 

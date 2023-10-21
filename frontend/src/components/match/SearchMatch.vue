@@ -24,7 +24,7 @@
     </div>
   </div>
   <LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
-    <MatchList :matches="pagedMatches" />
+    <MatchList :join-game="joinGame" :matches="pagedMatches" />
   </LoadingIndicator>
   <div>
     <button @click="prevPage()" class="button-link">Previous Page</button>
@@ -37,10 +37,17 @@
 <script setup lang="ts">
 // import useSearch from './useSearch'
 import { useMatchStore } from '@/stores/match'
-import { watchEffect } from 'vue'
+import { watchEffect, type PropType } from 'vue'
 import DropDown from './DropDown.vue'
 import LoadingIndicator from './LoadingIndicator.vue'
 import MatchList from './MatchList.vue'
+
+defineProps({
+    joinGame: {
+        type: Function as PropType<(id: number) => void>,
+        required: true
+    }
+})
 
 const matchStore = useMatchStore()
 

@@ -425,6 +425,8 @@ describe('Test for diffrent routes', () => {
     // [POST] /users/upload tests
     //TODO more test, mock interceptor?
     it('[POST] /users/upload uploading a to big file should return an error', async () => {
+      const mockUser = { id: 1, userName: 'testUser' }
+      prisma.user.findUnique.mockResolvedValue(mockUser as any)
       const { status, body } = await request(app.getHttpServer())
         .post('/users/upload')
         .attach('file', __dirname + '/files/tobigfile.jpg')

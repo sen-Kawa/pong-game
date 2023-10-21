@@ -35,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
   const getDisplayName = computed(() => userProfile.value.displayName)
   const getName = computed(() => userProfile.value.name)
   const getEmail = computed(() => userProfile.value.email)
+  const getId = computed(() => userProfile.value.id)
 
   const setLoginStatus = (newStatus: boolean) => {
     loginStatus.value = newStatus
@@ -85,9 +86,8 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
-  
+
   async function getuserProfile() {
-    
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
     })
@@ -158,7 +158,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   async function setDisplayName2(displayName: string, returnRoute: string) {
     const body = { displayName: displayName }
-    console.log("disp2", body)
+    console.log('disp2', body)
     try {
       const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
         headers: {
@@ -179,11 +179,29 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
-
+  async function login(username: string) {
+    console.log(username)
+    const body = { userid: username }
+    try {
+      await axios.post(baseUrlauth + 'login', body, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      })
+      loginStatus.value = true
+      router.push('/leader')
+    } catch (error: any) {
+      //TODO improve error handling
+      console.log(error)
+      //return error.response.data.message;
+    }
+  }
   return {
     getUserName,
     getName,
     getEmail,
+    getId,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,
@@ -195,6 +213,7 @@ export const useAuthStore = defineStore('auth', () => {
     setLoginStatus,
     setDisplayName,
     setDisplayName2,
-    getDisplayName
+    getDisplayName,
+    login
   }
 })

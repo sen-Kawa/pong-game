@@ -30,6 +30,7 @@ export const useMatchStore = defineStore('match', () => {
   const pageSize = ref(5)
   const loading = ref(false)
   const error = ref('')
+  const player_number = ref(0)
 
   const filters = ref<Filter>({
     gameStatus: GameStatus.CREATED,
@@ -78,12 +79,54 @@ export const useMatchStore = defineStore('match', () => {
       const newMatch = transformMatchDTO(response.data)
       matches.value.push(newMatch)
       currentMatch.value = newMatch
+      player_number.value = 0
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown Error'
       error.value = message
       console.error('Failed to create match for current player', e)
       throw error
     }
+  }
+
+  async function joinMatch(id: number) {
+    console.log("joinMatch called:", id)
+    const requestPath = baseUrlMatch + '/join'
+    // console.log("Join cM 1: ", currentMatch.value)
+
+
+    if (currentMatch.value) {
+        const message = 'already in game'
+        error.value = message
+        throw new Error(message)
+    }
+    try {
+        console.log("TryBlock1")
+
+        loading.value = true
+        const response = await jwtInterceptor.post(
+            requestPath,
+            { matchId: id },  // match id was not transferred correctly before
+            { withCredentials: true }
+        )
+        console.log("TryBlock2")
+        error.value = ''
+        loading.value = false
+        console.log("TryBlock3")
+        if (response.status != 201) {
+          throw new Error(response.statusText)
+        }
+        console.log("TryBlock4")
+        const newMatch = transformMatchDTO(response.data as MatchDTO)
+        console.log("TryBlock5", response)
+        currentMatch.value = newMatch
+        player_number.value = 1
+    } catch (e) {
+        const message = e instanceof Error ? e.message : 'Unknown Error'
+        error.value = message
+        console.error('Failed to join match ' + id, e)
+        throw error
+    }
+
   }
 
   async function getMatches(path?: string) {
@@ -187,7 +230,9 @@ export const useMatchStore = defineStore('match', () => {
     loading,
     error,
     filters,
+    player_number,
     clearFilters,
+    joinMatch,
     matchCount,
     pagination,
     gameStates,

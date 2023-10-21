@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
 import { UserEntity } from '../users/entities/user.entity'
@@ -130,6 +130,18 @@ export class AuthService {
       })
     } catch (error) {
       throw new InternalServerErrorException('resetRefreshToken')
+    }
+  }
+
+  //TODO test
+  async verifyJwt(jwt: string) {
+    try {
+      const validToken = await this.jwtService.verifyAsync(jwt, { secret: process.env.JWTSECRET })
+      if (!validToken) throw new UnauthorizedException()
+      return validToken
+    } catch (error) {
+      //console.log(error)
+      // throw new InternalServerErrorException('verifyJwt')
     }
   }
 }

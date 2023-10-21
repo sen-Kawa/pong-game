@@ -7,6 +7,7 @@ WORKDIR /app
 
 
 COPY ./backend .
+COPY ./common ../common
 
 
 
