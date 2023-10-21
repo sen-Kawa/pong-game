@@ -71,10 +71,11 @@ export class MatchService {
     this.matches = new Map<number, Game>()
     setInterval(() => {
       const remove: number[] = []
-      this.matches.forEach((game, key) => {
+      this.matches.forEach(async (game, key) => {
         const diff = Date.now() - game.last_modified.getTime()
         if (diff > 1000 * 60 * 2) {
           remove.push(key)
+          await this.matchEnd(game)
         }
       })
       remove.map((key) => {
@@ -88,6 +89,17 @@ export class MatchService {
 
   matches: Map<number, Game>
 
+  isInMatch(userId: number) {
+    let matchId = undefined
+    for (let [id, match] of this.matches) {
+      if (userId === match.players[0].id || userId === match.players[1].id) {
+        matchId = id
+        break
+      }
+    }
+    return matchId
+  }
+
   async join(matchId: number, playerId: number) {
     const match = this.matches.get(matchId)
     // const match = this.matches[matchId]
@@ -96,7 +108,7 @@ export class MatchService {
       return undefined
     }
 
-    if (playerId == match.players[1].id || match.players[1].id === undefined) {
+    if (match.players[1].id === undefined) {
       match.players[1].id = playerId
       await this.addPlayer(matchId, playerId)
     }

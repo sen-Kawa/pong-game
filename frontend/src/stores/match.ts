@@ -219,6 +219,29 @@ export const useMatchStore = defineStore('match', () => {
     }
   }
 
+  async function fetchCurrentMatch() {
+    const requestPath = baseUrlMatch + '/current'
+
+    try {
+      loading.value = true
+      const response = await jwtInterceptor.get(requestPath, {
+        withCredentials: true
+      })
+      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
+      error.value = ''
+      loading.value = false
+      if (response.status >= 200 && response.status < 300) {
+        if (response.data) {
+          joinMatch(response.data)
+        }
+      } else throw new Error(response.statusText)
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown Error'
+      error.value = message
+      console.error('Error fetching current match data from the backend:', e)
+    }
+  }
+
   function removeCurrentMatch() {
     currentMatch.value = undefined
   }
@@ -241,6 +264,7 @@ export const useMatchStore = defineStore('match', () => {
     getMatchHistory,
     getMatchesToJoin,
     getMatchesToSpectate,
-    removeCurrentMatch
+    removeCurrentMatch,
+    fetchCurrentMatch
   }
 })

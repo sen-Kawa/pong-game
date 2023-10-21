@@ -17,6 +17,10 @@ const matchStore = useMatchStore()
 matchStore.init()
 matchStore.pagination.pageSize.value = 10
 
+setTimeout(async () => {
+ await matchStore.fetchCurrentMatch()
+})
+
 onMounted(async () => {
   // TODO: only await once
   await matchStore.getMatchesToJoin()

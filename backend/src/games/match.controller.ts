@@ -72,6 +72,11 @@ export class MatchController {
     return this.matchService.join(request['body'].matchId, request.user.id)
   }
 
+  @Get('current')
+  currentMatch(@Req() request: any) {
+    return this.matchService.isInMatch(request.user.id)
+  }
+
   /**
    * Creates a new match with the current user already in it.
    * @param request contains the user that send the request.
