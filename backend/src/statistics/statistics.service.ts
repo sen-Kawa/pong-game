@@ -53,7 +53,6 @@ export class StatisticsService {
 
   async ladderPosition(displayName: string) {
     const leaderboard = await this.generateLeaderboard()
-    console.log(displayName)
     for (const item of leaderboard) {
       if (item.displayName == displayName) return item.rank
     }

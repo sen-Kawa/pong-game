@@ -31,6 +31,6 @@ export class StatisticsController {
   @Get('leaderboard')
   @UseGuards(JwtAuthGuard)
   async getLeaderboard(): Promise<any> {
-    return await this.statisticsService.generateLeaderboard()
+    return (await this.statisticsService.generateLeaderboard()).slice(0, 10)
   }
 }

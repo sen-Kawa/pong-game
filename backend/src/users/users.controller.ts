@@ -274,10 +274,10 @@ export class UsersController {
   /**
    * test route for updating users on win/losses
    */
-  @UseGuards(JwtAuthGuard)
-  @Post('/updateWinLosses')
-  async updateWinLosses(@Body() test: any) {
-    console.log(test)
-    this.usersService.updateWinLosses(test.winner, test.loser)
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Post('/updateWinLosses')
+  // async updateWinLosses(@Body() test: any) {
+  //   console.log(test)
+  //   this.usersService.updateWinLosses(test.winner, test.loser)
+  // }
 }
