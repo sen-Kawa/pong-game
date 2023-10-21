@@ -18,7 +18,7 @@
     },
     joinGame: {
         type: Function as PropType<(id: number) => void>,
-        required: true
+        required: false
     }
     })
 </script>
