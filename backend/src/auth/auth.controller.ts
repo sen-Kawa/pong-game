@@ -269,7 +269,8 @@ export class AuthController {
       throw new UnauthorizedException('No Valid RefreshToken')
     }
   }
-  //  TODO fake login route for testing
+
+  //TODO fake login route for testing
   // comment out if needed
   @Post('login')
   async login(
@@ -289,7 +290,7 @@ export class AuthController {
     })
     await this.authService.updateRefreshToken(+userId, jwtRefreshToken)
     return {
-      userId: +userId,
+      userId: userId,
       twoFaEnabled: false
     }
   }

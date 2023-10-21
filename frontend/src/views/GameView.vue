@@ -1,8 +1,13 @@
 <template>
   <div class="component-title">Game</div>
-  <button @click="createNewGame">New Game</button>
+  <button v-if="!matchStore.currentMatch" @click="createNewGame">New Game</button>
   <button @click="joinQueue">Join Queue</button>
-  <SearchMatch />
+  <GameComponent
+    v-if="matchStore.currentMatch"
+    :match="matchStore.currentMatch"
+    :player_number="matchStore.player_number"
+  />
+  <SearchMatch :join-game="matchStore.joinMatch" v-else />
 </template>
 
 <script setup lang="ts">
@@ -12,6 +17,7 @@ import { socket } from '@/sockets/sockets'
 import { useAuthStore } from '@/stores/auth'
 import { useMatchStore } from '@/stores/match'
 import { onMounted } from 'vue'
+import GameComponent from '../components/match/GameComponent.vue'
 
 const matchStore = useMatchStore()
 const authStore = useAuthStore()
@@ -23,6 +29,10 @@ onMounted(async () => {
   // TODO: only await once
   await matchStore.getMatchesToJoin()
   await matchStore.getMatchesToSpectate()
+})
+
+socket.on('match_end', async () => {
+  matchStore.removeCurrentMatch()
 })
 
 async function createNewGame() {

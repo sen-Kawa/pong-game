@@ -35,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
   const getDisplayName = computed(() => userProfile.value.displayName)
   const getName = computed(() => userProfile.value.name)
   const getEmail = computed(() => userProfile.value.email)
+  const getId = computed(() => userProfile.value.id)
 
   const setLoginStatus = (newStatus: boolean) => {
     loginStatus.value = newStatus
@@ -178,20 +179,16 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
-
-  //TODO fake login for chat testing
   async function login(username: string) {
     console.log(username)
     const body = { userid: username }
     try {
-      const response = await axios.post(baseUrlauth + 'login', body, {
+      await axios.post(baseUrlauth + 'login', body, {
         headers: {
           'Content-Type': 'application/json'
         },
         withCredentials: true
       })
-      console.debug({ response })
-      userProfile.value.id = response.data.userId
       loginStatus.value = true
       router.push('/leader')
     } catch (error: any) {
@@ -200,12 +197,12 @@ export const useAuthStore = defineStore('auth', () => {
       //return error.response.data.message;
     }
   }
-
   return {
     getUserId,
     getUserName,
     getName,
     getEmail,
+    getId,
     activated2FA,
     isLoggedIn,
     signInFortyTwo,
