@@ -14,6 +14,12 @@ import {
 } from 'common-types'
 import { SocketService } from 'src/socket/socket.service'
 
+enum GameState {
+  Created,
+  Running,
+  Paused
+}
+
 interface Game {
   players: {
     0: {
@@ -34,7 +40,7 @@ interface Game {
     yVec: number
   }
   score: [number, number]
-  started: boolean
+  state: GameState
   gameid: number
   last_modified: Date
 }
@@ -125,9 +131,27 @@ export class MatchService {
 
   gameTick() {
     this.matches.forEach(async (game) => {
-      if (!game.started) {
+      if (game.state == GameState.Created) {
         return
       }
+
+      const playerOne = this.socketService.getSocketId(game.players[0].id)
+      const playerTwo = this.socketService.getSocketId(game.players[1].id)
+      if (!playerOne || !playerTwo) {
+        const update: GameUpdate = {
+          players: {
+            0: game.players[0].player,
+            1: game.players[1].player
+          },
+          ball: game.ball,
+          score: game.score as [number, number],
+          paused: true
+        }
+        this.socketService.socket.to(playerOne).emit('game_update', update)
+        this.socketService.socket.to(playerTwo).emit('game_update', update)
+        return
+      }
+
       const state = game
 
       // bounce paddle left player and check for point
@@ -207,13 +231,15 @@ export class MatchService {
           1: state.players[1].player
         },
         ball: state.ball,
-        score: state.score as [number, number]
+        score: state.score as [number, number],
+        paused: false
       }
+
       this.socketService.socket
-        .to(this.socketService.getSocketId(state.players[0].id))
+        .to(playerOne)
         .emit('game_update', update)
       this.socketService.socket
-        .to(this.socketService.getSocketId(state.players[1].id))
+        .to(playerTwo)
         .emit('game_update', update)
     })
   }
@@ -253,7 +279,7 @@ export class MatchService {
         yVec: -1.5
       },
       score: [0, 0],
-      started: false,
+      state: GameState.Created,
       gameid: match.id,
       last_modified: new Date()
     })
@@ -286,12 +312,13 @@ export class MatchService {
           1: match.players[1].player
         },
         ball: match.ball,
-        score: match.score as [number, number]
+        score: match.score as [number, number],
+        paused: false
       }
       await this.start(gameid)
       this.socketService.socket.to(connection).emit('start_game', update)
       this.socketService.socket.to(other_player).emit('start_game', update)
-      match.started = true
+      match.state = GameState.Running
     }
   }
 

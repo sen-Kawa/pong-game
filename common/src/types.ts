@@ -21,5 +21,6 @@ export interface GameUpdate {
             xVec: number
             yVec: number
     }
-    score: [number, number]
+    score: [number, number],
+    paused: boolean
 }

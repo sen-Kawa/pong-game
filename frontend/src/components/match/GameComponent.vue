@@ -2,6 +2,7 @@
     <h2>No. {{ match.id }}</h2>
     <br>
 	<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: black; border: 1px solid grey;"></canvas>
+    <h1 style="color: red;" v-if="game_state.game.paused">Game is paused</h1>
     <h3>{{ playerInfo }}</h3>
 </template>
 
@@ -42,7 +43,8 @@
                     xVec: 1.5,
                     yVec: -1.5
             },
-            score: [0, 0]
+            score: [0, 0],
+            paused: false,
         }
     });
 

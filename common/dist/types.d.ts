@@ -20,4 +20,5 @@ export interface GameUpdate {
         yVec: number;
     };
     score: [number, number];
+    paused: boolean;
 }
