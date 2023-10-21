@@ -13,7 +13,6 @@ import {
   Post,
   Query,
   Req,
-  Session,
   UseGuards
 } from '@nestjs/common'
 import {
@@ -83,14 +82,12 @@ export class MatchController {
    * @returns a detailed representation of the created match.
    */
   @Post('me')
-  async createMatchForCurrentUser(@Req() request, @Session() session: Record<string, any>) {
+  async createMatchForCurrentUser(@Req() request) {
     const match = await this.matchService.create({
       players: {
         create: { playerId: request.user.id }
       }
     })
-
-    session.current_match = match.id
 
     return match
   }
