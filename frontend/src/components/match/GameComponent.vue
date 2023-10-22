@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
     import { socket } from '@/sockets/sockets';
-    import { ref, onUnmounted } from 'vue';
+    import { ref, onUnmounted, onMounted } from 'vue';
     import { type GameUpdate } from 'common-types'
 
     let keyUp: string = 'w'
@@ -72,9 +72,17 @@
         clearInterval(interval);
     })
 
-    function moveUp() { 
-        console.log("move up:", props.match.id)
-        socket.emit("move_up", props.match.id) }
+    // FIXME: find out why connect and reconnect events are not fired
+    socket.on("reconnect", () => {
+        console.log("Reconnected")
+        socket.emit("player_connected", props.match.id)
+    })
+
+    socket.on("connect", () => {
+        console.log("Connected")
+    })
+
+    function moveUp() { socket.emit("move_up", props.match.id) }
 
     function moveDown() { socket.emit("move_down", props.match.id) }
 
@@ -170,7 +178,9 @@
         drawBall(state.ball.xPos, state.ball.yPos, ctx)
     }
 
-    gameInit()
+    onMounted(() => {
+        gameInit()
+    })
 </script>
 
 

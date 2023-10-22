@@ -149,7 +149,7 @@ export class MatchService {
 
       const playerOne = this.socketService.getSocketId(game.players[0].id)
       const playerTwo = this.socketService.getSocketId(game.players[1].id)
-      if (!playerOne || !playerTwo) {
+      if (!playerOne || !playerTwo || game.state == GameState.Paused) {
         const update: GameUpdate = {
           players: {
             0: game.players[0].player,
@@ -159,6 +159,7 @@ export class MatchService {
           score: game.score as [number, number],
           paused: true
         }
+        game.state = GameState.Paused
         this.socketService.socket.to(playerOne).emit('game_update', update)
         this.socketService.socket.to(playerTwo).emit('game_update', update)
         return
@@ -182,7 +183,7 @@ export class MatchService {
         state.ball.xVec = 1
         state.ball.yVec = -1
         state.score[1] += 1
-        if (state.score[1] >= 2) {
+        if (state.score[1] >= 11) {
           this.matchEnd(game)
         }
         state.ball.xPos = ballRadius + paddleWidth + 1
@@ -204,7 +205,7 @@ export class MatchService {
         state.ball.xVec = -1
         state.ball.yVec = -1
         state.score[0] += 1
-        if (state.score[0] >= 2) {
+        if (state.score[0] >= 11) {
           this.matchEnd(game)
         }
         state.ball.xPos = fieldWidth - ballRadius - paddleWidth - 1
@@ -327,7 +328,11 @@ export class MatchService {
         score: match.score as [number, number],
         paused: false
       }
+      
+      if (match.state == GameState.Created) {
       await this.start(gameid)
+      }
+
       this.socketService.socket.to(connection).emit('start_game', update)
       this.socketService.socket.to(other_player).emit('start_game', update)
       match.state = GameState.Running
@@ -477,7 +482,7 @@ export class MatchService {
     await this.prisma.match.update({
       where: { id: matchId },
       data: {
-        start: new Date(Date.now())
+        start: new Date()
       }
     })
   }
