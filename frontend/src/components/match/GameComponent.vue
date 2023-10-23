@@ -1,5 +1,5 @@
 <template>
-    <h2>No. {{ match.id }}</h2>
+    <h2>No. {{ match.id }}: {{leftPlayerName}} ./. {{rightPlayerName}}</h2>
     <br>
 	<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: black; border: 1px solid grey;"></canvas>
     <h1 style="color: red;" v-if="game_state.game.paused">Game is paused</h1>
@@ -11,6 +11,7 @@
     import { socket } from '@/sockets/sockets';
     import { ref, onUnmounted, onMounted } from 'vue';
     import { type GameUpdate } from 'common-types'
+    import { useAuthStore } from '../../stores/auth.js'
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
@@ -22,6 +23,10 @@
     const ballRadius = 8
     const fieldWidth = 600
     const fieldHeight = 450
+
+    const authStore = useAuthStore()
+    const leftPlayerName = ref('leftPlayer')
+    const rightPlayerName = ref('rightPlayer')
 
     let interval: any
     const props = defineProps(['match', 'player_number']);
@@ -144,6 +149,12 @@
         if (props.player_number === 1) {
             playerInfo.value = 'Control your player with [p] for up and [l] for down.'
             setKeysRightSide()
+        }
+        // set player names
+        if (props.player_number === 1) {
+            rightPlayerName.value = authStore.getName
+        } else {
+            leftPlayerName.value = authStore.getName
         }
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
