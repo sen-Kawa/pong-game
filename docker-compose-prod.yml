@@ -58,7 +58,6 @@ services:
     container_name: nginx
     restart: always
     ports:
-      - 80:80
       - 443:443
     networks:
       - transcendence
@@ -70,11 +69,13 @@ services:
   certbot:
     image: certbot/certbot
     container_name: certbot
+    ports:
+      - 80:80
     restart: no
     volumes:
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-    entrypoint: certbot certonly -n --agree-tos --webroot --webroot-path /var/www/certbot/ -d pong.freddow.de
+    entrypoint: certbot certonly -n --standalone --agree-tos --email f.henrichs@web.de -d pong.freddow.de
 
   adminer:
     image: adminer
