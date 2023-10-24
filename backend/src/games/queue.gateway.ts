@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common'
 import {
   ConnectedSocket,
-  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer
@@ -9,6 +8,7 @@ import {
 import { Server } from 'http'
 import { MatchService } from './match.service'
 import { QueueService } from './queue.service'
+import { SocketService } from 'src/socket/socket.service'
 
 @WebSocketGateway({
   cors: {
@@ -20,7 +20,8 @@ import { QueueService } from './queue.service'
 export class QueueGateway {
   constructor(
     private queueService: QueueService,
-    private matchService: MatchService
+    private matchService: MatchService,
+    private socketService: SocketService
   ) {}
 
   @WebSocketServer() private server: Server
@@ -31,7 +32,7 @@ export class QueueGateway {
     const userId = client.data.userId
     this.queueService.addPlayer(userId)
     this.logger.log(`User ${userId} joined the queue`)
-    this.server.emit('player_joined', userId)
+    //this.server.emit('player_joined', userId)
     this.logger.debug(this.queueService.queue)
 
     if (this.queueService.queue.length > 1) {
@@ -44,7 +45,7 @@ export class QueueGateway {
     const userId = client.data.userId
     this.queueService.removePlayer(userId)
     this.logger.log(`User ${userId} left the queue`)
-    this.server.emit('player_left', userId)
+    //this.server.emit('player_left', userId)
     this.logger.debug(this.queueService.queue)
   }
 
@@ -59,8 +60,10 @@ export class QueueGateway {
         }
       })
       console.log(`created new match ${match.id} for players ${player1} and ${player2}`)
-
-      this.server.emit('newGame', match.id)
+      const playerOne = this.socketService.getSocketId(player1)
+      const playerTwo = this.socketService.getSocketId(player2)
+      this.socketService.socket.to(playerOne).emit('newGame', match.id)
+      this.socketService.socket.to(playerTwo).emit('newGame', match.id)
     } catch (error) {
       console.error(error)
     }

@@ -156,7 +156,7 @@ export class UsersService {
 
   //TODO fail on download handle / and tests?
   downloadProfil(url: string, fileName: string): boolean {
-    const dest = './files/' + fileName + '.jpg'
+    const dest = './files/' + fileName
     const file = fs.createWriteStream(dest)
     https.get(url, function (res) {
       res.pipe(file)

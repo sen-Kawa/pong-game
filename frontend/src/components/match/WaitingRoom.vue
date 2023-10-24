@@ -40,8 +40,7 @@ socket.on('newGame', async (matchId: number) => {
   console.log(`joining match ${matchId}`)
   canLeave.value = true
   shouldLeaveQueue.value = false
-  // TODO: redirect to the game
   await matchStore.getMatch(matchId)
-  router.back()
+  router.push('/game')
 })
 </script>

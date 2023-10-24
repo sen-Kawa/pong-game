@@ -170,20 +170,19 @@ export const useMatchStore = defineStore('match', () => {
     }
 
     try {
-      loading.value = true
+      // loading.value = true
 
-      Object.entries(localFilters).forEach(([key, value]) => {
-        if (Object.prototype.hasOwnProperty.call(filters.value, key)) {
-          searchParams.append(key, value.toString())
-        }
-      })
+      // Object.entries(localFilters).forEach(([key, value]) => {
+      //   if (Object.prototype.hasOwnProperty.call(filters.value, key)) {
+      //     searchParams.append(key, value.toString())
+      //   }
+      // })
 
-      const response = await jwtInterceptor.get(requestPath, {
+      const response = await jwtInterceptor.get(requestPath + '/' + matchId, {
         withCredentials: true,
         params: searchParams
       })
       // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
-
       error.value = ''
       loading.value = false
       if (response.status >= 200 && response.status < 300) {

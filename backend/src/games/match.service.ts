@@ -398,7 +398,13 @@ export class MatchService {
     if (includePlayers) {
       includes = { players: { include: { player: true } } }
     }
-
+    console.log(id)
+    console.log(
+      await this.prisma.match.findFirst({
+        include: includes,
+        where: { id }
+      })
+    )
     return this.prisma.match.findUniqueOrThrow({
       include: includes,
       where: { id }

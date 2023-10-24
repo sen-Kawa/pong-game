@@ -29,7 +29,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { CreateMatchDto } from './dto/create-match.dto'
 import { QueryPersonalMatchDTO } from './dto/query-personal-match.dto'
 import { QueryPlayerMatchDTO } from './dto/query-player-match.dto'
-import { QuerySingleMatchDTO } from './dto/query-single-match.dto'
+//import { QuerySingleMatchDTO } from './dto/query-single-match.dto'
 import { UpdateMatchDto } from './dto/update-match.dto'
 import { MatchEntity } from './entities/match.entity'
 import { MatchService } from './match.service'
@@ -143,12 +143,12 @@ export class MatchController {
   @Get(':id')
   @ApiOkResponse({ type: MatchEntity })
   @ApiNotFoundResponse({ description: 'match does not exist' })
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-    @Query() queryMatch: QuerySingleMatchDTO
-  ): Promise<MatchEntity> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<MatchEntity> {
     try {
-      return await this.matchService.findOne(id, queryMatch)
+      return await this.matchService.findOne(id, {
+        includeScores: false,
+        includePlayers: true
+      })
     } catch (error) {
       throw new NotFoundException('match does not exist')
     }

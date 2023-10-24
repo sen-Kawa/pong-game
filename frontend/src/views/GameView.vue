@@ -20,7 +20,7 @@ import GameComponent from '../components/match/GameComponent.vue'
 
 const matchStore = useMatchStore()
 
-matchStore.init()
+//matchStore.init()
 matchStore.pagination.pageSize.value = 10
 
 onMounted(async () => {
