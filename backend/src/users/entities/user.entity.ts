@@ -40,4 +40,13 @@ export class UserEntity implements User {
   @ApiHideProperty()
   @Exclude()
   twoFactorAuthenticationSecret: string
+
+  @ApiProperty()
+  wins: number
+
+  @ApiProperty()
+  losses: number
+
+  @ApiProperty()
+  ratio: number
 }

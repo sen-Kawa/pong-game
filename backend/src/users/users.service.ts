@@ -255,4 +255,49 @@ export class UsersService {
       }
     })
   }
+
+  async updateWinLosses(winner: number, loser: number) {
+    const winnerUser = await this.prisma.user.findUnique({
+      where: {
+        id: winner
+      },
+      select: {
+        wins: true,
+        losses: true
+      }
+    })
+
+    const wins = winnerUser.wins + 1
+    let ratio = wins / (wins + winnerUser.losses)
+    await this.prisma.user.update({
+      where: {
+        id: winner
+      },
+      data: {
+        wins: wins,
+        ratio: ratio
+      }
+    })
+    const loserUser = await this.prisma.user.findUnique({
+      where: {
+        id: loser
+      },
+      select: {
+        wins: true,
+        losses: true
+      }
+    })
+
+    const losses = loserUser.losses + 1
+    ratio = loserUser.wins / (losses + loserUser.wins)
+    await this.prisma.user.update({
+      where: {
+        id: loser
+      },
+      data: {
+        losses: losses,
+        ratio: ratio
+      }
+    })
+  }
 }

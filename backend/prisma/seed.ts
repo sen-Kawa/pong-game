@@ -1,17 +1,8 @@
 import { PrismaClient } from '@prisma/client'
-import * as bcrypt from 'bcrypt'
-import {
-  createFakeMatch,
-  matchWithOnePlayer,
-  matchWithScore,
-  maximalMatch,
-  minimalMatch
-} from './match.test-data'
+import { createFakeMatch, createFakeTournament } from './match.test-data'
 
 // initialize Prisma Client
 const prisma = new PrismaClient()
-
-const roundsOfHashing = 10
 
 async function main() {
   // create two user articles
@@ -35,7 +26,10 @@ async function main() {
       userName: 'test',
       displayName: 'Ulli',
       email: 'ulli@gmx.de',
-      activated2FA: false
+      activated2FA: false,
+      losses: 0,
+      wins: 20,
+      ratio: 20 / (0 + 20)
     }
   })
 
@@ -50,6 +44,9 @@ async function main() {
       displayName: 'Jacky',
       email: 'jacob.thomsen@example.com',
       activated2FA: false,
+      losses: 20,
+      wins: 0,
+      ratio: 0 / (20 + 0),
       following: {
         connect: { id: user1.id }
       }
@@ -67,6 +64,9 @@ async function main() {
       displayName: 'Juli',
       email: 'julia.hansen@example.com',
       activated2FA: false,
+      losses: 10,
+      wins: 10,
+      ratio: 10 / (10 + 10),
       following: {
         connect: { id: user2.id }
       }
@@ -84,6 +84,9 @@ async function main() {
       displayName: 'Caro',
       email: 'carito@example.com',
       activated2FA: false,
+      losses: 20,
+      wins: 20,
+      ratio: 20 / (20 + 20),
       following: {
         connect: [{ id: user1.id }, { id: user3.id }]
       }
@@ -92,13 +95,12 @@ async function main() {
 
   console.log({ avatar1, user1, user2, user3, user4 })
 
-  await prisma.match.create({ data: createFakeMatch({ completed: true }) })
-  await prisma.match.create({ data: createFakeMatch() })
-  await prisma.match.create({ data: createFakeMatch({ withPlayers: true }) })
-  await prisma.match.create({ data: createFakeMatch({ withPlayers: true, completed: false }) })
-  await prisma.match.create({
-    data: createFakeMatch({ withPlayers: true, completed: true, maxScore: 9999 })
-  })
+  // create alot of matches where players play more matches
+  const tournamentMatches = createFakeTournament(5)
+  for (const match of tournamentMatches) {
+    const m = await prisma.match.create({ data: match })
+    console.debug({ m })
+  }
 }
 
 // execute the main function
@@ -111,4 +113,3 @@ main()
     // close Prisma Client at the end
     await prisma.$disconnect()
   })
-  

@@ -59,7 +59,10 @@ describe('UsersController Unit Tests', () => {
     currentStatus: 'OFFLINE',
     avatarId: 2,
     refreshToken: '',
-    twoFactorAuthenticationSecret: ''
+    twoFactorAuthenticationSecret: '',
+    wins: 0,
+    losses: 0,
+    ratio: 0
   }
 
   const friendResult = { userName: 'hrings', displayName: 'Ulli', currentStatus: 'OFFLINE' }
