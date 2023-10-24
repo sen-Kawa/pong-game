@@ -23,7 +23,6 @@
 		text-align: center;
 	  background-color: black;
 	  color: white;
-	  position: absolute;
 	  bottom: 0%;
 	  width: 100%;
 	  position: fixed;
