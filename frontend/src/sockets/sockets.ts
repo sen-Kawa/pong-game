@@ -7,7 +7,6 @@ class SockManager {
 	socket: Socket;
 	options: any;
 	constructor() {
-		// FIXME: Somehow get dynamically the url of the server.
 		this.socket = io(`${import.meta.env.VITE_BACKEND_SERVER_URI}`, {
 			withCredentials: true
 		});
