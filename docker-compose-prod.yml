@@ -77,7 +77,7 @@ services:
     volumes:
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-    entrypoint: certbot certonly -n --standalone --agree-tos --email f.henrichs@web.de --test-cert -d pong.freddow.de
+    entrypoint: certbot certonly -n --standalone --agree-tos --email ${EMAIL} --test-cert -d ${SERVICEDOMAIN}
 
   adminer:
     image: adminer
