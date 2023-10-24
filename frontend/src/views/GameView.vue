@@ -38,7 +38,6 @@ async function createNewGame() {
 }
 
 function joinQueue() {
-  socket.emit('joinQueue')
   router.push('game/queue')
 }
 </script>

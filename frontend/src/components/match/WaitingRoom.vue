@@ -10,7 +10,7 @@ import { socket } from '@/sockets/sockets'
 import { useMatchStore } from '@/stores/match'
 import { ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
-
+import { onMounted } from 'vue'
 const matchStore = useMatchStore()
 const canLeave = ref(false)
 const shouldLeaveQueue = ref(true)
@@ -36,11 +36,16 @@ function leaveQueue() {
   router.back()
 }
 
+onMounted(() => {
+
 socket.on('newGame', async (matchId: number) => {
   console.log(`joining match ${matchId}`)
   canLeave.value = true
   shouldLeaveQueue.value = false
   await matchStore.getMatch(matchId)
+  console.log(matchStore.currentMatch)
   router.push('/game')
+})
+socket.emit('joinQueue')
 })
 </script>

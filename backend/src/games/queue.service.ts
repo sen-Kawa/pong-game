@@ -10,8 +10,7 @@ export class QueueService {
   queue: number[]
 
   addPlayer(playerId: number): boolean {
-    // TODO: prevent enter queue multiple times
-    this.queue.push(playerId)
+    if (!this.queue.includes(playerId)) this.queue.push(playerId)
 
     // if (this.queue.length > 1) {
     //   createGame(this.queue.shift(), this.queue.shift())

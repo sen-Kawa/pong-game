@@ -60,6 +60,7 @@ export class QueueGateway {
         }
       })
       console.log(`created new match ${match.id} for players ${player1} and ${player2}`)
+      //this.matchService.createQueueGame(match.id, player1, player2)
       const playerOne = this.socketService.getSocketId(player1)
       const playerTwo = this.socketService.getSocketId(player2)
       this.socketService.socket.to(playerOne).emit('newGame', match.id)
