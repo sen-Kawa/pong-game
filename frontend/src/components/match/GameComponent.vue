@@ -1,5 +1,5 @@
 <template>
-    <h2>No. {{ match.id }}: {{leftPlayerName}} ./. {{rightPlayerName}}</h2>
+    <h2>No. {{ match.id }}: {{matchStore.getLeftPlayer}} ./. {{matchStore.getRightPlayer}}</h2>
     <br>
 	<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: black; border: 1px solid grey;"></canvas>
     <h1 style="color: red;" v-if="game_state.game.paused">Game is paused</h1>
@@ -12,6 +12,7 @@
     import { ref, onUnmounted, onMounted } from 'vue';
     import { type GameUpdate } from 'common-types'
     import { useAuthStore } from '../../stores/auth.js'
+    import { useMatchStore } from '../../stores/match.js'
 
     let keyUp: string = 'w'
     let keyDown: string = 's'
@@ -27,6 +28,7 @@
     const authStore = useAuthStore()
     const leftPlayerName = ref('leftPlayer')
     const rightPlayerName = ref('rightPlayer')
+    const matchStore = useMatchStore()
 
     let interval: any
     const props = defineProps(['match', 'player_number']);
@@ -71,6 +73,8 @@
         console.log("Game started")
         interval = setInterval(drawGame, 1000/ 50)
     })
+
+    
 
     onUnmounted(() => {
         console.log("Unmounted")
@@ -150,12 +154,6 @@
             playerInfo.value = 'Control your player with [p] for up and [l] for down.'
             setKeysRightSide()
         }
-        // set player names
-        if (props.player_number === 1) {
-            rightPlayerName.value = authStore.getName
-        } else {
-            leftPlayerName.value = authStore.getName
-        }
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
 
@@ -163,6 +161,14 @@
     }
 
     function drawGame() {
+         // set player names
+         if (props.player_number === 1) {
+            leftPlayerName.value = matchStore.getLeftPlayer
+            rightPlayerName.value = authStore.getName
+        } else {
+            rightPlayerName.value = matchStore.getRightPlayer
+            leftPlayerName.value = authStore.getName
+        }
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
             console.log("cant get canvas");

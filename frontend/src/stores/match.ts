@@ -38,10 +38,16 @@ export const useMatchStore = defineStore('match', () => {
     includeScores: true
   })
 
+  const currentLeftPlayer = ref("unknownLeftPlayer")
+  const currentRightPlayer = ref("unknownRightPlayer")
+
   // computed becomes getter
   const matchCount = computed(() => matches.value.length)
   const pagination = computed(() => usePagination(matches, pageSize))
   const gameStates = computed(() => Object.values(GameStatus))
+  const getLeftPlayer = computed(() => currentLeftPlayer.value)
+  const getRightPlayer = computed(() => currentRightPlayer.value)
+  
 
   // function becomes action
   function init() {
@@ -77,6 +83,8 @@ export const useMatchStore = defineStore('match', () => {
         throw new Error(response.statusText)
       }
       const newMatch = transformMatchDTO(response.data)
+      currentLeftPlayer.value = newMatch.players[0].name
+      currentRightPlayer.value = "pending ..."
       matches.value.push(newMatch)
       currentMatch.value = newMatch
       player_number.value = 0
@@ -100,24 +108,22 @@ export const useMatchStore = defineStore('match', () => {
         throw new Error(message)
     }
     try {
-        console.log("TryBlock1")
-
         loading.value = true
         const response = await jwtInterceptor.post(
             requestPath,
             { matchId: id },  // match id was not transferred correctly before
             { withCredentials: true }
         )
-        console.log("TryBlock2")
         error.value = ''
         loading.value = false
-        console.log("TryBlock3")
         if (response.status != 201) {
           throw new Error(response.statusText)
         }
-        console.log("TryBlock4")
         const newMatch = transformMatchDTO(response.data as MatchDTO)
-        console.log("TryBlock5", response)
+        console.log("NewMatch", newMatch)
+        currentLeftPlayer.value = newMatch.players[0].name
+        currentRightPlayer.value = newMatch.players[1].name
+        // console.log("currentPlayers", currentLeftPlayer, ": ", currentRightPlayer)
         currentMatch.value = newMatch
         player_number.value = 1
     } catch (e) {
@@ -265,6 +271,8 @@ export const useMatchStore = defineStore('match', () => {
     getMatchesToJoin,
     getMatchesToSpectate,
     removeCurrentMatch,
-    fetchCurrentMatch
+    fetchCurrentMatch,
+    getLeftPlayer,
+    getRightPlayer
   }
 })
