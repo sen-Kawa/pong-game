@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../prisma/prisma.service'
 import { AddChannelDto } from './dto/add-channel.dto'
 import { SuggestedChannelsResultDto } from './dto/suggested-channels.dto'
-import { SearchChannelsDto, SearchChannelsResultDto } from './dto/search-channels.dto'
+import { SearchChannelsResultDto } from './dto/search-channels.dto'
 import { JoinOrExitChannelDto } from './dto/join-or-exit-channel.dto'
 import { ChannConnectionsResultDto } from './dto/chann-connections.dto'
-import { ChannHistoryDto, ChannHistoryResultDto } from './dto/chann-history.dto'
+import { ChannHistoryResultDto } from './dto/chann-history.dto'
 import { UpdateChannDto } from './dto/update-chann.dto'
 import { SetSeenDto } from './dto/set-seen.dto'
 import * as bcrypt from 'bcrypt'
@@ -112,7 +112,7 @@ export class ChannelsService {
     return result
   }
 
-  async joinOrExitChannel(requestProps: JoinOrExitChannelDto): Promise<string> {
+  async joinOrExitChannel(requestProps: JoinOrExitChannelDto, userId: number): Promise<string> {
     const theChannel = await this.prisma.channel.findUnique({
       where: {
         id: requestProps.chId
@@ -126,7 +126,7 @@ export class ChannelsService {
     if (requestProps.joinOrExit === false) {
       const deleteLink = await this.prisma.channel_link.deleteMany({
         where: {
-          userId: requestProps.userId,
+          userId: userId,
           chId: requestProps.chId
         }
       })
@@ -135,7 +135,7 @@ export class ChannelsService {
         await this.prisma.channel_history.create({
           data: {
             chId: requestProps.chId,
-            userId: requestProps.userId,
+            userId: userId,
             outgoing: '',
             deliveryStatus: 'exited'
           }
@@ -150,7 +150,7 @@ export class ChannelsService {
         const checkBanned = await this.prisma.channel_link.findFirstOrThrow({
           where: {
             chId: requestProps.chId,
-            userId: requestProps.userId
+            userId: userId
           }
         })
 
@@ -165,7 +165,7 @@ export class ChannelsService {
         await this.prisma.channel_pending.findFirstOrThrow({
           where: {
             chId: requestProps.chId,
-            userId: requestProps.userId
+            userId: userId
           }
         })
 
@@ -176,14 +176,14 @@ export class ChannelsService {
         await this.prisma.channel_link.create({
           data: {
             chId: requestProps.chId,
-            userId: requestProps.userId,
+            userId: userId,
             role: 'user',
             linkStatus: 'good',
             channel_historys: {
               create: [
                 {
                   chId: requestProps.chId,
-                  userId: requestProps.userId,
+                  userId: userId,
                   outgoing: 'joined',
                   deliveryStatus: 'joined'
                 }
@@ -201,14 +201,14 @@ export class ChannelsService {
         await this.prisma.channel_link.create({
           data: {
             chId: requestProps.chId,
-            userId: requestProps.userId,
+            userId: userId,
             role: 'user',
             linkStatus: 'good',
             channel_historys: {
               create: [
                 {
                   chId: requestProps.chId,
-                  userId: requestProps.userId,
+                  userId: userId,
                   outgoing: 'joined',
                   deliveryStatus: 'joined'
                 }
@@ -222,7 +222,7 @@ export class ChannelsService {
         await this.prisma.channel_pending.create({
           data: {
             chId: requestProps.chId,
-            userId: requestProps.userId
+            userId: userId
           }
         })
         this.gateway.emitToAll('new-channel-event', 0)
@@ -233,12 +233,13 @@ export class ChannelsService {
   }
 
   async searchChannels(
-    details: SearchChannelsDto
+    key: string,
+    userId: number
   ): Promise<SearchChannelsResultDto[] | ErrorValue> {
     try {
       await this.prisma.user.findUniqueOrThrow({
         where: {
-          id: details.userId
+          id: userId
         }
       })
     } catch (error) {
@@ -246,7 +247,7 @@ export class ChannelsService {
     }
 
     const searchKeyFilterRegex = /[^a-zA-Z\d]/gi
-    const searchKey = details.key.replace(searchKeyFilterRegex, '')
+    const searchKey = key.replace(searchKeyFilterRegex, '')
 
     const output = await this.prisma.channel.findMany({
       where: {
@@ -281,7 +282,7 @@ export class ChannelsService {
         const result = await this.prisma.channel_link.findFirstOrThrow({
           where: {
             chId: uniqueChannel.id,
-            userId: details.userId
+            userId: userId
           },
           select: {
             role: true,
@@ -307,11 +308,11 @@ export class ChannelsService {
     return result
   }
 
-  async addChannel(addChannelDto: AddChannelDto): Promise<ErrorValue> {
+  async addChannel(addChannelDto: AddChannelDto, userId: number): Promise<ErrorValue> {
     try {
       await this.prisma.user.findUniqueOrThrow({
         where: {
-          id: addChannelDto.userId
+          id: userId
         }
       })
     } catch (error) {
@@ -359,7 +360,7 @@ export class ChannelsService {
       .create({
         data: {
           chId: channelId,
-          userId: addChannelDto.userId,
+          userId: userId,
           role: 'owner',
           linkStatus: 'good'
         },
@@ -419,12 +420,12 @@ export class ChannelsService {
     return connections
   }
 
-  async channHistory(channel: ChannHistoryDto): Promise<ChannHistoryResultDto[] | boolean> {
+  async channHistory(userId: number, chId: number): Promise<ChannHistoryResultDto[] | boolean> {
     try {
       await this.prisma.channel_link.findFirstOrThrow({
         where: {
-          chId: channel.chId,
-          userId: channel.userId,
+          chId: chId,
+          userId: userId,
           NOT: {
             linkStatus: 'banned'
           }
@@ -436,7 +437,7 @@ export class ChannelsService {
 
     const history: ChannHistoryResultDto[] = await this.prisma.channel_history.findMany({
       where: {
-        chId: channel.chId
+        chId: chId
       },
       orderBy: {
         createdAt: 'desc'
@@ -456,8 +457,8 @@ export class ChannelsService {
     try {
       const muteExpire = await this.prisma.channel_link.findFirstOrThrow({
         where: {
-          chId: channel.chId,
-          userId: channel.userId,
+          chId: chId,
+          userId: userId,
           linkStatus: 'muted'
         },
         select: {
@@ -469,8 +470,8 @@ export class ChannelsService {
       if (new Date() >= muteExpire.mutedUntil) {
         await this.prisma.channel_link.updateMany({
           where: {
-            chId: channel.chId,
-            userId: channel.userId,
+            chId: chId,
+            userId: userId,
             linkStatus: 'muted'
           },
           data: {
@@ -483,7 +484,7 @@ export class ChannelsService {
     return history
   }
 
-  async updateChanns(channPayload: UpdateChannDto[]) {
+  async updateChanns(channPayload: UpdateChannDto[], userId: number) {
     for (const singleChannKey in channPayload) {
       const singleChannObject: UpdateChannDto = channPayload[singleChannKey]
 
@@ -491,7 +492,7 @@ export class ChannelsService {
         await this.prisma.channel_link.findFirstOrThrow({
           where: {
             chId: singleChannObject.chId,
-            userId: singleChannObject.userId,
+            userId: userId,
             OR: [
               {
                 linkStatus: 'good'
@@ -507,10 +508,11 @@ export class ChannelsService {
       }
 
       const filterRegex = /[^a-zA-Z\d?@!üöäßÜÖÄ ,.'^\n]/gi
+      if (singleChannObject.msg.replace(filterRegex, '').length === 0) continue
       await this.prisma.channel_history.create({
         data: {
           chId: singleChannObject.chId,
-          userId: singleChannObject.userId,
+          userId: userId,
           outgoing: singleChannObject.msg.replace(filterRegex, ''),
           createdAt: singleChannObject.time
         }
@@ -522,7 +524,7 @@ export class ChannelsService {
           NOT: {
             OR: [
               {
-                userId: singleChannObject.userId
+                userId: userId
               },
               {
                 linkStatus: 'banned'
@@ -540,21 +542,21 @@ export class ChannelsService {
       await this.prisma.channel_link.updateMany({
         where: {
           chId: singleChannObject.chId,
-          userId: singleChannObject.userId
+          userId: userId
         },
         data: {
-          userId: singleChannObject.userId
+          userId: userId
         }
       })
       this.gateway.emitToAll('new-channel-event', singleChannObject.chId)
     }
   }
 
-  async setSeen(channDetails: SetSeenDto) {
+  async setSeen(channDetails: SetSeenDto, userId: number) {
     await this.prisma.channel_link.updateMany({
       where: {
         chId: channDetails.chId,
-        userId: channDetails.userId
+        userId: userId
       },
       data: {
         unreadCount: 0
@@ -563,10 +565,10 @@ export class ChannelsService {
     this.gateway.emitToAll('new-channel-event', channDetails.chId)
   }
 
-  async getMemberId(getMemberId: GetMemberIdDto): Promise<string> {
+  async getMemberId(getMemberId: GetMemberIdDto, adminId: number): Promise<string> {
     const moderator = await this.prisma.channel_link.findFirst({
       where: {
-        userId: getMemberId.adminId,
+        userId: adminId,
         chId: getMemberId.chId,
         linkStatus: 'good',
         OR: [
@@ -599,11 +601,12 @@ export class ChannelsService {
   }
 
   async pendingApprovals(
-    pendingProp: PendingApprovalsDto
+    pendingProp: PendingApprovalsDto,
+    adminId: number
   ): Promise<PendingApprovalsResultDto[] | null> {
     const moderator = await this.prisma.channel_link.findFirst({
       where: {
-        userId: pendingProp.adminId,
+        userId: adminId,
         chId: pendingProp.chId,
         linkStatus: 'good',
         OR: [
@@ -642,14 +645,14 @@ export class ChannelsService {
     return output
   }
 
-  async moderateUsers(moderateProp: ModerateUsersDto): Promise<string> {
-    if (moderateProp.adminId === moderateProp.userId) {
+  async moderateUsers(moderateProp: ModerateUsersDto, adminId: number): Promise<string> {
+    if (adminId === moderateProp.userId) {
       return 'You cannot moderate yourself!'
     }
 
     const moderator = await this.prisma.channel_link.findFirst({
       where: {
-        userId: moderateProp.adminId,
+        userId: adminId,
         chId: moderateProp.chId,
         linkStatus: 'good',
         OR: [
@@ -757,7 +760,22 @@ export class ChannelsService {
     }
   }
 
-  async approveOrReject(moderateProp: ApproveOrRejectDto): Promise<string> {
+  async approveOrReject(moderateProp: ApproveOrRejectDto, adminId: number): Promise<string> {
+    const moderator = await this.prisma.channel_link.findFirst({
+      where: {
+        userId: adminId,
+        chId: moderateProp.chId,
+        linkStatus: 'good',
+        role: {
+          in: ['owner', 'admin']
+        }
+      },
+      include: {}
+    })
+    if (!moderator) {
+      return 'Unauthorized Access!'
+    }
+
     const deleted = await this.prisma.channel_pending.deleteMany({
       where: {
         chId: moderateProp.chId,
@@ -798,10 +816,10 @@ export class ChannelsService {
     }
   }
 
-  async modifyChannel(newChannelProp: ModifyChannelDto): Promise<string> {
+  async modifyChannel(newChannelProp: ModifyChannelDto, adminId: number): Promise<string> {
     const moderator = await this.prisma.channel_link.findFirst({
       where: {
-        userId: newChannelProp.adminId,
+        userId: adminId,
         chId: newChannelProp.chId,
         linkStatus: 'good',
         role: 'owner'

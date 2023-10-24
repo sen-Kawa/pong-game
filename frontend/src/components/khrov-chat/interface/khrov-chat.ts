@@ -7,10 +7,6 @@ export interface ChatBlockedItem {
 export interface ChatWindow {
   chnList: string
 }
-export interface ChatBuilder {
-  cbdFakeLogin: string
-  cbdUserInput: number
-}
 export interface ChatInvite {
   civSearchInput: string
   civContentOrNot: boolean
@@ -35,6 +31,8 @@ export interface ChatList {
   chiMorphBlockStatus?: boolean
   chiMorphUnbAllowed: boolean
   chiChatConnsApiOk: number
+  notifDiff: number
+  loading: boolean
 }
 export interface ChatListTmp {
   outgoing: string
@@ -98,7 +96,6 @@ export interface Chat_historyTb {
 }
 
 export interface ChnListOfflineCache {
-  userId: number
   chId: number
   msg: string
   time: string

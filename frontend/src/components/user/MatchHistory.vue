@@ -27,12 +27,15 @@ function toggleScope() {
 onMounted(() => {
   matchStore.getMatchHistory(scope.value)
 })
+
+//TODO fix joinGame function as props for matchlist?
 </script>
 
 <template>
   <h2 class="component-title">{{ Scope[scope] }} MatchHistory</h2>
   <button @click="toggleScope">Switch Scope</button>
   <LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
-    <MatchList :matches="matchStore.matches" />
+    <MatchList :matches="matchStore.matches" :joinGame="(id: number) =>{}"/>
   </LoadingIndicator>
 </template>
+

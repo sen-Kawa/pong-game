@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -5,9 +6,11 @@ import {
   WebSocketGateway,
   WebSocketServer
 } from '@nestjs/websockets'
-import { SocketService } from './socket/socket.service'
+import { parse } from 'cookie'
 import { Server, Socket } from 'socket.io'
-import { Logger } from '@nestjs/common'
+import { AppService } from './app.service'
+import { AuthService } from './auth/auth.service'
+import { SocketService } from './socket/socket.service'
 
 @WebSocketGateway({
   cors: {
@@ -17,7 +20,11 @@ import { Logger } from '@nestjs/common'
   transports: ['websocket', 'polling']
 })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private socketService: SocketService) {}
+  constructor(
+    private socketService: SocketService,
+    private authService: AuthService,
+    private appService: AppService
+  ) {}
 
   @WebSocketServer() public server: Server
   private logger: Logger = new Logger('AppGateWay')
@@ -26,12 +33,37 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     this.socketService.socket = server
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
-    args
-    this.logger.log('Client connected ' + client.id)
+  async handleConnection(client: Socket, ...args: any[]) {
+    //TODO error handling
+    //TODO run via refresh if auth token invalid
+    if (!client.handshake.headers.cookie) client.disconnect()
+    else {
+      try {
+        const { 'auth-cookie': token } = parse(client.handshake.headers.cookie)
+        if (token) {
+          const test = await this.authService.verifyJwt(token)
+          if (!test) {
+            this.server.emit('failed_con')
+            return client.disconnect()
+          }
+          client.data.userId = test.userId
+          this.appService.connectedUser(test.userId, client.id)
+          args
+          this.logger.log('Client connected ' + client.id)
+        }
+      } catch (error) {
+        console.error(error)
+        client.disconnect()
+      }
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log('Client disconnected ' + client.id)
+  async handleDisconnect(client: Socket) {
+    //TODO error handling
+    if (client.data.userId) {
+      this.appService.disconnectedUser(client.data.userId)
+      this.logger.log('Client disconnected ' + client.data.userId)
+    } else this.logger.log('Unknown Client disconnected ' + client.id)
+    client.disconnect()
   }
 }

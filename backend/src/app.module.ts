@@ -11,6 +11,7 @@ import { AppGateway } from './app.gateway'
 import { StatisticsModule } from './statistics/statistics.module'
 import { ChatsModule } from './khrov-chat/chats/chats.module'
 import { ChannelsModule } from './khrov-chat/channels/channels.module'
+import { AppService } from './app.service'
 
 @Module({
   imports: [
@@ -32,6 +33,6 @@ import { ChannelsModule } from './khrov-chat/channels/channels.module'
     ChannelsModule
   ],
   controllers: [],
-  providers: [AppGateway]
+  providers: [AppGateway, AppService]
 })
 export class AppModule {}

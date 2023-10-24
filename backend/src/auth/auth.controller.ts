@@ -1,33 +1,33 @@
 import {
-  Controller,
-  Post,
-  Get,
-  Req,
-  Res,
   Body,
-  UseGuards,
-  UnauthorizedException,
+  Controller,
+  Get,
+  HttpCode,
   HttpException,
   HttpStatus,
-  HttpCode
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards
 } from '@nestjs/common'
-import { AuthService } from './auth.service'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
+import { AuthGuard } from '@nestjs/passport'
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiForbiddenResponse,
-  ApiBearerAuth,
+  ApiOkResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
-  ApiOkResponse
+  ApiUnauthorizedResponse
 } from '@nestjs/swagger'
-import { AuthGuard } from '@nestjs/passport'
 import { Response } from 'express'
-import { JwtService } from '@nestjs/jwt'
-import { ConfigService } from '@nestjs/config'
 import { TFAAuthGuard } from 'src/auth/guards/2fa-auth.guard'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { RefreshAuthGuard } from 'src/auth/guards/refresh.guard'
 import { UserEntity } from 'src/users/entities/user.entity'
+import { AuthService } from './auth.service'
 
 //TODO token and cookie to much same code
 export interface JwtPayload {
@@ -267,6 +267,31 @@ export class AuthController {
       })
     } else {
       throw new UnauthorizedException('No Valid RefreshToken')
+    }
+  }
+
+  //TODO fake login route for testing
+  // comment out if needed
+  @Post('login')
+  async login(
+    @Req() req: any,
+    @Body('userid') userId: number,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const jwtToken = this.authService.getAccessToken(+userId, false)
+    res.cookie('auth-cookie', jwtToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime() + 86409000)
+    })
+    const jwtRefreshToken = this.authService.getRefreshToken(+userId)
+    res.cookie('refresh-cookie', jwtRefreshToken, {
+      httpOnly: true,
+      expires: new Date(new Date().getTime() + 86409000)
+    })
+    await this.authService.updateRefreshToken(+userId, jwtRefreshToken)
+    return {
+      userId: userId,
+      twoFaEnabled: false
     }
   }
 }

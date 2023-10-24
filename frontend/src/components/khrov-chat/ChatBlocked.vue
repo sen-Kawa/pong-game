@@ -3,22 +3,17 @@ import { reactive } from 'vue'
 import { onMounted } from 'vue'
 import ChatBlockedItem from '@/components/khrov-chat/ChatBlockedItem.vue'
 import type { ChatBlocked, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
-import { useChatsStore } from '@/stores/chatsAll'
+import { useChatsStore } from '@/stores/chats'
 import { socket } from '@/sockets/sockets'
 
-const props = defineProps<{
-  sTemp: number
-}>()
-
 const chatsStore = useChatsStore();
-const $: number = props.sTemp as unknown as number
 const cBlkd: ChatBlocked = reactive({
   cbkKeyBuild: 0
 })
 let output: Chat_unionTb[]
 
 const searchBlocked = async () => {
-  const response = await chatsStore.fetchForKhrov(`/chats/blocked/${$}`, 'GET', {});
+  const response = await chatsStore.fetchForKhrov(`/chats/blocked/search`, 'GET', {});
   if (response) {
     try {
       if (!response.ok) throw response;
@@ -47,7 +42,6 @@ onMounted(() => {
     <ChatBlockedItem
       v-for="item in output"
       v-bind:key="item.client2Id"
-      :myId="$"
       :theirId="item.client2Id"
       :displayName="item.client2.userName"
       :profileDp="item.client2.profile_pics[0].avatar"

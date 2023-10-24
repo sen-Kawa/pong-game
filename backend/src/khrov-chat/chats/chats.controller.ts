@@ -4,8 +4,8 @@ import {
   Post,
   Put,
   Body,
-  Param,
   Query,
+  Req,
   UseGuards,
   ParseArrayPipe,
   HttpException,
@@ -21,8 +21,8 @@ import { NewChatDto, NewChatResultDto } from './dto/new-chat.dto'
 import { SetSeenDto, SetSeenResultDto } from './dto/set-seen.dto'
 import { DeleteHistoryDto, DeleteHistoryResultDto } from './dto/delete-history.dto'
 import { BlockingDto, BlockingResultDto } from './dto/blocking.dto'
-import { GetBlockedDto, GetBlockedResultDto } from './dto/get-blocked.dto'
-import { ChatConnectionsDto, ChatConnectionsResultDto } from './dto/chat-connections.dto'
+import { GetBlockedResultDto } from './dto/get-blocked.dto'
+import { ChatConnectionsResultDto } from './dto/chat-connections.dto'
 import { SearchUsersDto, SearchUsersResultDto } from './dto/search-users.dto'
 import { PrismaService } from '../../prisma/prisma.service' // will be removed along with test Api
 
@@ -116,8 +116,8 @@ export class ChatsController {
   @ApiResponse({ status: 417, description: 'Request to start a new chat conversation failed!' })
   @UseGuards(JwtAuthGuard)
   @Post()
-  async newChat(@Body() newChat: NewChatDto) {
-    const response: boolean = await this.chatsService.newChat(newChat)
+  async newChat(@Body() newChat: NewChatDto, @Req() req) {
+    const response: boolean = await this.chatsService.newChat(newChat, req.user.id)
     if (response === false) {
       throw new HttpException(
         'Request to start a new chat conversation failed!',
@@ -157,10 +157,10 @@ export class ChatsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @UseGuards(JwtAuthGuard)
-  @Get('/:userId')
-  async chatConnections(@Param() user: ChatConnectionsDto) {
+  @Get('/previews')
+  async chatConnections(@Req() req) {
     const response: ChatConnectionsResultDto[] = await this.chatsService.chatConnections(
-      user.userId
+      req.user.id
     )
     return response
   }
@@ -173,9 +173,9 @@ export class ChatsController {
       'Endpoint Request Parameters And/Or Body Requirements Not Met. Check Response Error Message For Details!'
   })
   @UseGuards(JwtAuthGuard)
-  @Get('/blocked/:userId')
-  async getBlocked(@Param() id: GetBlockedDto) {
-    const response: GetBlockedResultDto[] = await this.chatsService.getBlocked(id.userId)
+  @Get('/blocked/search')
+  async getBlocked(@Req() req) {
+    const response: GetBlockedResultDto[] = await this.chatsService.getBlocked(req.user.id)
     return response
   }
 
@@ -189,8 +189,8 @@ export class ChatsController {
   @ApiResponse({ status: 417, description: 'Block Request Failed' })
   @UseGuards(JwtAuthGuard)
   @Put('/block/user')
-  async blockUser(@Body() blockDetails: BlockingDto) {
-    const response: boolean = await this.chatsService.blockUser(blockDetails)
+  async blockUser(@Body() blocked: BlockingDto, @Req() req) {
+    const response: boolean = await this.chatsService.blockUser(blocked.blockedId, req.user.id)
     if (response === false) {
       throw new HttpException('Block Request Failed', HttpStatus.EXPECTATION_FAILED)
     } else {
@@ -208,8 +208,8 @@ export class ChatsController {
   @ApiResponse({ status: 417, description: 'Unblock Request Failed' })
   @UseGuards(JwtAuthGuard)
   @Put('/block/user/unblock')
-  async unblockUser(@Body() blockDetails: BlockingDto) {
-    const response: boolean = await this.chatsService.unblockUser(blockDetails)
+  async unblockUser(@Body() blocked: BlockingDto, @Req() req) {
+    const response: boolean = await this.chatsService.unblockUser(blocked.blockedId, req.user.id)
     if (response === false) {
       throw new HttpException('Unlock Request Failed', HttpStatus.EXPECTATION_FAILED)
     } else {
@@ -226,39 +226,18 @@ export class ChatsController {
   })
   @UseGuards(JwtAuthGuard)
   @Get('/get/search/user')
-  async searchUsers(@Query() details: SearchUsersDto) {
-    const response: SearchUsersResultDto[] = await this.chatsService.searchUsers(details)
+  async searchUsers(@Query() details: SearchUsersDto, @Req() req) {
+    const response: SearchUsersResultDto[] = await this.chatsService.searchUsers(
+      details.key,
+      req.user.id
+    )
     return response
   }
 
-  // just a test api // will be removed
-  @ApiOperation({ summary: 'Just a test API for testing purposes. will be deleted in due time' })
+  @ApiOperation({ summary: 'Health Check and Fix Operations for Chat DB Tables' })
   @UseGuards(JwtAuthGuard)
-  @Get('/get/temp/login/:userId')
-  async apiTest(@Param() userId: ChatConnectionsDto) {
-    try {
-      await this.prisma.user.findUniqueOrThrow({
-        where: {
-          id: userId.userId
-        }
-      })
-    } catch (error) {
-      throw new HttpException(
-        'No User Associated With Your Provided User ID In Your "User" DB Table. Please Create',
-        HttpStatus.BAD_REQUEST
-      )
-    }
-    try {
-      await this.prisma.profile_pic.findUniqueOrThrow({
-        where: {
-          userId: userId.userId
-        }
-      })
-    } catch (error) {
-      throw new HttpException(
-        'User ID Must Have An Avatar in Your "Profile_pic" DB Table. Please Create',
-        HttpStatus.BAD_REQUEST
-      )
-    }
+  @Put('/app/plugin/chat/health')
+  async chatHealth(@Req() req) {
+    await this.chatsService.chatHealth(req.user.avatarId, req.user.id)
   }
 }

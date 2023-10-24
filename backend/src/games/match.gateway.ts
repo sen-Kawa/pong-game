@@ -2,36 +2,48 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  MessageBody
+  MessageBody,
+  ConnectedSocket
 } from '@nestjs/websockets'
-import { SocketService } from '../socket/socket.service'
 import { Server } from 'socket.io'
-import { Logger, Req, UseGuards } from '@nestjs/common'
+import { Logger } from '@nestjs/common'
 import { MatchService } from './match.service'
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { GameUpdate } from 'common-types'
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:8080'],
+    origin: [
+      'http://localhost:8080',
+      'https://sturdy-halibut-5px7jx47ggwh79vw-8080.app.github.dev'
+    ],
     credentials: true
   },
   transports: ['websocket', 'polling']
 })
-@UseGuards(JwtAuthGuard)
 export class MatchGateway {
-  constructor(
-    private socketService: SocketService,
-    private matchService: MatchService
-  ) {}
+  constructor(private matchService: MatchService) {}
 
   @WebSocketServer() public server: Server
-  private logger: Logger = new Logger('MatchGateWay')
 
-  @SubscribeMessage('move')
-  game_update(@Req() request: any, @MessageBody() update: any) {
-    const match = this.matchService.makeMove(update, request.user.refreshToken)
-    console.log('Update in game_update:', update)
-    this.socketService.socket.emit('game_update', match)
-    console.log('Match is: ' + match)
+  private logger: Logger = new Logger('MatchGateway')
+
+  @SubscribeMessage('move_up')
+  move_up(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
+    this.matchService.makeMove(client.data.userId, -3, gameid[0])
+  }
+
+  @SubscribeMessage('move_down')
+  move_down(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
+    this.matchService.makeMove(client.data.userId, 3, gameid[0])
+  }
+
+  @SubscribeMessage('stop')
+  stop(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
+    this.matchService.makeMove(client.data.userId, 0, gameid[0])
+  }
+
+  @SubscribeMessage('player_connected')
+  async player_connected(@ConnectedSocket() client: any, @MessageBody() update: GameUpdate) {
+    await this.matchService.playerConnected(client.id, client.data.userId, (update as any)[0])
   }
 }

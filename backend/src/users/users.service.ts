@@ -155,10 +155,10 @@ export class UsersService {
   }
 
   //TODO fail on download handle / and tests?
-  downloadProfil(url: string, fileName: string): string {
+  downloadProfil(url: string, fileName: string): boolean {
     const dest = './files/' + fileName + '.jpg'
     const file = fs.createWriteStream(dest)
-    const req = https.get(url, function (res) {
+    https.get(url, function (res) {
       res.pipe(file)
       file
         .on('finish', function () {
@@ -171,37 +171,24 @@ export class UsersService {
           })
         })
     })
-    req.end()
-    if (req && fs.existsSync(dest)) {
-      try {
-        const base64 = `data:image/gif;base64, ${fs.readFileSync(dest, { encoding: 'base64' })}`
-        return base64
-      } catch (error) {
-        return ''
-      }
-    }
-    return ''
-  }
-
-  async createAvatarId(name: string): Promise<number> {
-    try {
-      const avatar = await this.prisma.userAvatar.create({
-        data: {
-          filename: name
-        },
-        select: {
-          id: true
-        }
-      })
-      return avatar.id
-    } catch (error) {
-      return 1
-    }
+    return true
   }
 
   async createUser(profile: any): Promise<any> {
-    const userDp64 = this.downloadProfil(profile._json.image.versions.small, profile.username)
-    const avatarId = await this.createAvatarId(profile.username + '.jpg')
+    let avatar: any
+    if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
+      try {
+        avatar = await this.prisma.userAvatar.create({
+          data: {
+            filename: profile.username
+          }
+        })
+      } catch (error) {
+        avatar = { id: 1 }
+      }
+    } else {
+      avatar = { id: 1 }
+    }
     try {
       const user = await this.prisma.user.create({
         data: {
@@ -210,19 +197,9 @@ export class UsersService {
           userName: profile.username,
           email: profile.email,
           activated2FA: false,
-          avatarId: avatarId
+          avatarId: avatar.id
         }
       })
-      if (userDp64 && userDp64.length === 0) {
-        await this.prisma.profile_pic.create({ data: { userId: user.id } })
-      } else {
-        await this.prisma.profile_pic.create({
-          data: {
-            userId: user.id,
-            avatar: userDp64
-          }
-        })
-      }
       return user
     } catch (error) {
       throw new InternalServerErrorException('createUser')
@@ -246,6 +223,21 @@ export class UsersService {
       })
     } catch (error) {
       throw new InternalServerErrorException('updateAvatar')
+    }
+  }
+
+  async updateAvatarFile(id: number, fileName: string) {
+    try {
+      await this.prisma.userAvatar.update({
+        where: {
+          id: id
+        },
+        data: {
+          filename: fileName
+        }
+      })
+    } catch (error) {
+      throw new InternalServerErrorException('updateAvatarFile')
     }
   }
 

@@ -1,19 +1,12 @@
 <script setup lang="ts">
-  import { reactive } from 'vue'
-  import { toRef } from "vue";
+  import { reactive, watch, onMounted } from 'vue'
   import type { ChatList, ChatListTmp, Chat_unionTb } from '@/components/khrov-chat/interface/khrov-chat'
-  import { onMounted } from 'vue'
   import ChatListItem from '@/components/khrov-chat/ChatListItem.vue'
   import ChatListItemMsg from '@/components/khrov-chat/ChatListItemMsg.vue'
   import { layer } from '@layui/layer-vue';
-  import { useChatsStore } from '@/stores/chatsAll'
+  import { useChatsStore } from '@/stores/chats'
   import { socket } from '@/sockets/sockets'
 
-  const props =  defineProps< {
-    sTemp: number,
-  } >()
-
-  const $_ = toRef(() => props.sTemp);
   const chatsStore = useChatsStore();
 
   const cList: ChatList = reactive({
@@ -22,7 +15,8 @@
     chiMorphPartnerUserId: 0,
     chiMorphPartnerUName: '',
     chiMorphUnbAllowed: false,
-
+    notifDiff: 0,
+    loading: false,
   });
 
   const chatCache: any = reactive({});  
@@ -39,9 +33,8 @@
     }
   }
 
-  const blockUnblock = async (blocker: number, blocked: number, partner: string, flag: boolean) => {
+  const blockUnblock = async (blocked: number, partner: string, flag: boolean) => {
     const tmp = {
-      'blockerId': blocker,
       'blockedId': blocked,
     }
     let msg: string = `You have unblocked ${partner} successfully!` ;
@@ -67,7 +60,8 @@
   }
 
   const submitChatMsg = async () => {
-    if (cList.chiChatMsg && cList.chiChatMsg.length == 0) {
+    if ( !cList.chiChatMsg ||
+       ( cList.chiChatMsg && (cList.chiChatMsg.trimStart()).length == 0) ) {
       return ;
     }
     const tmp: ChatListTmp = {
@@ -89,14 +83,36 @@
     }
   }
 
+  const calculateChatNotif = (datas : Chat_unionTb[]) : number => {
+    let total: number = 0;
+    for (let key in datas) {
+      const oneUnion = datas[key];
+      total += oneUnion.unreadCount;
+    }
+    return total ;
+  }
+
+  watch(() => cList.notifDiff, async (curr, expired) => {
+    if (curr > expired) {
+      let there_be_sounds = new Audio(chatsStore.getKhrovCelestial);  
+      there_be_sounds.play();
+      chatsStore.manageAllNotifCounter(curr, 0);
+    }
+  })
   const getConversationPreviews = async () => {
-    const response = await chatsStore.fetchForKhrov(`/chats/${$_.value}`, 'GET', {});
+    cList.loading = true;
+    const response = await chatsStore.fetchForKhrov(`/chats/previews`, 'GET', {});
     if (response) {
+      cList.loading = false;
       try {
         if (!response.ok) throw response;
         const jsonObj = await response.json();
-        datas = jsonObj; 
-        cList.chiChatConnsApiOk+=1;
+        if (JSON.stringify(datas) != JSON.stringify(jsonObj)) {
+          datas = jsonObj;
+          cList.chiChatConnsApiOk+=1;
+          cList.notifDiff = calculateChatNotif(datas);
+        }
+         
       } catch (error) {
          cList.chiChatConnsApiOk = cList.chiChatConnsApiOk ? 1 : 0;
       }
@@ -104,6 +120,7 @@
     if (cList.chiChatConnsApiOk && cList.chiUnionUnderFocus){
       await getOneConversation();
     }
+    cList.loading = false;
   }
 
   const getOneConversation = async () => {
@@ -122,9 +139,19 @@
   onMounted(() => {
     getConversationPreviews();
     socket.on('new-chat-event', (id: number) => {
+    // Tricky Bug: chatCache{key: {},...} key will be empty 
+    // when no conversation has been clicked from preview yet
+    let found: boolean = false;
+    for (let key in datas) {
+      const union = datas[key];
+      if (union.unionId === id) {
+        found = true;
+        break ;
+      }
+    }
     // const found: boolean = chatCache.hasOwnProperty(id)
-    const found = Object.getOwnPropertyDescriptor(chatCache, id)
-    if (found !== undefined || id === 0) {
+    // const found = Object.getOwnPropertyDescriptor(chatCache, id)
+    if (found || id === 0) {
       getConversationPreviews();
     }
   })
@@ -186,10 +213,14 @@
             setSeen(item.unionId, item.unionIdOther);
             getConversationPreviews();
             cactc('Single-conversation');
+            chatsStore.manageAllNotifCounter(0, 0, 'chat');
             }"
           />
       </div>
-      <div v-if='!cList.chiChatConnsApiOk' class="Awaiting-chat-list"></div>
+      <div v-if='datas.length===0&&!cList.loading'>
+        <p class="Empty-chat-list">No Chat Conversations to display!</p>
+      </div>
+      <div v-if='cList.loading' class="Awaiting-chat-list"></div>
     </div>
 
     <div class="Single-conversation Output-box" :class="{clActive: vtofctc.SingleConversationIsActive}"
@@ -267,7 +298,7 @@
           <button class="I-blocked-them" v-if="cList.chiMorphUnbAllowed === true">
             <img src="/khrov-chat-media/unblock.png" alt="Unblock">
             <span @click="{
-                blockUnblock($_, cList.chiMorphPartnerUserId, cList.chiMorphPartnerUName, false);
+                blockUnblock(cList.chiMorphPartnerUserId, cList.chiMorphPartnerUName, false);
 
                 styling.TopOfChatUlHeight='0px';
 
@@ -336,7 +367,7 @@
             styling.DisplayBlockingConfirm='none';
             styling.DisplayBlockingQuestion='block';
 
-            blockUnblock($_, cList.chiMorphPartnerUserId, cList.chiMorphPartnerUName, true);
+            blockUnblock(cList.chiMorphPartnerUserId, cList.chiMorphPartnerUName, true);
 
             styling.TopOfChatUlHeight='0px';
 
@@ -380,7 +411,13 @@
   background-repeat: no-repeat;
   background-size: 30%;
   background-position: center;
-
+}
+.Empty-chat-list {
+  text-align: center;
+  padding-top: 10px;
+  color: #009900;
+  font-size: 14px;
+  letter-spacing: 0.5px;
 }
 
 .Single-conversation {
