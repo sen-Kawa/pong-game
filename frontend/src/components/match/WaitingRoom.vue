@@ -7,11 +7,11 @@
 <script setup lang="ts">
 import router from '@/router'
 import { socket } from '@/sockets/sockets'
-import { useAuthStore } from '@/stores/auth'
+import { useMatchStore } from '@/stores/match'
 import { ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
-const authStore = useAuthStore()
+const matchStore = useMatchStore()
 const canLeave = ref(false)
 const shouldLeaveQueue = ref(true)
 
@@ -27,18 +27,21 @@ onBeforeRouteLeave(() => {
 })
 
 function sendLeaveQueueEvent() {
-  socket.emit('leaveQueue', { userId: authStore.getUserId })
+  socket.emit('leaveQueue')
 }
 
 function leaveQueue() {
   canLeave.value = true
+  socket.off('newGame')
   router.back()
 }
 
-socket.on('newGame', (matchId: number) => {
+socket.on('newGame', async (matchId: number) => {
   console.log(`joining match ${matchId}`)
   canLeave.value = true
   shouldLeaveQueue.value = false
   // TODO: redirect to the game
+  await matchStore.getMatch(matchId)
+  router.back()
 })
 </script>

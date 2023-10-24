@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common'
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
@@ -26,7 +27,8 @@ export class QueueGateway {
   private logger: Logger = new Logger('MatchGateWay')
 
   @SubscribeMessage('joinQueue')
-  joinQueue(@MessageBody('userId') userId: number) {
+  joinQueue(@ConnectedSocket() client: any) {
+    const userId = client.data.userId
     this.queueService.addPlayer(userId)
     this.logger.log(`User ${userId} joined the queue`)
     this.server.emit('player_joined', userId)
@@ -38,7 +40,8 @@ export class QueueGateway {
   }
 
   @SubscribeMessage('leaveQueue')
-  leaveQueue(@MessageBody('userId') userId: number) {
+  leaveQueue(@ConnectedSocket() client: any) {
+    const userId = client.data.userId
     this.queueService.removePlayer(userId)
     this.logger.log(`User ${userId} left the queue`)
     this.server.emit('player_left', userId)

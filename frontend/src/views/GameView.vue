@@ -1,7 +1,7 @@
 <template>
   <div class="component-title">Game</div>
   <button v-if="!matchStore.currentMatch" @click="createNewGame">New Game</button>
-  <button @click="joinQueue">Join Queue</button>
+  <button v-if="!matchStore.currentMatch" @click="joinQueue">Join Queue</button>
   <GameComponent
     v-if="matchStore.currentMatch"
     :match="matchStore.currentMatch"
@@ -14,13 +14,11 @@
 import SearchMatch from '@/components/match/SearchMatch.vue'
 import router from '@/router'
 import { socket } from '@/sockets/sockets'
-import { useAuthStore } from '@/stores/auth'
 import { useMatchStore } from '@/stores/match'
 import { onMounted } from 'vue'
 import GameComponent from '../components/match/GameComponent.vue'
 
 const matchStore = useMatchStore()
-const authStore = useAuthStore()
 
 matchStore.init()
 matchStore.pagination.pageSize.value = 10
@@ -40,8 +38,7 @@ async function createNewGame() {
 }
 
 function joinQueue() {
-  console.log(authStore.getUserId)
-  socket.emit('joinQueue', { userId: authStore.getUserId })
+  socket.emit('joinQueue')
   router.push('game/queue')
 }
 </script>
