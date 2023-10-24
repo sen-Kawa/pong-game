@@ -61,7 +61,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   async handleDisconnect(client: Socket) {
     //TODO error handling
     if (client.data.userId) {
-      this.appService.disconnectedUser(client.data.userId)
+      this.appService.disconnectedUser(client.data.userId, client.id)
       this.logger.log('Client disconnected ' + client.data.userId)
     } else this.logger.log('Unknown Client disconnected ' + client.id)
     client.disconnect()

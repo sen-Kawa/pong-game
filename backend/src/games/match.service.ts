@@ -268,7 +268,7 @@ export class MatchService {
       return undefined
     }
 
-    let other_player = ''
+    let other_player = []
     if (match.players[0].id === userId) {
       match.players[0].connected = true
       other_player = this.socketService.getSocketId(match.players[1].id)
