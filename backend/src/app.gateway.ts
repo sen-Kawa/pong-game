@@ -14,7 +14,10 @@ import { AppService } from './app.service'
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:8080'],
+    origin: [
+      'http://localhost:8080',
+      'https://sturdy-halibut-5px7jx47ggwh79vw-8080.app.github.dev'
+    ],
     credentials: true
   },
   transports: ['websocket', 'polling']
@@ -34,7 +37,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-    console.log(client.handshake.headers)
     //TODO error handling
     //TODO run via refresh if auth token invalid
     if (!client.handshake.headers.cookie) client.disconnect()

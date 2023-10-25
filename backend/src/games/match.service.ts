@@ -492,7 +492,6 @@ export class MatchService {
       ...score,
       matchId: matchId
     }))
-    console.log(playersOnMatchData)
     return this.prisma.match.update({
       include: { players: true },
       where: { id: matchId },

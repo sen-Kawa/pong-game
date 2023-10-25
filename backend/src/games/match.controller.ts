@@ -67,7 +67,6 @@ export class MatchController {
 
   @Post('join')
   joinMatch(@Req() request: any) {
-    console.log('Join: ', request['body'].matchId)
     return this.matchService.join(request['body'].matchId, request.user.id)
   }
 
