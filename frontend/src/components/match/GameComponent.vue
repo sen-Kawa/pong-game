@@ -1,7 +1,9 @@
 <template>
     <h2>No. {{ match.id }}: {{matchStore.getLeftPlayer}} ./. {{matchStore.getRightPlayer}}</h2>
     <br>
-	<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: black; border: 1px solid grey;"></canvas>
+	<div class="canvas-container">
+		<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: transparent; border: 1px solid grey;"></canvas>
+	</div>
     <h1 style="color: red;" v-if="game_state.game.paused">Game is paused</h1>
     <h3>{{ playerInfo }}</h3>
 </template>
@@ -193,4 +195,17 @@
     })
 </script>
 
+<style scoped>
+.canvas-container {
+	background-image: url('../../../public/space.jpg');
+	background-size: cover;
+	width: 600px;
+	height: 450px;
+	display: block;
+	margin: auto;
+}
+
+canvas {
+}
+</style>
 
