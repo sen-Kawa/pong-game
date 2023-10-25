@@ -61,11 +61,13 @@ services:
     restart: always
     ports:
       - 443:443
+    environment:
+      - SERVICEDOMAIN=${SERVICEDOMAIN}
     networks:
       - transcendence
     volumes:
       - $PWD/frontend/dist:/usr/share/nginx/html
-      - certbot-conf:/etc/letsencrypt
+      - $PWD/certs:/etc/letsencrypt
       - certbot-www:/var/www/certbot
 
   certbot:
@@ -75,9 +77,9 @@ services:
       - 80:80
     restart: no
     volumes:
-      - certbot-conf:/etc/letsencrypt
+      - $PWD/certs:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-    entrypoint: certbot certonly -n --standalone --agree-tos --email ${EMAIL} --test-cert -d ${SERVICEDOMAIN}
+    entrypoint: certbot certonly -n --standalone --agree-tos --email ${EMAIL} -d ${SERVICEDOMAIN}
 
   adminer:
     image: adminer

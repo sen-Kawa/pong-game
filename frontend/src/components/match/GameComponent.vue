@@ -156,7 +156,7 @@
         }
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
-
+	console.log("gameInit()")
         socket.emit("player_connected", props.match.id)
     }
 

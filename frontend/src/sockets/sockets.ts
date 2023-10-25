@@ -7,8 +7,11 @@ class SockManager {
 	socket: Socket;
 	options: any;
 	constructor() {
-		this.socket = io(`${import.meta.env.VITE_BACKEND_SERVER_URI}`, {
-			withCredentials: true
+		console.log("Constructor", `${import.meta.env.VITE_SOCKET_URI}`)
+		// FIXME: Somehow get dynamically the url of the server.
+		this.socket = io(`${import.meta.env.VITE_SOCKET_URI}`, {
+			withCredentials: true,
+//			path: "/api/socket.io/"
 		});
 	}
 
