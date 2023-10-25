@@ -326,7 +326,10 @@ describe('Test for diffrent routes', () => {
         currentStatus: 'OFFLINE',
         avatarId: 2,
         refreshToken: '',
-        twoFactorAuthenticationSecret: ''
+        twoFactorAuthenticationSecret: '',
+        wins: 0,
+        losses: 0,
+        ratio: 0
       }
 
       prisma.user.findUnique.mockResolvedValue(null as any)
