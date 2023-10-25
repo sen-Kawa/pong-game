@@ -490,6 +490,9 @@ export class MatchService {
       ...score,
       matchId: matchId
     }))
+
+    if (scores.length != 2) throw new ConflictException('Cannot add match result.')
+
     return this.prisma.match.update({
       include: { players: true },
       where: { id: matchId },
