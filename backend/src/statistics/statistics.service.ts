@@ -22,94 +22,57 @@ export class StatisticsService {
   //  `
 
   async getUserGamesCount(userid: number): Promise<number> {
-    // console.log("UserId: ", userid)
-    const result: Array<any> = await this.prisma.$queryRaw`SELECT  "matchId"
-        FROM "PlayersOnMatch" 
-        WHERE "playerId" = ${userid} AND
-        "matchId" IN 
-        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL)
-        `
-    // console.log("Games: ", result, result.length)
-    return result.length
-
-    // let numberOfGames = await this.prisma.playersOnMatch.count({
-    //     // add right id + check for ongoing games + divide by 2
-    //     where: {
-    //         // for testing
-    //         // playerId: 5
-    //         playerId: userid
-    //     }
-    // })
-    // return numberOfGames
+    let result = await this.getWinCount(userid)
+    result += await this.getLossesCount(userid)
+    return result
   }
 
   async getWinCount(userid: number) {
-    // for testing id = 14
-    // userid = 14
-    const result: Array<any> = await this.prisma
-      .$queryRaw`SELECT  "matchId", p1."playerId" as "playerId1", p1."score" as "score1", p2."playerId" as "playerId2", p2."score" as "score2"
-        FROM "PlayersOnMatch" as p1 
-        INNER JOIN "PlayersOnMatch" as p2 USING ("matchId")
-        WHERE p1."playerId" != p2."playerId" AND 
-        p1."matchId" IN 
-        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL) AND
-        p1."playerId" = ${userid} AND
-        p1."score" > p2."score"
-        `
-    // console.log("Wins: ", result, result.length)
-    return result.length
+    const result = await this.prisma.user.findUnique({
+      where: {
+        id: userid
+      },
+      select: {
+        wins: true
+      }
+    })
+    return result.wins
   }
 
   async getLossesCount(userid: number) {
-    // for testing id = 14
-    // userid = 14
-    const result: Array<any> = await this.prisma
-      .$queryRaw`SELECT  "matchId", p1."playerId" as "playerId1", p1."score" as "score1", p2."playerId" as "playerId2", p2."score" as "score2"
-        FROM "PlayersOnMatch" as p1 
-        INNER JOIN "PlayersOnMatch" as p2 USING ("matchId")
-        WHERE p1."playerId" != p2."playerId" AND 
-        p1."matchId" IN 
-        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL) AND
-        p1."playerId" = ${userid} AND
-        p1."score" < p2."score"
-        `
-    // console.log("Losses: ", result, result.length)
-    return result.length
+    const result = await this.prisma.user.findUnique({
+      where: {
+        id: userid
+      },
+      select: {
+        losses: true
+      }
+    })
+    return result.losses
   }
-  // yet to do
-  async ladderPosition(userId: number) {
-    // userId = 16
-    const result: Array<any> = await this.prisma.$queryRaw`SELECT  p1."playerId", sum(p1."score")
-        FROM "PlayersOnMatch" as p1 
-        INNER JOIN "PlayersOnMatch" as p2 USING ("matchId")
-        WHERE p1."playerId" != p2."playerId" AND 
-        p1."matchId" IN 
-        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL) AND
-        p1."score" > p2."score"
-        GROUP BY p1."playerId"
-        ORDER BY sum(p1."score") DESC
-        `
-    // console.log("Leaderboard: ", result)
 
-    const isUserId = (element: any) => element.playerId === userId
-    console.log('Position: ', result.findIndex(isUserId))
-    // TODO: check for -1 and for players who did not complete a game
-    if (result.findIndex(isUserId) === -1) return -1
-    return result.findIndex(isUserId) + 1 // as index starts with 0
+  async ladderPosition(displayName: string) {
+    const leaderboard = await this.generateLeaderboard()
+    for (const item of leaderboard) {
+      if (item.displayName == displayName) return item.rank
+    }
+    return -1
   }
 
   async generateLeaderboard() {
-    const result: Array<any> = await this.prisma.$queryRaw`SELECT  p1."playerId", sum(p1."score")
-        FROM "PlayersOnMatch" as p1 
-        INNER JOIN "PlayersOnMatch" as p2 USING ("matchId")
-        WHERE p1."playerId" != p2."playerId" AND 
-        p1."matchId" IN 
-        (SELECT "id" FROM "Match" WHERE "end" IS NOT NULL) AND
-        p1."score" > p2."score"
-        GROUP BY p1."playerId"
-        ORDER BY sum(p1."score") DESC
+    const tmp: Array<any> = await this.prisma.$queryRaw`SELECT "displayName",
+    RANK () OVER (ORDER BY ratio DESC) AS rank,
+    ratio
+    FROM "User"
         `
-    // console.log("Leaderboard: ", result)
+    const result: Array<any> = []
+    tmp.forEach((item) => {
+      result.push({
+        displayName: item.displayName,
+        rank: Number(item.rank),
+        ratio: item.ratio
+      })
+    })
     return result
   }
 }

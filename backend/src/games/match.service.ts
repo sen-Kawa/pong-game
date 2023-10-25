@@ -258,6 +258,7 @@ export class MatchService {
   }
 
   async create(data: Prisma.MatchCreateInput) {
+    console.debug({ data })
     const match = await this.prisma.match.create({
       data,
       include: { players: { include: { player: true } } }
@@ -296,7 +297,6 @@ export class MatchService {
       gameid: match.id,
       last_modified: new Date()
     })
-
     return match
   }
 
@@ -307,7 +307,7 @@ export class MatchService {
       return undefined
     }
 
-    let other_player = ''
+    let other_player = []
     if (match.players[0].id === userId) {
       match.players[0].connected = true
       other_player = this.socketService.getSocketId(match.players[1].id)
@@ -344,7 +344,6 @@ export class MatchService {
     if (!match) {
       return undefined
     }
-
     switch (userId) {
       case match.players[0].id:
         match.players[0].player.vector = newVector
@@ -441,7 +440,6 @@ export class MatchService {
     if (includePlayers) {
       includes = { players: { include: { player: true } } }
     }
-
     return this.prisma.match.findUniqueOrThrow({
       include: includes,
       where: { id }
@@ -510,6 +508,40 @@ export class MatchService {
   async remove(id: number) {
     return this.prisma.match.delete({ where: { id } })
   }
+
+  // createQueueGame(matchId: number, player1: number, player2: number)
+  // {
+  //   this.matches.set(matchId, {
+  //     players: [
+  //       {
+  //         player: {
+  //           pos: 0,
+  //           vector: 0
+  //         },
+  //         id: player1,
+  //         connected: false
+  //       },
+  //       {
+  //         player: {
+  //           pos: 0,
+  //           vector: 0
+  //         },
+  //         id: player2,
+  //         connected: false
+  //       }
+  //     ],
+  //     ball: {
+  //       xPos: 100,
+  //       yPos: 100,
+  //       xVec: 1.5,
+  //       yVec: -1.5
+  //     },
+  //     score: [0, 0],
+  //     started: false,
+  //     gameid: matchId,
+  //     last_modified: new Date()
+  //   })
+  // }
 }
 
 // /**

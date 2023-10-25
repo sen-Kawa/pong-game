@@ -81,21 +81,13 @@
         clearInterval(interval);
     })
 
-    // FIXME: find out why connect and reconnect events are not fired
-    socket.on("reconnect", () => {
-        console.log("Reconnected")
-        socket.emit("player_connected", props.match.id)
-    })
+    function moveUp() { 
+        console.log("move up:", props.match.id)
+        socket.emit("move_up", [props.match.id]) }
 
-    socket.on("connect", () => {
-        console.log("Connected")
-    })
+    function moveDown() { socket.emit("move_down", [props.match.id]) }
 
-    function moveUp() { socket.emit("move_up", props.match.id) }
-
-    function moveDown() { socket.emit("move_down", props.match.id) }
-
-    function stop() { socket.emit("stop", props.match.id) }
+    function stop() { socket.emit("stop", [props.match.id]) }
 
     function keyDownHandler(event: any) {
         if (event.key == keyDown) {
@@ -156,8 +148,8 @@
         }
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
-	console.log("gameInit()")
-        socket.emit("player_connected", props.match.id)
+
+        socket.emit("player_connected", [props.match.id])
     }
 
     function drawGame() {
@@ -172,6 +164,7 @@
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
             console.log("cant get canvas");
+            clearInterval(interval);
             document.removeEventListener("keydown", (event) => {
                 keyUpHandler(event)
             });

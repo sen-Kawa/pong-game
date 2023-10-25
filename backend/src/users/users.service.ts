@@ -156,7 +156,7 @@ export class UsersService {
 
   //TODO fail on download handle / and tests?
   downloadProfil(url: string, fileName: string): boolean {
-    const dest = './files/' + fileName + '.jpg'
+    const dest = './files/' + fileName
     const file = fs.createWriteStream(dest)
     https.get(url, function (res) {
       res.pipe(file)
@@ -252,6 +252,51 @@ export class UsersService {
             filename: true
           }
         }
+      }
+    })
+  }
+
+  async updateWinLosses(winner: number, loser: number) {
+    const winnerUser = await this.prisma.user.findUnique({
+      where: {
+        id: winner
+      },
+      select: {
+        wins: true,
+        losses: true
+      }
+    })
+
+    const wins = winnerUser.wins + 1
+    let ratio = wins / (wins + winnerUser.losses)
+    await this.prisma.user.update({
+      where: {
+        id: winner
+      },
+      data: {
+        wins: wins,
+        ratio: ratio
+      }
+    })
+    const loserUser = await this.prisma.user.findUnique({
+      where: {
+        id: loser
+      },
+      select: {
+        wins: true,
+        losses: true
+      }
+    })
+
+    const losses = loserUser.losses + 1
+    ratio = loserUser.wins / (losses + loserUser.wins)
+    await this.prisma.user.update({
+      where: {
+        id: loser
+      },
+      data: {
+        losses: losses,
+        ratio: ratio
       }
     })
   }

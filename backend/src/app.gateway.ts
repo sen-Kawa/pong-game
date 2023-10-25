@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -5,12 +6,11 @@ import {
   WebSocketGateway,
   WebSocketServer
 } from '@nestjs/websockets'
-import { SocketService } from './socket/socket.service'
-import { Server, Socket } from 'socket.io'
-import { Logger } from '@nestjs/common'
 import { parse } from 'cookie'
-import { AuthService } from './auth/auth.service'
+import { Server, Socket } from 'socket.io'
 import { AppService } from './app.service'
+import { AuthService } from './auth/auth.service'
+import { SocketService } from './socket/socket.service'
 
 @WebSocketGateway({
   cors: {
@@ -55,7 +55,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
           this.logger.log('Client connected ' + client.id)
         }
       } catch (error) {
-        console.log(error)
+        console.error(error)
         client.disconnect()
       }
     }
@@ -64,7 +64,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   async handleDisconnect(client: Socket) {
     //TODO error handling
     if (client.data.userId) {
-      this.appService.disconnectedUser(client.data.userId)
+      this.appService.disconnectedUser(client.data.userId, client.id)
       this.logger.log('Client disconnected ' + client.data.userId)
     } else this.logger.log('Unknown Client disconnected ' + client.id)
     client.disconnect()

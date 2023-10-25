@@ -28,7 +28,10 @@ describe('AuthService', () => {
     currentStatus: 'OFFLINE',
     avatarId: 2,
     refreshToken: '',
-    twoFactorAuthenticationSecret: 'ThisIsATwoFASecret'
+    twoFactorAuthenticationSecret: 'ThisIsATwoFASecret',
+    wins: 0,
+    losses: 0,
+    ratio: 0
   }
   const userWithOutRefreshToken = 42
 

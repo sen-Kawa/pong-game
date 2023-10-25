@@ -8,7 +8,7 @@ import {
 import { Server } from 'socket.io'
 import { Logger } from '@nestjs/common'
 import { MatchService } from './match.service'
-import { GameUpdate } from 'common-types'
+//import { GameUpdate } from 'common-types'
 
 @WebSocketGateway({
   cors: {
@@ -43,8 +43,7 @@ export class MatchGateway {
   }
 
   @SubscribeMessage('player_connected')
-  async player_connected(@ConnectedSocket() client: any, @MessageBody() update: GameUpdate) {
-    console.log("Player connected", client.data.userId)
-    await this.matchService.playerConnected(client.id, client.data.userId, (update as any)[0])
+  async player_connected(@ConnectedSocket() client: any, @MessageBody() payload: any) {
+    await this.matchService.playerConnected(client.id, client.data.userId, (payload as any)[0])
   }
 }

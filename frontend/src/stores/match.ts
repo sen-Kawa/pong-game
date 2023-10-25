@@ -97,15 +97,14 @@ export const useMatchStore = defineStore('match', () => {
   }
 
   async function joinMatch(id: number) {
-    console.log("joinMatch called:", id)
+    console.log('joinMatch called:', id)
     const requestPath = baseUrlMatch + '/join'
     // console.log("Join cM 1: ", currentMatch.value)
 
-
     if (currentMatch.value) {
-        const message = 'already in game'
-        error.value = message
-        throw new Error(message)
+      const message = 'already in game'
+      error.value = message
+      throw new Error(message)
     }
     try {
         loading.value = true
@@ -127,12 +126,11 @@ export const useMatchStore = defineStore('match', () => {
         currentMatch.value = newMatch
         player_number.value = 1
     } catch (e) {
-        const message = e instanceof Error ? e.message : 'Unknown Error'
-        error.value = message
-        console.error('Failed to join match ' + id, e)
-        throw error
+      const message = e instanceof Error ? e.message : 'Unknown Error'
+      error.value = message
+      console.error('Failed to join match ' + id, e)
+      throw error
     }
-
   }
 
   async function getMatches(path?: string) {
@@ -158,6 +156,43 @@ export const useMatchStore = defineStore('match', () => {
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
         matches.value.push(...response.data.map(transformMatchDTO))
+      } else throw new Error(response.statusText)
+      if (matches.value.length === 0) error.value = 'No Matches found!'
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown Error'
+      error.value = message
+      console.error('Error fetching match data from the backend:', e)
+    }
+  }
+
+  async function getMatch(matchId: number) {
+    const requestPath = baseUrlMatch
+    const searchParams = new URLSearchParams()
+
+    const localFilters: Filter = {
+      gameStatus: GameStatus.CREATED,
+      includePlayers: true,
+      includeScores: true
+    }
+
+    try {
+      // loading.value = true
+
+      // Object.entries(localFilters).forEach(([key, value]) => {
+      //   if (Object.prototype.hasOwnProperty.call(filters.value, key)) {
+      //     searchParams.append(key, value.toString())
+      //   }
+      // })
+
+      const response = await jwtInterceptor.get(requestPath + '/' + matchId, {
+        withCredentials: true,
+        params: searchParams
+      })
+      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
+      error.value = ''
+      loading.value = false
+      if (response.status >= 200 && response.status < 300) {
+        currentMatch.value = transformMatchDTO(response.data)
       } else throw new Error(response.statusText)
       if (matches.value.length === 0) error.value = 'No Matches found!'
     } catch (e) {
@@ -267,6 +302,7 @@ export const useMatchStore = defineStore('match', () => {
     gameStates,
     createMatch,
     getMatches,
+    getMatch,
     getMatchHistory,
     getMatchesToJoin,
     getMatchesToSpectate,
