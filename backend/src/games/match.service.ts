@@ -62,7 +62,7 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
   typeof playersOnMatchWithUserInfo
 >
 
-const MAXBOUNCEANGLE = 75 * Math.PI / 180
+const MAXBOUNCEANGLE = (75 * Math.PI) / 180
 const BALLSPEED = 8
 
 @Injectable()
@@ -95,7 +95,7 @@ export class MatchService {
 
   isInMatch(userId: number) {
     let matchId = undefined
-    for (let [id, match] of this.matches) {
+    for (const [id, match] of this.matches) {
       if (userId === match.players[0].id || userId === match.players[1].id) {
         matchId = id
         break
@@ -128,16 +128,16 @@ export class MatchService {
   private async matchEnd(game: Game) {
     console.log(game.gameid)
     if (game.players[1].id !== undefined) {
-        await this.addMatchResult(game.gameid, [
+      await this.addMatchResult(game.gameid, [
         {
-            playerId: game.players[0].id,
-            score: game.score[0]
+          playerId: game.players[0].id,
+          score: game.score[0]
         },
         {
-            playerId: game.players[1].id,
-            score: game.score[1]
+          playerId: game.players[1].id,
+          score: game.score[1]
         }
-        ])
+      ])
     }
 
     this.socketService.socket
@@ -204,7 +204,7 @@ export class MatchService {
         state.ball.xPos = 0 + paddleWidth + ballRadius + 1
 
         if (state.ball.xVec < 0) {
-            this.bounceBallLeft(game)
+          this.bounceBallLeft(game)
         }
       } else if (state.ball.xPos <= 0 && state.ball.xVec < 0) {
         const angle = Math.random() * MAXBOUNCEANGLE + Math.PI
@@ -227,7 +227,7 @@ export class MatchService {
         state.ball.xPos = fieldWidth - paddleWidth - 1
 
         if (state.ball.xVec > 0) {
-            this.bounceBallRight(game)
+          this.bounceBallRight(game)
         }
       } else if (state.ball.xPos >= fieldWidth && state.ball.xVec > 0) {
         const angle = Math.random() * MAXBOUNCEANGLE - Math.PI
@@ -277,12 +277,8 @@ export class MatchService {
         paused: false
       }
 
-      this.socketService.socket
-        .to(playerOne)
-        .emit('game_update', update)
-      this.socketService.socket
-        .to(playerTwo)
-        .emit('game_update', update)
+      this.socketService.socket.to(playerOne).emit('game_update', update)
+      this.socketService.socket.to(playerTwo).emit('game_update', update)
     })
   }
 
@@ -359,7 +355,7 @@ export class MatchService {
       }
 
       if (match.state == GameState.Created) {
-      await this.start(gameid)
+        await this.start(gameid)
       }
 
       this.socketService.socket.to(connection).emit('start_game', update)
@@ -515,11 +511,6 @@ export class MatchService {
   }
 
   async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
-    const playersOnMatchData = scores.map((score) => ({
-      ...score,
-      matchId: matchId
-    }))
-
     if (scores.length != 2) throw new ConflictException('Cannot add match result.')
 
     return this.prisma.match.update({
