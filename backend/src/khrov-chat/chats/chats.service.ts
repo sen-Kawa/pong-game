@@ -659,19 +659,21 @@ export class ChatsService {
         select: { filename: true }
       })
       .then((data) => {
-        return data != null ? data.filename : null
+        return data ? data.filename : null
       })
-    if (avatarPath != null) {
-      const fullPath = './files/' + avatarPath
-      const base64 = `data:image/gif;base64, ${fs.readFileSync(fullPath, { encoding: 'base64' })}`
-      await this.prisma.profile_pic.upsert({
-        where: { userId: userId },
-        update: { avatar: base64 },
-        create: {
-          userId: userId,
-          avatar: base64
-        }
-      })
+    if (avatarPath) {
+      try {
+        const fullPath = './files/' + avatarPath + '.jpg'
+        const base64Img = `data:image/gif;base64, ${fs.readFileSync(fullPath, { encoding: 'base64' })}`
+        await this.prisma.profile_pic.upsert({
+          where: { userId: userId },
+          update: { avatar: base64Img },
+          create: {
+            userId: userId,
+            avatar: base64Img
+          }
+        })
+      } catch { console.log(`Error reading ./files/${avatarPath}.jpg`) }
     }
     const totalUsers = await this.prisma.user.count()
     const chatAppUsers = await this.prisma.profile_pic.count()
