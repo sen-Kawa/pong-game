@@ -20,7 +20,7 @@
 <script setup lang="ts">
     import { socket } from '@/sockets/sockets';
     import { ref, onUnmounted, onMounted } from 'vue';
-    import { type GameUpdate } from 'common-types';
+    import { type GameUpdate, paddleHeight, paddleWidth, ballRadius, fieldHeight, fieldWidth } from 'common-types';
     import { useAuthStore } from '../../stores/auth.js';
     import { useMatchStore } from '../../stores/match.js';
 
@@ -37,12 +37,6 @@
     let keyDown: string = 's'
     const playerInfo = ref('Control your player with [w] for up and [s] for down.')
     const elementColor:string = 'white'
-
-    const paddleWidth = 15
-    const paddleHeight = 70
-    const ballRadius = 8
-    const fieldWidth = 600
-    const fieldHeight = 450
 
     const authStore = useAuthStore()
     const leftPlayerName = ref('leftPlayer')
