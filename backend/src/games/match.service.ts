@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
+import { UsersService } from '../users/users.service'
 import {
   Player,
   GameUpdate,
@@ -66,7 +67,8 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
 export class MatchService {
   constructor(
     private prisma: PrismaService,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private usersService: UsersService
   ) {
     this.matches = new Map<number, Game>()
     setInterval(() => {
@@ -92,7 +94,7 @@ export class MatchService {
 
   isInMatch(userId: number) {
     let matchId = undefined
-    for (let [id, match] of this.matches) {
+    for (const [id, match] of this.matches) {
       if (userId === match.players[0].id || userId === match.players[1].id) {
         matchId = id
         break
@@ -109,7 +111,7 @@ export class MatchService {
       return undefined
     }
 
-    if (match.players[1].id === undefined) {
+    if (match.players[0].id != playerId && match.players[1].id === undefined) {
       match.players[1].id = playerId
       await this.addPlayer(matchId, playerId)
     }
@@ -125,16 +127,20 @@ export class MatchService {
   private async matchEnd(game: Game) {
     console.log(game.gameid)
     if (game.players[1].id !== undefined) {
-        await this.addMatchResult(game.gameid, [
+      await this.addMatchResult(game.gameid, [
         {
-            playerId: game.players[0].id,
-            score: game.score[0]
+          playerId: game.players[0].id,
+          score: game.score[0]
         },
         {
-            playerId: game.players[1].id,
-            score: game.score[1]
+          playerId: game.players[1].id,
+          score: game.score[1]
         }
-        ])
+      ])
+      if (game.score[0] > game.score[1])
+        this.usersService.updateWinLosses(game.players[0].id, game.players[1].id)
+      else if (game.score[1] > game.score[0])
+        this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
     }
 
     this.socketService.socket
@@ -253,12 +259,8 @@ export class MatchService {
         paused: false
       }
 
-      this.socketService.socket
-        .to(playerOne)
-        .emit('game_update', update)
-      this.socketService.socket
-        .to(playerTwo)
-        .emit('game_update', update)
+      this.socketService.socket.to(playerOne).emit('game_update', update)
+      this.socketService.socket.to(playerTwo).emit('game_update', update)
     })
   }
 
@@ -335,7 +337,7 @@ export class MatchService {
       }
 
       if (match.state == GameState.Created) {
-      await this.start(gameid)
+        await this.start(gameid)
       }
 
       this.socketService.socket.to(connection).emit('start_game', update)
@@ -497,20 +499,25 @@ export class MatchService {
     //}))
 
     if (scores.length != 2) throw new ConflictException('Cannot add match result.')
-
-    return this.prisma.match.update({
-      include: { players: true },
-      where: { id: matchId },
-      data: {
-        end: new Date(),
-        players: {
-          deleteMany: { matchId: matchId },
-          createMany: {
-            data: scores
+    try {
+      console.log(scores)
+      console.log('in addMatchResult')
+      return this.prisma.match.update({
+        include: { players: true },
+        where: { id: matchId },
+        data: {
+          end: new Date(),
+          players: {
+            deleteMany: { matchId: matchId },
+            createMany: {
+              data: scores
+            }
           }
         }
-      }
-    })
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async remove(id: number) {

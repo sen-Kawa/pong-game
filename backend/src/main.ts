@@ -34,8 +34,10 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:8080',
-      'https://sturdy-halibut-5px7jx47ggwh79vw-8080.app.github.dev'],
+    origin: [
+      'http://localhost:8080',
+      'https://sturdy-halibut-5px7jx47ggwh79vw-8080.app.github.dev'
+    ],
     methods: 'GET, PUT, POST, PATCH, DELETE',
     allowedHeaders: 'Content-Type, Authorization'
   })

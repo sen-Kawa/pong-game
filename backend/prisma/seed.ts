@@ -95,7 +95,7 @@ async function main() {
 
   console.log({ avatar1, user1, user2, user3, user4 })
 
-  // create alot of matches where players play more matches
+  //create alot of matches where players play more matches
   const tournamentMatches = createFakeTournament(5)
   for (const match of tournamentMatches) {
     const m = await prisma.match.create({ data: match })
