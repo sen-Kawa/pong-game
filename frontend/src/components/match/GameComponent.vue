@@ -1,8 +1,14 @@
 <template>
     <h2>No. {{ match.id }}: {{matchStore.getLeftPlayer}} ./. {{matchStore.getRightPlayer}}</h2>
     <br>
-	<div class="canvas-container">
-		<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: transparent; border: 1px solid grey;"></canvas>
+	<div>
+		<label for="mapSelect">Select Map:</label>
+		<select id="mapSelect" v-model="selectedMap">
+			<option v-for="image in mapPaths" :value="image.path" :key="image.path">{{image.name}}</option>
+		</select>
+		<div class="canvas-container" :style="{ backgroundImage: `url(${selectedMap})`}">
+			<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: transparent; border: 1px solid grey;"></canvas>
+		</div>
 	</div>
     <h1 style="color: red;" v-if="game_state.game.paused">Game is paused</h1>
     <h3>{{ playerInfo }}</h3>
@@ -12,10 +18,17 @@
 <script setup lang="ts">
     import { socket } from '@/sockets/sockets';
     import { ref, onUnmounted, onMounted } from 'vue';
-    import { type GameUpdate } from 'common-types'
-    import { useAuthStore } from '../../stores/auth.js'
-    import { useMatchStore } from '../../stores/match.js'
+    import { type GameUpdate } from 'common-types';
+    import { useAuthStore } from '../../stores/auth.js';
+    import { useMatchStore } from '../../stores/match.js';
 
+	const mapPaths = [
+		{ name: 'space', path: '../../../public/space.jpg' },
+		{ name: 'desert', path: '../../../public/desert.jpg' },
+		{ name: 'forest', path: '../../../public/forest.jpg' },
+		{ name: 'underwater', path: '../../../public/underwater.jpg' },
+	];
+	const selectedMap = ref(mapPaths[1].path);
     let keyUp: string = 'w'
     let keyDown: string = 's'
     const playerInfo = ref('Control your player with [w] for up and [s] for down.')
@@ -192,12 +205,11 @@
 
     onMounted(() => {
         gameInit()
-    })
+    });
 </script>
 
 <style scoped>
 .canvas-container {
-	background-image: url('../../../public/space.jpg');
 	background-size: cover;
 	width: 600px;
 	height: 450px;
