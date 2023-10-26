@@ -19,6 +19,7 @@ export interface User {
 
 export const useAuthStore = defineStore('auth', () => {
   const loginStatus = ref(useStorage('loginStatus', false))
+  const profilLoaded = ref(false)
   const userProfile = ref<User>({
     id: 0,
     userName: '',
@@ -29,6 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   const isLoggedIn = computed(() => loginStatus.value)
+  const isLoaded = computed(() => profilLoaded.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
   const getUserId = computed(() => userProfile.value.id)
@@ -50,6 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
     // console.log(date.activated2FA);
     // console.log(date);
     loginStatus.value = true
+    profilLoaded.value = true
     userProfile.value.id = date.id
     userProfile.value.name = date.name
     userProfile.value.displayName = date.displayName
@@ -91,12 +94,12 @@ export const useAuthStore = defineStore('auth', () => {
   async function getuserProfile() {
     const response = await jwtInterceptor.get(baseUrlauth + 'user-profile', {
       withCredentials: true
-    })
+    }).catch(() => {})
     if (response && response.status == 200) {
       setUserProfile(response.data)
     } else {
       loginStatus.value = false
-      router.push('/')
+      //router.push('/')
     }
   }
 
@@ -207,6 +210,7 @@ export const useAuthStore = defineStore('auth', () => {
     getId,
     activated2FA,
     isLoggedIn,
+    isLoaded,
     signInFortyTwo,
     validate2fa,
     getuserProfile,

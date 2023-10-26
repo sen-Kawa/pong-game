@@ -30,8 +30,7 @@ describe('MatchList', () => {
   it('renders properly', async () => {
     const wrapper = mount(MatchListVue, {
       props: {
-        matches: fakeMatches,
-        joinGame: (id: number) =>{}
+        matches: fakeMatches
       }
     })
 
