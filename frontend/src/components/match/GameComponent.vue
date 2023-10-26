@@ -96,6 +96,12 @@
     onUnmounted(() => {
         console.log("Unmounted")
         clearInterval(interval);
+        document.removeEventListener("keydown", (event) => {
+            keyUpHandler(event)
+        });
+        document.removeEventListener("keyup", (event) => {
+            keyUpHandler(event)
+        });
     })
 
     function moveUp() {
@@ -207,6 +213,17 @@
 
     onMounted(() => {
         gameInit()
+        const c = document.getElementById("game-canvas") as HTMLCanvasElement;
+        if (c === null) {
+            console.log("cant get canvas");
+            return;
+        }
+        const ctx = c.getContext("2d");
+        if (ctx === null) {
+            console.log("Cant get canvas");
+            return;
+        }
+        ctx.clearRect(0, 0, c.width, c.height)
     });
 </script>
 
