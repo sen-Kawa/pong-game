@@ -73,7 +73,8 @@ export class MatchService {
       const remove: number[] = []
       this.matches.forEach(async (game, key) => {
         const diff = Date.now() - game.last_modified.getTime()
-        if (diff > 1000 * 60 * 2) {
+        if (diff > 1000 * 30) {
+          console.log('Match timed out')
           remove.push(key)
           await this.matchEnd(game)
         }
@@ -122,16 +123,20 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
-    await this.addMatchResult(game.gameid, [
-      {
-        playerId: game.players[0].id,
-        score: game.score[0]
-      },
-      {
-        playerId: game.players[1].id,
-        score: game.score[1]
-      }
-    ])
+    console.log(game.gameid)
+    if (game.players[1].id !== undefined) {
+        await this.addMatchResult(game.gameid, [
+        {
+            playerId: game.players[0].id,
+            score: game.score[0]
+        },
+        {
+            playerId: game.players[1].id,
+            score: game.score[1]
+        }
+        ])
+    }
+
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
       .emit('match_end')
@@ -328,7 +333,7 @@ export class MatchService {
         score: match.score as [number, number],
         paused: false
       }
-      
+
       if (match.state == GameState.Created) {
       await this.start(gameid)
       }
