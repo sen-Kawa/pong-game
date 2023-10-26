@@ -198,8 +198,8 @@
             clearInterval(interval);
             return;
         }
-        const state = game_state.value.game;
         ctx.clearRect(0, 0, c.width, c.height)
+        const state = game_state.value.game;
         drawNet(ctx)
         drawScore(state.score[0], state.score[1], ctx)
         drawPaddle(0, state.players[0].pos - paddleHeight/2, ctx)
@@ -212,11 +212,13 @@
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
             console.log("cant get canvas");
+            clearInterval(interval);
             return;
         }
         const ctx = c.getContext("2d");
         if (ctx === null) {
             console.log("Cant get canvas");
+            clearInterval(interval);
             return;
         }
         ctx.clearRect(0, 0, c.width, c.height)
