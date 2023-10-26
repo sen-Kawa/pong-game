@@ -63,7 +63,7 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
 >
 
 const MAXBOUNCEANGLE = 75 * Math.PI / 180
-const BALLSPEED = 5
+const BALLSPEED = 8
 
 @Injectable()
 export class MatchService {

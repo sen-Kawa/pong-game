@@ -29,12 +29,12 @@ export class MatchGateway {
 
   @SubscribeMessage('move_up')
   move_up(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
-    this.matchService.makeMove(client.data.userId, -3, gameid[0])
+    this.matchService.makeMove(client.data.userId, -4, gameid[0])
   }
 
   @SubscribeMessage('move_down')
   move_down(@MessageBody() gameid: number, @ConnectedSocket() client: any) {
-    this.matchService.makeMove(client.data.userId, 3, gameid[0])
+    this.matchService.makeMove(client.data.userId, 4, gameid[0])
   }
 
   @SubscribeMessage('stop')
