@@ -62,6 +62,9 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
   typeof playersOnMatchWithUserInfo
 >
 
+const MAXBOUNCEANGLE = 5 + Math.PI / 12
+const BALLSPEED = 5
+
 @Injectable()
 export class MatchService {
   constructor(
@@ -146,6 +149,26 @@ export class MatchService {
     this.matches.delete(game.gameid)
   }
 
+  private bounceBallLeft(game: Game) {
+    const ball = game.ball
+    const playerOne = game.players[0].player
+    const intersect = playerOne.pos - ball.yPos
+    const normalized = intersect / (paddleHeight / 2)
+    const bounceAngle = normalized * MAXBOUNCEANGLE
+    ball.xVec = BALLSPEED * Math.cos(bounceAngle)
+    ball.yVec = BALLSPEED * -Math.sin(bounceAngle)
+  }
+
+  private bounceBallRight(game: Game) {
+    const ball = game.ball
+    const playerOne = game.players[1].player
+    const intersect = playerOne.pos - ball.yPos
+    const normalized = intersect / (paddleHeight / 2)
+    const bounceAngle = normalized * MAXBOUNCEANGLE
+    ball.xVec = -(BALLSPEED * Math.cos(bounceAngle))
+    ball.yVec = BALLSPEED * -Math.sin(bounceAngle)
+  }
+
   gameTick() {
     this.matches.forEach(async (game) => {
       if (game.state == GameState.Created) {
@@ -181,8 +204,7 @@ export class MatchService {
         state.ball.xPos = 0 + paddleWidth + 1
 
         if (state.ball.xVec < 0) {
-          state.ball.xVec = state.ball.xVec * -1.4
-          state.ball.yVec = state.ball.yVec * 1.4
+            this.bounceBallLeft(game)
         }
       } else if (state.ball.xPos <= 0 && state.ball.xVec < 0) {
         state.ball.xVec = 1
@@ -204,7 +226,7 @@ export class MatchService {
         state.ball.xPos = fieldWidth - paddleWidth - 1
 
         if (state.ball.xVec > 0) {
-          state.ball.xVec = state.ball.xVec * -2
+            this.bounceBallRight(game)
         }
       } else if (state.ball.xPos >= fieldWidth && state.ball.xVec > 0) {
         state.ball.xVec = -1
