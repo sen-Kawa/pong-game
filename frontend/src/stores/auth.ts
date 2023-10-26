@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import jwtInterceptor from '../interceptor/jwtInterceptor'
 import router from '../router'
+import { socket } from '@/sockets/sockets'
 
 const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 const baseUrlUser = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/`
@@ -132,6 +133,7 @@ export const useAuthStore = defineStore('auth', () => {
       })
 
     loginStatus.value = false
+    socket.socket.disconnect()
     router.push('/')
   }
 
