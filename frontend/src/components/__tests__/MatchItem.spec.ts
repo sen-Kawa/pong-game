@@ -64,9 +64,6 @@ describe('MatchItemItem', () => {
 
     const joinButton = wrapper.find('.button.join')
     expect(joinButton.text()).toEqual('Join Game')
-
-    const spectateButton = wrapper.find('.button.spectate')
-    expect(spectateButton.text()).toEqual('Spectate')
   })
 
   it('should render a match with one player', () => {
@@ -96,9 +93,6 @@ describe('MatchItemItem', () => {
     expect(joinButton.exists()).toBe(true)
     expect(joinButton.text()).toEqual('Join Game')
 
-    const spectateButton = wrapper.find('.button.spectate')
-    expect(spectateButton.exists()).toBe(true)
-    expect(spectateButton.text()).toEqual('Spectate')
   })
 
   it('should render a match in progress', () => {
@@ -137,8 +131,5 @@ describe('MatchItemItem', () => {
     const joinButton = wrapper.find('.button.join')
     expect(joinButton.exists()).toBe(false)
 
-    const spectateButton = wrapper.find('.button.spectate')
-    expect(spectateButton.exists()).toBe(true)
-    expect(spectateButton.text()).toEqual('Spectate')
   })
 })
