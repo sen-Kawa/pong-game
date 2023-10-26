@@ -104,7 +104,8 @@ export const useMatchStore = defineStore('match', () => {
     if (currentMatch.value) {
       const message = 'already in game'
       error.value = message
-      throw new Error(message)
+      return;
+      // throw new Error(message)
     }
     try {
       loading.value = true
@@ -121,7 +122,10 @@ export const useMatchStore = defineStore('match', () => {
       const newMatch = transformMatchDTO(response.data as MatchDTO)
       console.log("NewMatch", newMatch)
       currentLeftPlayer.value = newMatch.players[0].name
-      currentRightPlayer.value = newMatch.players[1].name
+      if (newMatch.players[1])
+        currentRightPlayer.value = newMatch.players[1].name
+      else
+        currentRightPlayer.value = 'pending ...'
       // console.log("currentPlayers", currentLeftPlayer, ": ", currentRightPlayer)
       currentMatch.value = newMatch
       player_number.value = 1
@@ -129,7 +133,7 @@ export const useMatchStore = defineStore('match', () => {
       const message = e instanceof Error ? e.message : 'Unknown Error'
       error.value = message
       console.error('Failed to join match ' + id, e)
-      throw error
+      //throw error
     }
   }
 
