@@ -1,7 +1,7 @@
 <template>
   <div v-if="!isLoggedIn">
     <div>
-      <img src="../../public/oauth.svg" alt="OAuth image" />
+      <img src="/oauth.svg" alt="OAuth image" />
     </div>
     <div>
       <a class="component-title login" v-bind:href="back_url"> Login with your 42 account </a>

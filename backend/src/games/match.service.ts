@@ -63,6 +63,9 @@ export type PlayersOnMatchWithUserInfo = Prisma.PlayersOnMatchGetPayload<
   typeof playersOnMatchWithUserInfo
 >
 
+const MAXBOUNCEANGLE = (75 * Math.PI) / 180
+const BALLSPEED = 8
+
 @Injectable()
 export class MatchService {
   constructor(
@@ -152,6 +155,26 @@ export class MatchService {
     this.matches.delete(game.gameid)
   }
 
+  private bounceBallLeft(game: Game) {
+    const ball = game.ball
+    const player = game.players[0].player
+    const intersect = player.pos - ball.yPos
+    const normalized = intersect / paddleHeight
+    const bounceAngle = -normalized * MAXBOUNCEANGLE + Math.PI
+    ball.xVec = -BALLSPEED * Math.cos(bounceAngle)
+    ball.yVec = BALLSPEED * -Math.sin(bounceAngle)
+  }
+
+  private bounceBallRight(game: Game) {
+    const ball = game.ball
+    const player = game.players[1].player
+    const intersect = player.pos - ball.yPos
+    const normalized = intersect / paddleHeight
+    const bounceAngle = -normalized * MAXBOUNCEANGLE - Math.PI
+    ball.xVec = BALLSPEED * Math.cos(bounceAngle)
+    ball.yVec = BALLSPEED * -Math.sin(bounceAngle)
+  }
+
   gameTick() {
     this.matches.forEach(async (game) => {
       if (game.state == GameState.Created) {
@@ -160,7 +183,7 @@ export class MatchService {
 
       const playerOne = this.socketService.getSocketId(game.players[0].id)
       const playerTwo = this.socketService.getSocketId(game.players[1].id)
-      if (!playerOne || !playerTwo || game.state == GameState.Paused) {
+      if (playerOne.length === 0 || playerTwo.length === 0 || game.state == GameState.Paused) {
         const update: GameUpdate = {
           players: {
             0: game.players[0].player,
@@ -184,15 +207,15 @@ export class MatchService {
         state.ball.yPos <= state.players[0].player.pos + paddleHeight / 2 &&
         state.ball.yPos >= state.players[0].player.pos - paddleHeight / 2
       ) {
-        state.ball.xPos = 0 + paddleWidth + 1
+        state.ball.xPos = 0 + paddleWidth + ballRadius + 1
 
         if (state.ball.xVec < 0) {
-          state.ball.xVec = state.ball.xVec * -1.4
-          state.ball.yVec = state.ball.yVec * 1.4
+          this.bounceBallLeft(game)
         }
       } else if (state.ball.xPos <= 0 && state.ball.xVec < 0) {
-        state.ball.xVec = 1
-        state.ball.yVec = -1
+        const angle = Math.random() * MAXBOUNCEANGLE + Math.PI
+        state.ball.xVec = -BALLSPEED * Math.cos(angle)
+        state.ball.yVec = BALLSPEED * -Math.sin(angle)
         state.score[1] += 1
         if (state.score[1] >= 11) {
           this.matchEnd(game)
@@ -210,11 +233,12 @@ export class MatchService {
         state.ball.xPos = fieldWidth - paddleWidth - 1
 
         if (state.ball.xVec > 0) {
-          state.ball.xVec = state.ball.xVec * -2
+          this.bounceBallRight(game)
         }
       } else if (state.ball.xPos >= fieldWidth && state.ball.xVec > 0) {
-        state.ball.xVec = -1
-        state.ball.yVec = -1
+        const angle = Math.random() * MAXBOUNCEANGLE - Math.PI
+        state.ball.xVec = -BALLSPEED * Math.cos(angle)
+        state.ball.yVec = BALLSPEED * -Math.sin(angle)
         state.score[0] += 1
         if (state.score[0] >= 11) {
           this.matchEnd(game)
@@ -296,8 +320,8 @@ export class MatchService {
       ball: {
         xPos: 100,
         yPos: 100,
-        xVec: 1.5,
-        yVec: -1.5
+        xVec: 2,
+        yVec: 0
       },
       score: [0, 0],
       state: GameState.Created,
@@ -493,11 +517,6 @@ export class MatchService {
   }
 
   async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
-    //const playersOnMatchData = scores.map((score) => ({
-    // ...score,
-    // matchId: matchId
-    //}))
-
     if (scores.length != 2) throw new ConflictException('Cannot add match result.')
     try {
       console.log(scores)

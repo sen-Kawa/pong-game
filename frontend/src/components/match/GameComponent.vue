@@ -21,8 +21,15 @@
     import { socket } from '@/sockets/sockets';
     import { ref, onUnmounted, onMounted } from 'vue';
     import { type GameUpdate } from 'common-types';
+    // import { paddleHeight, paddleWidth, ballRadius, fieldHeight, fieldWidth } from 'common-types'
     import { useAuthStore } from '../../stores/auth.js';
     import { useMatchStore } from '../../stores/match.js';
+
+    const paddleWidth = 15
+    const paddleHeight = 70
+    const ballRadius = 8
+    const fieldWidth = 600
+    const fieldHeight = 450
 
 	const mapPaths = [
 		{ name: 'default', path: '/black.jpg' },
@@ -37,12 +44,6 @@
     let keyDown: string = 's'
     const playerInfo = ref('Control your player with [w] for up and [s] for down.')
     const elementColor:string = 'white'
-
-    const paddleWidth = 15
-    const paddleHeight = 70
-    const ballRadius = 8
-    const fieldWidth = 600
-    const fieldHeight = 450
 
     const authStore = useAuthStore()
     const leftPlayerName = ref('leftPlayer')
@@ -165,12 +166,15 @@
         ctx.fillRect(x, y, paddleWidth, paddleHeight)
     }
 
+    socket.on("connect", () => {
+        console.log("connected")
+        if (props.match) {
+            socket.emit("player_connected", [props.match.id])
+        }
+    })
+
     const gameInit = () => {
         // change the key and info if player is on the right side (maybe put it to a setup function later)
-        if (props.player_number === 1) {
-            playerInfo.value = 'Control your player with [p] for up and [l] for down.'
-            setKeysRightSide()
-        }
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
 
@@ -204,8 +208,8 @@
             clearInterval(interval);
             return;
         }
-        const state = game_state.value.game;
         ctx.clearRect(0, 0, c.width, c.height)
+        const state = game_state.value.game;
         drawNet(ctx)
         drawScore(state.score[0], state.score[1], ctx)
         drawPaddle(0, state.players[0].pos - paddleHeight/2, ctx)
@@ -218,11 +222,13 @@
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
             console.log("cant get canvas");
+            clearInterval(interval);
             return;
         }
         const ctx = c.getContext("2d");
         if (ctx === null) {
             console.log("Cant get canvas");
+            clearInterval(interval);
             return;
         }
         ctx.clearRect(0, 0, c.width, c.height)
