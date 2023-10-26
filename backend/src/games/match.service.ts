@@ -491,10 +491,10 @@ export class MatchService {
   }
 
   async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
-    const playersOnMatchData = scores.map((score) => ({
-      ...score,
-      matchId: matchId
-    }))
+    //const playersOnMatchData = scores.map((score) => ({
+    // ...score,
+    // matchId: matchId
+    //}))
 
     if (scores.length != 2) throw new ConflictException('Cannot add match result.')
 
