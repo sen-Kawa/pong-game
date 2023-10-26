@@ -89,7 +89,7 @@ describe('MatchController', () => {
 
   describe('findOne', () => {
     it('should return the match in detailed representation', async () => {
-      const match = await controller.findOne(1, { includeScores: true, includePlayers: true })
+      const match = await controller.findOne(1)
 
       expect(match).toEqual(maximalMatch)
     })
