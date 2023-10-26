@@ -20,9 +20,16 @@
 <script setup lang="ts">
     import { socket } from '@/sockets/sockets';
     import { ref, onUnmounted, onMounted } from 'vue';
-    import { type GameUpdate, paddleHeight, paddleWidth, ballRadius, fieldHeight, fieldWidth } from 'common-types';
+    import { type GameUpdate } from 'common-types';
+    // import { paddleHeight, paddleWidth, ballRadius, fieldHeight, fieldWidth } from 'common-types'
     import { useAuthStore } from '../../stores/auth.js';
     import { useMatchStore } from '../../stores/match.js';
+
+    const paddleWidth = 15
+    const paddleHeight = 70
+    const ballRadius = 8
+    const fieldWidth = 600
+    const fieldHeight = 450
 
 	const mapPaths = [
 		{ name: 'default', path: '/black.jpg' },
