@@ -70,7 +70,12 @@ describe('GamesService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MatchService, SocketService, UsersService, { provide: PrismaService, useValue: gamesDb }]
+      providers: [
+        MatchService,
+        SocketService,
+        UsersService,
+        { provide: PrismaService, useValue: gamesDb }
+      ]
     }).compile()
 
     service = module.get<MatchService>(MatchService)
