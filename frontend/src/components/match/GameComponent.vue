@@ -1,17 +1,19 @@
 <template>
-    <h2>No. {{ match.id }}: {{matchStore.getLeftPlayer}} ./. {{matchStore.getRightPlayer}}</h2>
+    <h2 class="component-subtitle">No. {{ match.id }}: {{matchStore.getLeftPlayer}} ./. {{matchStore.getRightPlayer}}</h2>
     <br>
-	<div>
-		<label for="mapSelect">Select Map: </label>
-		<select id="mapSelect" v-model="selectedMap">
-			<option v-for="image in mapPaths" :value="image.path" :key="image.path">{{image.name}}</option>
-		</select>
+	<div class="game">
+		<div class="map-menu">
+			<label for="mapSelect">Select Map: </label>
+			<select id="mapSelect" v-model="selectedMap">
+				<option v-for="image in mapPaths" :value="image.path" :key="image.path">{{image.name}}</option>
+			</select>
+		</div>
 		<div class="canvas-container" :style="{ backgroundImage: `url(${selectedMap})`}">
 			<canvas id="game-canvas" :width="fieldWidth" :height="fieldHeight" style="background-color: transparent; border: 1px solid grey;"></canvas>
 		</div>
 	</div>
     <h1 style="color: red;" v-if="game_state.game.paused">Game is paused</h1>
-    <h3>{{ playerInfo }}</h3>
+    <h3 class="details">{{ playerInfo }}</h3>
 </template>
 
 
@@ -228,6 +230,7 @@
 </script>
 
 <style scoped>
+
 .canvas-container {
 	background-size: cover;
 	width: 600px;
@@ -236,7 +239,19 @@
 	margin: auto;
 }
 
-canvas {
+.map-menu {
+	font-size: 25px;
+	position: absolute;
+	margin-left: 50px;
+	color: grey;
+	border: 2px dashed grey;
+	border-radius: 20px;
+	padding: 20px;
+}
+
+#mapSelect {
+	font-size: 25px;
+	padding: 5px;
 }
 </style>
 
