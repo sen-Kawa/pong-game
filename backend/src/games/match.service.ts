@@ -177,7 +177,7 @@ export class MatchService {
 
       const playerOne = this.socketService.getSocketId(game.players[0].id)
       const playerTwo = this.socketService.getSocketId(game.players[1].id)
-      if (!playerOne || !playerTwo || game.state == GameState.Paused) {
+      if (playerOne.length === 0 || playerTwo.length === 0 || game.state == GameState.Paused) {
         const update: GameUpdate = {
           players: {
             0: game.players[0].player,
