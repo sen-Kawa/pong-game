@@ -122,16 +122,18 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
-    await this.addMatchResult(game.gameid, [
-      {
-        playerId: game.players[0].id,
-        score: game.score[0]
-      },
-      {
-        playerId: game.players[1].id,
-        score: game.score[1]
-      }
-    ])
+    if (game.players[1].id !== undefined) {
+        await this.addMatchResult(game.gameid, [
+        {
+            playerId: game.players[0].id,
+            score: game.score[0]
+        },
+        {
+            playerId: game.players[1].id,
+            score: game.score[1]
+        }
+        ])
+    }
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
       .emit('match_end')
@@ -328,7 +330,7 @@ export class MatchService {
         score: match.score as [number, number],
         paused: false
       }
-      
+
       if (match.state == GameState.Created) {
       await this.start(gameid)
       }
