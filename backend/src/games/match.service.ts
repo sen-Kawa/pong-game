@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
+import { UsersService } from '../users/users.service'
 import {
   Player,
   GameUpdate,
@@ -69,7 +70,8 @@ const BALLSPEED = 8
 export class MatchService {
   constructor(
     private prisma: PrismaService,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private usersService: UsersService
   ) {
     this.matches = new Map<number, Game>()
     setInterval(() => {
@@ -138,6 +140,9 @@ export class MatchService {
           score: game.score[1]
         }
       ])
+      if (game.score[0] > game.score[1])
+        this.usersService.updateWinLosses(game.players[0].id, game.players[1].id)
+      else this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
     }
 
     this.socketService.socket
