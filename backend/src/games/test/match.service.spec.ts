@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { MatchService } from '../match.service'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { SocketService } from 'src/socket/socket.service'
-
+import { UsersService } from '../../users/users.service'
 const gameArray = [
   {
     id: 1,
@@ -70,7 +70,7 @@ describe('GamesService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MatchService, SocketService, { provide: PrismaService, useValue: gamesDb }]
+      providers: [MatchService, SocketService, UsersService, { provide: PrismaService, useValue: gamesDb }]
     }).compile()
 
     service = module.get<MatchService>(MatchService)
