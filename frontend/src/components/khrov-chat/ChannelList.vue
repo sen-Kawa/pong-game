@@ -14,22 +14,6 @@ import { socket } from '@/sockets/sockets'
 const chatsStore = useChatsStore()
 const chnlstStore = useChannelListStore()
 
-
-
-
-const channCache: any = reactive({})
-const offlineCache: ChnListOfflineCache[] = []
-
-
-const calculateChannNotif = (channConn: ChnListChannConn[]): number => {
-  let total: number = 0;
-  for (let key in channConn) {
-    const oneChann = channConn[key];
-    total += oneChann.unreadCount;
-  }
-  return total ;
-}
-
 watch(() => chnlstStore.getChList.notifDiff, async (curr, expired) => {
   if (curr > expired) {
     let there_be_sounds = new Audio(chatsStore.getKhrovCelestial);  
@@ -37,225 +21,17 @@ watch(() => chnlstStore.getChList.notifDiff, async (curr, expired) => {
     chatsStore.manageAllNotifCounter(0, curr);
   }
 })
-const getChannelPreviews = async () => {
-  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/get`, 'GET', {});
-  if (response) {
-    try {
-      if (!response.ok) throw response;
-      const jsonObj = await response.json();
-      if (JSON.stringify(jsonObj) != JSON.stringify(chnlstStore.getChList.channConn)) {
-        chnlstStore.getChList.channConn = jsonObj
-        chnlstStore.getChList.notifDiff = calculateChannNotif(chnlstStore.getChList.channConn);
-      }
-      if (chnlstStore.getChList.chlIdOfFocus != 0) {
-        getFocusedChannelHistory()
-      }
-    } catch {/* Do nothing */}
-  }
-}
-
-const getFocusedChannelHistory = async () => {
-  const response = await chatsStore.fetchForKhrov(`/channels/get/connections/chann/${chnlstStore.getChList.chlIdOfFocus}`, 'GET', {});
-  if (response) {
-    try {
-      if (!response.ok) {
-        chnlstStore.getChList.chlIdOfFocus = 0;
-        throw response;
-      }
-      const jsonObj = await response.json();
-      if (!offlineCache.length &&
-          JSON.stringify(jsonObj) != JSON.stringify(channCache[chnlstStore.getChList.chlIdOfFocus])) {
-        channCache[chnlstStore.getChList.chlIdOfFocus] = jsonObj
-      }
-    } catch {/* Do nothing */}
-  }
-}
-
-const submitChannMsg = async () => {
-  if ( !chnlstStore.getChList.chlMsgInput ||
-     ( chnlstStore.getChList.chlMsgInput && (chnlstStore.getChList.chlMsgInput.trimStart()).length == 0) ) {
-    return
-  }
-  const offlineAppend = {
-    outgoing: chnlstStore.getChList.chlMsgInput as string,
-    createdAt: new Date().toISOString(),
-    deliveryStatus: 'pending',
-    user: {
-      userName: 'ME'
-    }
-  }
-  channCache[chnlstStore.getChList.chlIdOfFocus] = [offlineAppend, ...channCache[chnlstStore.getChList.chlIdOfFocus]]
-  const tmp = {
-    chId: chnlstStore.getChList.chlIdOfFocus,
-    msg: chnlstStore.getChList.chlMsgInput as string,
-    time: new Date().toISOString()
-  }
-  offlineCache.push(tmp)
-  chnlstStore.getChList.chlMsgInput = ''
-  const response = await chatsStore.fetchForKhrov('/channels', 'PUT', offlineCache);
-  if (response) 
-    if (response.ok)
-      offlineCache.length = 0;
-}
-
-const setSeen = async (chId: number) => {
-  const tmp = {
-    chId: chId
-  }
-  await chatsStore.fetchForKhrov(`/channels/put/set-seen`, 'PUT', tmp);
-}
 
 onMounted(() => {
-  getChannelPreviews();
+  chnlstStore.getChannelPreviews();
   socket.on('new-channel-event', (id: number) => {
     const found = chnlstStore.getChList.channConn.find((element) => element.chId===id)
     if (found !== undefined || id === 0) {
-      getChannelPreviews();
+      chnlstStore.getChannelPreviews();
     }
   })
 })
 
-const changeActiveBox = (name: string) => {
-  if (!name.match(/^Chl-item$|^Chl-msgs$|^Chl-mod$/)) {
-    return
-  }
-
-  chnlstStore.getChList.chlItemActive = name === 'Chl-item' ? true : false
-  chnlstStore.getChList.chlMsgsActive = name === 'Chl-msgs' ? true : false
-  chnlstStore.getChList.chlModActive = name === 'Chl-mod' ? true : false
-}
-
-const visibilityToImage = (visibility: string): string => {
-  if (!visibility.match(/^public$|^private$|^password$/)) {
-    return ''
-  }
-  let visImage: string = '/khrov-chat-media/Channel.png'
-  if (visibility === 'public') {
-    return visImage.substring(0, 18) + 'public' + visImage.substring(18)
-  } else if (visibility === 'private') {
-    return visImage.substring(0, 18) + 'private' + visImage.substring(18)
-  }
-  return visImage.substring(0, 18) + 'password' + visImage.substring(18)
-}
-
-const getUserID = async (userNameInput: string) => {
-  chnlstStore.getChList.notifMsg = ''
-  if (!userNameInput || userNameInput.length < 3) {
-    chnlstStore.getChList.notifMsg = 'Input in "userName" must be more than 3 chars'
-    return
-  }
-  const response = await chatsStore.fetchForKhrov(`/channels/?chId=${chnlstStore.getChList.chlIdOfFocus}&userName=${userNameInput}`, 'GET', {});
-  if (response) {
-    try {
-      if (!response.ok) throw response;
-      chnlstStore.getChList.modGetUserIdInput = ''
-      const jsonObj = await response.json();
-      chnlstStore.getChList.notifMsg = jsonObj.message
-    } catch {/* Do nothing */}
-  }
-}
-
-const moderateMembers = async () => {
-  chnlstStore.getChList.notifModerMsg = ''
-
-  if (!parseInt(chnlstStore.getChList.modModerMemberId) || parseInt(chnlstStore.getChList.modModerMemberId) < 1) {
-    chnlstStore.getChList.notifModerMsg = 'Input in "member Id" must be greater than 0'
-    return
-  }
-
-  if (!chnlstStore.getChList.modModerSelectAction) {
-    chnlstStore.getChList.notifModerMsg = 'Please select an option under "Select Action"'
-    return
-  }
-
-  if (chnlstStore.getChList.modModerSelectAction === 'mute' && !chnlstStore.getChList.modModerMuteMins) {
-    chnlstStore.getChList.notifModerMsg = 'Please enter number of minutes to mute'
-    return
-  }
-
-  const muteTime = parseInt(chnlstStore.getChList.modModerMuteMins) ? parseInt(chnlstStore.getChList.modModerMuteMins) : 0
-  const currentTime = new Date()
-  const mutedUntil = new Date(currentTime.getTime() + 1000 * 60 * muteTime)
-
-  const tmp = {
-    chId: chnlstStore.getChList.chlIdOfFocus,
-    userId: parseInt(chnlstStore.getChList.modModerMemberId),
-    action: chnlstStore.getChList.modModerSelectAction,
-    mutedUntil: mutedUntil.toISOString()
-  }
-
-  const response = await chatsStore.fetchForKhrov(`/channels/put/channel/moderate`, 'PUT', tmp);
-  if (response) {
-    try {
-      if (!response.ok) throw response;
-      chnlstStore.getChList.modModerMemberId = ''
-      chnlstStore.getChList.modModerSelectAction = ''
-      chnlstStore.getChList.modModerMuteMins = ''
-      const jsonObj = await response.json();
-      chnlstStore.getChList.notifModerMsg = jsonObj.message
-    } catch {/* Do nothing */}
-  }
-}
-
-const modifyChannel = async () => {
-  chnlstStore.getChList.notifModifyMsg = ''
-
-  if (!chnlstStore.getChList.modModifySelectVisi.match(/^public$|^private$|^password$/)) {
-    chnlstStore.getChList.notifModifyMsg = 'Please Select a Channel Visibility Option!'
-    return
-  }
-  if (
-    chnlstStore.getChList.modModifySelectVisi === 'password' &&
-    !chnlstStore.getChList.modModifyPwd.match(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])^[a-zA-Z\d]{6,20}$/)
-  ) {
-    chnlstStore.getChList.notifModifyMsg =
-      'Password must contain an Uppercase, Lowercase and Decimal. Length must be between 6 - 20 chars.'
-    return
-  }
-
-  const passTmp = chnlstStore.getChList.modModifySelectVisi === 'password' ? chnlstStore.getChList.modModifyPwd : 'Abc123'
-
-  const tmp = {
-    chId: chnlstStore.getChList.chlIdOfFocus,
-    newVisibility: chnlstStore.getChList.modModifySelectVisi,
-    password: passTmp
-  }
-
-  const response = await chatsStore.fetchForKhrov('/channels/put/channel/moderate/modify', 'PUT', tmp);
-  if (response) {
-    try {
-      if (!response.ok) throw response;
-      chnlstStore.getChList.modModifySelectVisi = ''
-      chnlstStore.getChList.modModifyPwd = ''
-      const jsonObj = await response.json();
-      chnlstStore.getChList.notifModifyMsg = jsonObj.message
-    } catch {/* Do nothing */}
-  }
-}
-
-const getAllPending = async () => {
-  chnlstStore.getChList.getPendingsObj.length = 0
-
-  const response = await chatsStore.fetchForKhrov(`/channels/get/channel/moderate/true/${chnlstStore.getChList.chlIdOfFocus}`, 'GET', {});
-  if (response) {
-    try {
-      if (!response.ok) throw response;
-      const jsonObj = await response.json();
-      chnlstStore.getChList.getPendingsObj = jsonObj
-      chnlstStore.getChList.getPendingsObjRef += 1
-    } catch {/* Do nothing */}
-  }
-}
-
-const approveOrReject = async (choice: boolean, memberId: number) => {
-  const tmp = {
-    chId: chnlstStore.getChList.chlIdOfFocus,
-    memberId: memberId,
-    action: choice
-  }
-  const response = await chatsStore.fetchForKhrov('/channels/put/channel/moderate/pending/decide', 'PUT', tmp);
-  if (response && response.ok) getAllPending();
-}
 </script>
 
 <template>
@@ -276,10 +52,10 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
         :unread="item.unreadCount"
         :channelName="item.ch.name"
         :desc="item.ch.desc"
-        :visibility="visibilityToImage(item.ch.visibility)"
+        :visibility="chnlstStore.visibilityToImage(item.ch.visibility)"
         @click="
           {
-            chnlstStore.getChList.chlVisibilityOfFocus = visibilityToImage(item.ch.visibility);
+            chnlstStore.getChList.chlVisibilityOfFocus = chnlstStore.visibilityToImage(item.ch.visibility);
 
             chnlstStore.getChList.chlIdOfFocus = item.chId;
 
@@ -293,10 +69,10 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
 
             chnlstStore.getChList.mutedUntilOfFocus = item.mutedUntil;
 
-            changeActiveBox('Chl-msgs');
+            chnlstStore.changeActiveBox('Chl-msgs');
 
-            getChannelPreviews();
-            setSeen(chnlstStore.getChList.chlIdOfFocus);
+            chnlstStore.getChannelPreviews();
+            chnlstStore.setSeen(chnlstStore.getChList.chlIdOfFocus);
             chatsStore.manageAllNotifCounter(0, 0, 'channel');
 
           }"
@@ -306,11 +82,11 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
       <div class="Chl-msgs-header">
         <span
           @click="{
-              changeActiveBox('Chl-item');
+              chnlstStore.changeActiveBox('Chl-item');
 
               chnlstStore.getChList.chlMsgOrModerate = true;
 
-              setSeen(chnlstStore.getChList.chlIdOfFocus);
+              chnlstStore.setSeen(chnlstStore.getChList.chlIdOfFocus);
             }
           "
           >&#11164;</span
@@ -342,11 +118,11 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
         <!-- v-if the channelId of channel under focus already exists as a key in channCache -->
         <div
           class="Channel-messages"
-          :key="channCache[chnlstStore.getChList.chlIdOfFocus]"
-          v-if="chnlstStore.getChList.chlIdOfFocus in channCache"
+          :key="chnlstStore.getChannCache[chnlstStore.getChList.chlIdOfFocus]"
+          v-if="chnlstStore.getChList.chlIdOfFocus in chnlstStore.getChannCache"
         >
           <ChannelListItemMsg
-            v-for="item in channCache[chnlstStore.getChList.chlIdOfFocus]"
+            v-for="item in chnlstStore.getChannCache[chnlstStore.getChList.chlIdOfFocus]"
             v-bind:key="item"
             :name="item.user.userName"
             :msg="item.outgoing"
@@ -363,9 +139,9 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
             type="text"
             class="Channel-msg-box"
             v-model="chnlstStore.getChList.chlMsgInput"
-            @keyup.enter="submitChannMsg"
+            @keyup.enter="chnlstStore.submitChannMsg"
           />
-          <span class="Channel-msg-send" @click="submitChannMsg">&#11166;</span>
+          <span class="Channel-msg-send" @click="chnlstStore.submitChannMsg">&#11166;</span>
         </div>
         <!-- rendered if user is muted and they are not channel owner -->
         <div
@@ -409,7 +185,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
               class="Chn-mod-get-id-input"
               placeholder="Enter userName"
               v-model="chnlstStore.getChList.modGetUserIdInput"
-              @keyup.enter="getUserID(chnlstStore.getChList.modGetUserIdInput)"
+              @keyup.enter="chnlstStore.getUserID(chnlstStore.getChList.modGetUserIdInput)"
             />
             <p class="Chn-mod-get-id-msg" v-if="chnlstStore.getChList.notifMsg">{{ chnlstStore.getChList.notifMsg }}</p>
           </div>
@@ -460,7 +236,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
               placeholder="Mute for N minutes"
               v-model="chnlstStore.getChList.modModerMuteMins"
             />
-            <button class="Chn-mod-moder-submit" @click="moderateMembers()">Submit</button>
+            <button class="Chn-mod-moder-submit" @click="chnlstStore.moderateMembers()">Submit</button>
             <p class="Chn-mod-moder-msg" v-if="chnlstStore.getChList.notifModerMsg">{{ chnlstStore.getChList.notifModerMsg }}</p>
           </div>
 
@@ -502,7 +278,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
               placeholder="Set new password"
               v-model="chnlstStore.getChList.modModifyPwd"
             />
-            <button class="Chn-mod-modify-submit" @click="modifyChannel()">Submit</button>
+            <button class="Chn-mod-modify-submit" @click="chnlstStore.modifyChannel()">Submit</button>
             <p class="Chn-mod-modify-msg" v-if="chnlstStore.getChList.notifModifyMsg">
               {{ chnlstStore.getChList.notifModifyMsg }}
             </p>
@@ -515,7 +291,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
                   chnlstStore.getChList.modPendingRequestsBoxDisplayToggle = '150px';
                   chnlstStore.getChList.modPendingRequestsArrowRotate = 'rotate(90deg)';
 
-                  getAllPending();
+                  chnlstStore.getAllPending();
                 } else {
                   chnlstStore.getChList.modPendingRequestsBoxDisplayToggle = '0px';
                   chnlstStore.getChList.modPendingRequestsArrowRotate = 'rotate(0deg)';
@@ -541,7 +317,7 @@ const approveOrReject = async (choice: boolean, memberId: number) => {
                 :userId="item.userId"
                 :userName="item.user.userName"
                 :chId="item.chId"
-                @to-approve="(choice) => approveOrReject(choice, item.userId)"
+                @to-approve="(choice) => chnlstStore.approveOrReject(choice, item.userId)"
               />
               <p :key="chnlstStore.getChList.getPendingsObjRef" v-if="!chnlstStore.getChList.getPendingsObj.length">
                 No pending member request
