@@ -16,7 +16,6 @@
       <!-- TODO: watch to live update the duration for matches in progress -->
       <p v-if="inProgress || isCompleted">duration: {{ duration }}</p>
       <button v-if="canJoin" @click="join_game(match.id)" class="button join">Join Game</button>
-      <button v-if="canSpectate" class="button spectate">Spectate</button>
     </li>
   </template>
 
@@ -52,11 +51,6 @@
 
     const canJoin = computed(() => {
     if (inProgress.value || isCompleted.value) return false
-    return true
-    })
-
-    const canSpectate = computed(() => {
-    if (isCompleted.value) return false
     return true
     })
 
