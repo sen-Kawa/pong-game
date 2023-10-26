@@ -225,7 +225,7 @@ export class UsersController {
   @ApiBearerAuth('JwtAuthGuard')
   async seeUploadedFile(@Req() req, @Res() res) {
     const image = await this.usersService.getUserAvatarUrl(req.user.avatarId)
-    return res.sendFile(image.filename, { root: './files' })
+	return res.sendFile(image.filename, { root: './files' })
   }
 
   /**

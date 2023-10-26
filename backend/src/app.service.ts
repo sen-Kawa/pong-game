@@ -21,12 +21,12 @@ export class AppService {
     }
   }
 
-  async disconnectedUser(userId: number) {
+  async disconnectedUser(userId: number, socketId: string) {
     const user = await this.userService.findOne(userId)
     if (!user) return
     try {
-      this.socketService.removeClient(userId)
-      this.userService.setUserStatus(userId, 'OFFLINE')
+      if (this.socketService.removeClient(userId, socketId))
+        this.userService.setUserStatus(userId, 'OFFLINE')
     } catch (error) {
       console.log(error)
     }

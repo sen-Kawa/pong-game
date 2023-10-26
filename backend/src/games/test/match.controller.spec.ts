@@ -87,13 +87,13 @@ describe('MatchController', () => {
     })
   })
 
-  describe('findOne', () => {
-    it('should return the match in detailed representation', async () => {
-      const match = await controller.findOne(1, { includeScores: true, includePlayers: true })
+  // describe('findOne', () => {
+  //   it('should return the match in detailed representation', async () => {
+  //     const match = await controller.findOne(1, { includeScores: true, includePlayers: true })
 
-      expect(match).toEqual(maximalMatch)
-    })
-  })
+  //     expect(match).toEqual(maximalMatch)
+  //   })
+  // })
 
   describe('update', () => {
     it('should add a second player to an existing match', async () => {

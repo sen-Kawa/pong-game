@@ -76,13 +76,17 @@
     async function getAvatar() {
         const response = await jwtInterceptor.get(backendUrl + '/users/userImage', {
             withCredentials: true, responseType: 'blob', timeout: 30000,
+        }).catch((error) => {;
+            // console.log("Promise rejection error", error)
+            // catch error when there is no avatar image
         })
+            
         if (response && response.status == 200) {
             avatar2.value =  URL.createObjectURL(response.data)
             // console.log(response.data) //.data
         } else {
             window.alert("Can't get avatar");
-        }
+        }  
     }
     getStatistics()
     // fetch(backendUrl + '/users/userImage', { method: "GET", credentials: "include" }).then(response => {

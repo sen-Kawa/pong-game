@@ -14,6 +14,12 @@ import {
 } from 'common-types'
 import { SocketService } from 'src/socket/socket.service'
 
+enum GameState {
+  Created,
+  Running,
+  Paused
+}
+
 interface Game {
   players: {
     0: {
@@ -34,7 +40,7 @@ interface Game {
     yVec: number
   }
   score: [number, number]
-  started: boolean
+  state: GameState
   gameid: number
   last_modified: Date
 }
@@ -65,10 +71,12 @@ export class MatchService {
     this.matches = new Map<number, Game>()
     setInterval(() => {
       const remove: number[] = []
-      this.matches.forEach((game, key) => {
+      this.matches.forEach(async (game, key) => {
         const diff = Date.now() - game.last_modified.getTime()
-        if (diff > 1000 * 60 * 2) {
+        if (diff > 1000 * 30) {
+          console.log('Match timed out')
           remove.push(key)
+          await this.matchEnd(game)
         }
       })
       remove.map((key) => {
@@ -82,6 +90,17 @@ export class MatchService {
 
   matches: Map<number, Game>
 
+  isInMatch(userId: number) {
+    let matchId = undefined
+    for (let [id, match] of this.matches) {
+      if (userId === match.players[0].id || userId === match.players[1].id) {
+        matchId = id
+        break
+      }
+    }
+    return matchId
+  }
+
   async join(matchId: number, playerId: number) {
     const match = this.matches.get(matchId)
     // const match = this.matches[matchId]
@@ -90,7 +109,7 @@ export class MatchService {
       return undefined
     }
 
-    if (playerId == match.players[1].id || match.players[1].id === undefined) {
+    if (match.players[1].id === undefined) {
       match.players[1].id = playerId
       await this.addPlayer(matchId, playerId)
     }
@@ -104,16 +123,20 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
-    await this.addMatchResult(game.gameid, [
-      {
-        playerId: game.players[0].id,
-        score: game.score[0]
-      },
-      {
-        playerId: game.players[1].id,
-        score: game.score[1]
-      }
-    ])
+    console.log(game.gameid)
+    if (game.players[1].id !== undefined) {
+        await this.addMatchResult(game.gameid, [
+        {
+            playerId: game.players[0].id,
+            score: game.score[0]
+        },
+        {
+            playerId: game.players[1].id,
+            score: game.score[1]
+        }
+        ])
+    }
+
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
       .emit('match_end')
@@ -125,9 +148,28 @@ export class MatchService {
 
   gameTick() {
     this.matches.forEach(async (game) => {
-      if (!game.started) {
+      if (game.state == GameState.Created) {
         return
       }
+
+      const playerOne = this.socketService.getSocketId(game.players[0].id)
+      const playerTwo = this.socketService.getSocketId(game.players[1].id)
+      if (!playerOne || !playerTwo || game.state == GameState.Paused) {
+        const update: GameUpdate = {
+          players: {
+            0: game.players[0].player,
+            1: game.players[1].player
+          },
+          ball: game.ball,
+          score: game.score as [number, number],
+          paused: true
+        }
+        game.state = GameState.Paused
+        this.socketService.socket.to(playerOne).emit('game_update', update)
+        this.socketService.socket.to(playerTwo).emit('game_update', update)
+        return
+      }
+
       const state = game
 
       // bounce paddle left player and check for point
@@ -146,7 +188,7 @@ export class MatchService {
         state.ball.xVec = 1
         state.ball.yVec = -1
         state.score[1] += 1
-        if (state.score[1] >= 2) {
+        if (state.score[1] >= 11) {
           this.matchEnd(game)
         }
         state.ball.xPos = ballRadius + paddleWidth + 1
@@ -168,7 +210,7 @@ export class MatchService {
         state.ball.xVec = -1
         state.ball.yVec = -1
         state.score[0] += 1
-        if (state.score[0] >= 2) {
+        if (state.score[0] >= 11) {
           this.matchEnd(game)
         }
         state.ball.xPos = fieldWidth - ballRadius - paddleWidth - 1
@@ -207,18 +249,21 @@ export class MatchService {
           1: state.players[1].player
         },
         ball: state.ball,
-        score: state.score as [number, number]
+        score: state.score as [number, number],
+        paused: false
       }
+
       this.socketService.socket
-        .to(this.socketService.getSocketId(state.players[0].id))
+        .to(playerOne)
         .emit('game_update', update)
       this.socketService.socket
-        .to(this.socketService.getSocketId(state.players[1].id))
+        .to(playerTwo)
         .emit('game_update', update)
     })
   }
 
   async create(data: Prisma.MatchCreateInput) {
+    console.debug({ data })
     const match = await this.prisma.match.create({
       data,
       include: { players: { include: { player: true } } }
@@ -253,11 +298,10 @@ export class MatchService {
         yVec: -1.5
       },
       score: [0, 0],
-      started: false,
+      state: GameState.Created,
       gameid: match.id,
       last_modified: new Date()
     })
-
     return match
   }
 
@@ -268,7 +312,7 @@ export class MatchService {
       return undefined
     }
 
-    let other_player = ''
+    let other_player = []
     if (match.players[0].id === userId) {
       match.players[0].connected = true
       other_player = this.socketService.getSocketId(match.players[1].id)
@@ -286,12 +330,17 @@ export class MatchService {
           1: match.players[1].player
         },
         ball: match.ball,
-        score: match.score as [number, number]
+        score: match.score as [number, number],
+        paused: false
       }
+
+      if (match.state == GameState.Created) {
       await this.start(gameid)
+      }
+
       this.socketService.socket.to(connection).emit('start_game', update)
       this.socketService.socket.to(other_player).emit('start_game', update)
-      match.started = true
+      match.state = GameState.Running
     }
   }
 
@@ -300,7 +349,6 @@ export class MatchService {
     if (!match) {
       return undefined
     }
-
     switch (userId) {
       case match.players[0].id:
         match.players[0].player.vector = newVector
@@ -397,7 +445,6 @@ export class MatchService {
     if (includePlayers) {
       includes = { players: { include: { player: true } } }
     }
-
     return this.prisma.match.findUniqueOrThrow({
       include: includes,
       where: { id }
@@ -438,17 +485,19 @@ export class MatchService {
     await this.prisma.match.update({
       where: { id: matchId },
       data: {
-        start: new Date(Date.now())
+        start: new Date()
       }
     })
   }
 
   async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
-    const playersOnMatchData = scores.map((score) => ({
-      ...score,
-      matchId: matchId
-    }))
-    console.log(playersOnMatchData)
+    //const playersOnMatchData = scores.map((score) => ({
+    // ...score,
+    // matchId: matchId
+    //}))
+
+    if (scores.length != 2) throw new ConflictException('Cannot add match result.')
+
     return this.prisma.match.update({
       include: { players: true },
       where: { id: matchId },
@@ -467,6 +516,40 @@ export class MatchService {
   async remove(id: number) {
     return this.prisma.match.delete({ where: { id } })
   }
+
+  // createQueueGame(matchId: number, player1: number, player2: number)
+  // {
+  //   this.matches.set(matchId, {
+  //     players: [
+  //       {
+  //         player: {
+  //           pos: 0,
+  //           vector: 0
+  //         },
+  //         id: player1,
+  //         connected: false
+  //       },
+  //       {
+  //         player: {
+  //           pos: 0,
+  //           vector: 0
+  //         },
+  //         id: player2,
+  //         connected: false
+  //       }
+  //     ],
+  //     ball: {
+  //       xPos: 100,
+  //       yPos: 100,
+  //       xVec: 1.5,
+  //       yVec: -1.5
+  //     },
+  //     score: [0, 0],
+  //     started: false,
+  //     gameid: matchId,
+  //     last_modified: new Date()
+  //   })
+  // }
 }
 
 // /**

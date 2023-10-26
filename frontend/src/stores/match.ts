@@ -38,10 +38,16 @@ export const useMatchStore = defineStore('match', () => {
     includeScores: true
   })
 
+  const currentLeftPlayer = ref("unknownLeftPlayer")
+  const currentRightPlayer = ref("unknownRightPlayer")
+
   // computed becomes getter
   const matchCount = computed(() => matches.value.length)
   const pagination = computed(() => usePagination(matches, pageSize))
   const gameStates = computed(() => Object.values(GameStatus))
+  const getLeftPlayer = computed(() => currentLeftPlayer.value)
+  const getRightPlayer = computed(() => currentRightPlayer.value)
+  
 
   // function becomes action
   function init() {
@@ -77,6 +83,8 @@ export const useMatchStore = defineStore('match', () => {
         throw new Error(response.statusText)
       }
       const newMatch = transformMatchDTO(response.data)
+      currentLeftPlayer.value = newMatch.players[0].name
+      currentRightPlayer.value = "pending ..."
       matches.value.push(newMatch)
       currentMatch.value = newMatch
       player_number.value = 0
@@ -89,44 +97,40 @@ export const useMatchStore = defineStore('match', () => {
   }
 
   async function joinMatch(id: number) {
-    console.log("joinMatch called:", id)
+    console.log('joinMatch called:', id)
     const requestPath = baseUrlMatch + '/join'
     // console.log("Join cM 1: ", currentMatch.value)
 
-
     if (currentMatch.value) {
-        const message = 'already in game'
-        error.value = message
-        throw new Error(message)
+      const message = 'already in game'
+      error.value = message
+      throw new Error(message)
     }
     try {
-        console.log("TryBlock1")
-
         loading.value = true
         const response = await jwtInterceptor.post(
             requestPath,
             { matchId: id },  // match id was not transferred correctly before
             { withCredentials: true }
         )
-        console.log("TryBlock2")
         error.value = ''
         loading.value = false
-        console.log("TryBlock3")
         if (response.status != 201) {
           throw new Error(response.statusText)
         }
-        console.log("TryBlock4")
         const newMatch = transformMatchDTO(response.data as MatchDTO)
-        console.log("TryBlock5", response)
+        console.log("NewMatch", newMatch)
+        currentLeftPlayer.value = newMatch.players[0].name
+        currentRightPlayer.value = newMatch.players[1].name
+        // console.log("currentPlayers", currentLeftPlayer, ": ", currentRightPlayer)
         currentMatch.value = newMatch
         player_number.value = 1
     } catch (e) {
-        const message = e instanceof Error ? e.message : 'Unknown Error'
-        error.value = message
-        console.error('Failed to join match ' + id, e)
-        throw error
+      const message = e instanceof Error ? e.message : 'Unknown Error'
+      error.value = message
+      console.error('Failed to join match ' + id, e)
+      throw error
     }
-
   }
 
   async function getMatches(path?: string) {
@@ -152,6 +156,43 @@ export const useMatchStore = defineStore('match', () => {
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
         matches.value.push(...response.data.map(transformMatchDTO))
+      } else throw new Error(response.statusText)
+      if (matches.value.length === 0) error.value = 'No Matches found!'
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown Error'
+      error.value = message
+      console.error('Error fetching match data from the backend:', e)
+    }
+  }
+
+  async function getMatch(matchId: number) {
+    const requestPath = baseUrlMatch
+    const searchParams = new URLSearchParams()
+
+    const localFilters: Filter = {
+      gameStatus: GameStatus.CREATED,
+      includePlayers: true,
+      includeScores: true
+    }
+
+    try {
+      // loading.value = true
+
+      // Object.entries(localFilters).forEach(([key, value]) => {
+      //   if (Object.prototype.hasOwnProperty.call(filters.value, key)) {
+      //     searchParams.append(key, value.toString())
+      //   }
+      // })
+
+      const response = await jwtInterceptor.get(requestPath + '/' + matchId, {
+        withCredentials: true,
+        params: searchParams
+      })
+      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
+      error.value = ''
+      loading.value = false
+      if (response.status >= 200 && response.status < 300) {
+        currentMatch.value = transformMatchDTO(response.data)
       } else throw new Error(response.statusText)
       if (matches.value.length === 0) error.value = 'No Matches found!'
     } catch (e) {
@@ -219,6 +260,29 @@ export const useMatchStore = defineStore('match', () => {
     }
   }
 
+  async function fetchCurrentMatch() {
+    const requestPath = baseUrlMatch + '/current'
+
+    try {
+      loading.value = true
+      const response = await jwtInterceptor.get(requestPath, {
+        withCredentials: true
+      })
+      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
+      error.value = ''
+      loading.value = false
+      if (response.status >= 200 && response.status < 300) {
+        if (response.data) {
+          joinMatch(response.data)
+        }
+      } else throw new Error(response.statusText)
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Unknown Error'
+      error.value = message
+      console.error('Error fetching current match data from the backend:', e)
+    }
+  }
+
   function removeCurrentMatch() {
     currentMatch.value = undefined
   }
@@ -238,9 +302,13 @@ export const useMatchStore = defineStore('match', () => {
     gameStates,
     createMatch,
     getMatches,
+    getMatch,
     getMatchHistory,
     getMatchesToJoin,
     getMatchesToSpectate,
-    removeCurrentMatch
+    removeCurrentMatch,
+    fetchCurrentMatch,
+    getLeftPlayer,
+    getRightPlayer
   }
 })

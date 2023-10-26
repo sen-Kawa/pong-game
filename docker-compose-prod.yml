@@ -1,0 +1,103 @@
+version: '3.9'
+
+networks:
+  transcendence:
+
+
+services:
+  backend:
+    restart: always
+    image: backend
+    container_name: backend
+    build:
+      dockerfile: ./docker/production/backend/Dockerfile
+    networks:
+      - transcendence
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    volumes:
+      - $PWD/backend/:/app
+    ports:
+      - 3000:3000
+    tty: true
+
+  frontend:
+    restart: no
+    image: frontend
+    container_name: frontend_build
+    build:
+      dockerfile: ./docker/production/frontend/Dockerfile
+    networks:
+      - transcendence
+    volumes:
+      - $PWD/frontend/:/app
+
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    user: ${POSTGRES_USER}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - transcendence
+
+  nginx:
+    image: nginx_trancendence
+    build:
+      dockerfile: ./docker/production/nginx/Dockerfile
+    container_name: nginx
+    restart: always
+    ports:
+      - 443:443
+    environment:
+      - SERVICEDOMAIN=${SERVICEDOMAIN}
+    networks:
+      - transcendence
+    volumes:
+      - $PWD/frontend/dist:/usr/share/nginx/html
+      - $PWD/certs:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    ports:
+      - 80:80
+    restart: no
+    volumes:
+      - $PWD/certs:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: certbot certonly -n --standalone --agree-tos --email ${EMAIL} -d ${SERVICEDOMAIN}
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 5050:8080
+    networks:
+      - transcendence
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+volumes:
+  db:
+    driver: local
+  certbot-conf:
+    driver: local
+  certbot-www:
+    driver: local

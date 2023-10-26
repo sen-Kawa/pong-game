@@ -36,7 +36,7 @@ async function getLeaderboard() {
     withCredentials: true
   })
   if (response && response.status == 200) {
-    console.table(response.data)
+    //console.table(response.data)
     leaderboard.value = response.data
   }
 }

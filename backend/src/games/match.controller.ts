@@ -13,7 +13,6 @@ import {
   Post,
   Query,
   Req,
-  Session,
   UseGuards
 } from '@nestjs/common'
 import {
@@ -29,7 +28,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
 import { CreateMatchDto } from './dto/create-match.dto'
 import { QueryPersonalMatchDTO } from './dto/query-personal-match.dto'
 import { QueryPlayerMatchDTO } from './dto/query-player-match.dto'
-import { QuerySingleMatchDTO } from './dto/query-single-match.dto'
+//import { QuerySingleMatchDTO } from './dto/query-single-match.dto'
 import { UpdateMatchDto } from './dto/update-match.dto'
 import { MatchEntity } from './entities/match.entity'
 import { MatchService } from './match.service'
@@ -68,8 +67,12 @@ export class MatchController {
 
   @Post('join')
   joinMatch(@Req() request: any) {
-    console.log('Join: ', request['body'].matchId)
     return this.matchService.join(request['body'].matchId, request.user.id)
+  }
+
+  @Get('current')
+  currentMatch(@Req() request: any) {
+    return this.matchService.isInMatch(request.user.id)
   }
 
   /**
@@ -78,14 +81,12 @@ export class MatchController {
    * @returns a detailed representation of the created match.
    */
   @Post('me')
-  async createMatchForCurrentUser(@Req() request, @Session() session: Record<string, any>) {
+  async createMatchForCurrentUser(@Req() request) {
     const match = await this.matchService.create({
       players: {
         create: { playerId: request.user.id }
       }
     })
-
-    session.current_match = match.id
 
     return match
   }
@@ -143,12 +144,12 @@ export class MatchController {
   @Get(':id')
   @ApiOkResponse({ type: MatchEntity })
   @ApiNotFoundResponse({ description: 'match does not exist' })
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-    @Query() queryMatch: QuerySingleMatchDTO
-  ): Promise<MatchEntity> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<MatchEntity> {
     try {
-      return await this.matchService.findOne(id, queryMatch)
+      return await this.matchService.findOne(id, {
+        includeScores: false,
+        includePlayers: true
+      })
     } catch (error) {
       throw new NotFoundException('match does not exist')
     }

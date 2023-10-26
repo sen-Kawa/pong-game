@@ -26,6 +26,12 @@ up:
 down:
 	@docker compose -f docker-compose.yml down
 
+production:
+	@docker compose -f docker-compose-prod.yml build
+	@docker compose -f docker-compose-prod.yml up -d
+
+re-prod: clean production
+
 clean:
 	-docker stop $$(docker ps -qa)
 	-docker rm $$(docker ps -qa)
@@ -36,4 +42,4 @@ clean:
 fclean: clean
 	@docker system prune -f
 
-.PHONY: all re down clean fclean install
+.PHONY: all re down clean fclean install production re-prod

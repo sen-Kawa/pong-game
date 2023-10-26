@@ -31,10 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '../stores/auth'
 import { storeToRefs } from 'pinia'
-import { Form, Field } from 'vee-validate'
+import { Field, Form } from 'vee-validate'
 import * as Yup from 'yup'
+import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
 const schema = Yup.object().shape({

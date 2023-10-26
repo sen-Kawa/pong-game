@@ -1,10 +1,9 @@
-import { defineStore } from 'pinia'
-import axios from 'axios'
 import { useStorage } from '@vueuse/core'
-import router from '../router'
-import { ref, computed } from 'vue'
+import axios, { AxiosError } from 'axios'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 import jwtInterceptor from '../interceptor/jwtInterceptor'
-import { AxiosError } from 'axios'
+import router from '../router'
 
 const baseUrlauth = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/`
 const baseUrlUser = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/`
@@ -31,6 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => loginStatus.value)
   const activated2FA = computed(() => userProfile.value.activated2FA)
 
+  const getUserId = computed(() => userProfile.value.id)
   const getUserName = computed(() => userProfile.value.userName)
   const getDisplayName = computed(() => userProfile.value.displayName)
   const getName = computed(() => userProfile.value.name)
@@ -198,6 +198,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   return {
+    getUserId,
     getUserName,
     getName,
     getEmail,
