@@ -6,6 +6,7 @@
 			<th class="component-subtitle">Name</th>
 			<th class="component-subtitle">User Name</th>
 			<th class="component-subtitle">Status</th>
+			<th class="component-subtitle">Avatar</th>
 			<th></th>
 		</tr>
      		 <Friend
