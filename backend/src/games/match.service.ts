@@ -139,7 +139,8 @@ export class MatchService {
       ])
       if (game.score[0] > game.score[1])
         this.usersService.updateWinLosses(game.players[0].id, game.players[1].id)
-      else this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
+      else if (game.score[1] > game.score[0])
+        this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
     }
 
     this.socketService.socket
