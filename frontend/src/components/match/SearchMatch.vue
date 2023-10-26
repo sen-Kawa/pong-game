@@ -1,15 +1,18 @@
 <template>
   <div>
-    <h2>Search a match</h2>
+    <h2 class="component-subtitle">Search a match</h2>
+	  <!--
     <div>
       <input placeholder="Enter Search Term" />
     </div>
+	  -->
     <div class="filters">
-      <DropDown
-        label="MatchStatus"
+      <DropDown class="details"
+        label="Match Status: "
         :options="matchStore.gameStates"
         @drop-down-value-change="(val) => (matchStore.filters.gameStatus = val)"
       />
+	  <!--
       <label>
         <input type="checkbox" v-model="matchStore.filters.includePlayers" />
         includePlayers
@@ -18,9 +21,14 @@
         <input type="checkbox" v-model="matchStore.filters.includeScores" />
         includeScores
       </label>
+	  -->
+	  <!--
       <div><button @click="matchStore.clearFilters()">Clear Filters</button></div>
+	  -->
       <div><button @click="applyFilters()">Apply Filters</button></div>
+	  <!--
       <div>Filters: {{ matchStore.filters }}</div>
+	  -->
     </div>
   </div>
   <LoadingIndicator :is-loading="matchStore.loading" :error="matchStore.error">
