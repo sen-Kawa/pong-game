@@ -2,7 +2,7 @@
     <h2>No. {{ match.id }}: {{matchStore.getLeftPlayer}} ./. {{matchStore.getRightPlayer}}</h2>
     <br>
 	<div>
-		<label for="mapSelect">Select Map:</label>
+		<label for="mapSelect">Select Map: </label>
 		<select id="mapSelect" v-model="selectedMap">
 			<option v-for="image in mapPaths" :value="image.path" :key="image.path">{{image.name}}</option>
 		</select>
@@ -23,12 +23,14 @@
     import { useMatchStore } from '../../stores/match.js';
 
 	const mapPaths = [
+		{ name: 'default', path: '/black.jpg' },
 		{ name: 'space', path: '/space.jpg' },
 		{ name: 'desert', path: '/desert.jpg' },
 		{ name: 'forest', path: '/forest.jpg' },
 		{ name: 'underwater', path: '/underwater.jpg' },
+		{ name: 'trippy', path: '/trippy.jpg' },
 	];
-	const selectedMap = ref(mapPaths[1].path);
+	const selectedMap = ref(mapPaths[0].path);
     let keyUp: string = 'w'
     let keyDown: string = 's'
     const playerInfo = ref('Control your player with [w] for up and [s] for down.')
