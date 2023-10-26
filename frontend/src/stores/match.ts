@@ -47,7 +47,7 @@ export const useMatchStore = defineStore('match', () => {
   const gameStates = computed(() => Object.values(GameStatus))
   const getLeftPlayer = computed(() => currentLeftPlayer.value)
   const getRightPlayer = computed(() => currentRightPlayer.value)
-  
+
 
   // function becomes action
   function init() {
@@ -107,24 +107,24 @@ export const useMatchStore = defineStore('match', () => {
       throw new Error(message)
     }
     try {
-        loading.value = true
-        const response = await jwtInterceptor.post(
-            requestPath,
-            { matchId: id },  // match id was not transferred correctly before
-            { withCredentials: true }
-        )
-        error.value = ''
-        loading.value = false
-        if (response.status != 201) {
-          throw new Error(response.statusText)
-        }
-        const newMatch = transformMatchDTO(response.data as MatchDTO)
-        console.log("NewMatch", newMatch)
-        currentLeftPlayer.value = newMatch.players[0].name
-        currentRightPlayer.value = newMatch.players[1].name
-        // console.log("currentPlayers", currentLeftPlayer, ": ", currentRightPlayer)
-        currentMatch.value = newMatch
-        player_number.value = 1
+      loading.value = true
+      const response = await jwtInterceptor.post(
+        requestPath,
+        { matchId: id },  // match id was not transferred correctly before
+        { withCredentials: true }
+      )
+      error.value = ''
+      loading.value = false
+      if (response.status != 201) {
+        throw new Error(response.statusText)
+      }
+      const newMatch = transformMatchDTO(response.data as MatchDTO)
+      console.log("NewMatch", newMatch)
+      currentLeftPlayer.value = newMatch.players[0].name
+      currentRightPlayer.value = newMatch.players[1].name
+      // console.log("currentPlayers", currentLeftPlayer, ": ", currentRightPlayer)
+      currentMatch.value = newMatch
+      player_number.value = 1
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown Error'
       error.value = message
@@ -176,13 +176,13 @@ export const useMatchStore = defineStore('match', () => {
     }
 
     try {
-      // loading.value = true
+      loading.value = true
 
-      // Object.entries(localFilters).forEach(([key, value]) => {
-      //   if (Object.prototype.hasOwnProperty.call(filters.value, key)) {
-      //     searchParams.append(key, value.toString())
-      //   }
-      // })
+      Object.entries(localFilters).forEach(([key, value]) => {
+        if (Object.prototype.hasOwnProperty.call(filters.value, key)) {
+          searchParams.append(key, value.toString())
+        }
+      })
 
       const response = await jwtInterceptor.get(requestPath + '/' + matchId, {
         withCredentials: true,
@@ -193,6 +193,8 @@ export const useMatchStore = defineStore('match', () => {
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
         currentMatch.value = transformMatchDTO(response.data)
+        currentLeftPlayer.value = currentMatch.value.players[0].name
+        currentRightPlayer.value = currentMatch.value.players[1].name
       } else throw new Error(response.statusText)
       if (matches.value.length === 0) error.value = 'No Matches found!'
     } catch (e) {
