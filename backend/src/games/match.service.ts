@@ -114,7 +114,7 @@ export class MatchService {
       return undefined
     }
 
-    if (match.players[1].id === undefined) {
+    if ((match.players[0].id != playerId) && (match.players[1].id === undefined)) {
       match.players[1].id = playerId
       await this.addPlayer(matchId, playerId)
     }
@@ -518,7 +518,9 @@ export class MatchService {
 
   async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
     if (scores.length != 2) throw new ConflictException('Cannot add match result.')
-
+try{
+  console.log(scores)
+  console.log("in addMatchResult")
     return this.prisma.match.update({
       include: { players: true },
       where: { id: matchId },
@@ -532,6 +534,10 @@ export class MatchService {
         }
       }
     })
+  }catch(error)
+  {
+    console.log(error)
+  }
   }
 
   async remove(id: number) {
