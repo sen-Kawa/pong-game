@@ -14,16 +14,19 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
+      meta: { requiredAuth: true },
       component: () => import('../views/About.vue')
     },
     {
       path: '/game',
       name: 'game',
+      meta: { requiredAuth: true },
       component: () => import('../views/GameView.vue')
     },
     {
       path: '/leader',
       name: 'leader',
+      meta: { requiredAuth: true },
       component: () => import('../views/LeaderView.vue')
     },
     {
@@ -35,17 +38,20 @@ const router = createRouter({
     {
       path: '/user/Profile',
       name: 'profile',
+      meta: { requiredAuth: true },
       component: () => import('../components/user/ProfileComp.vue')
     },
     {
       path: '/user/Matchhistory',
       name: 'matchhistory',
+      meta: { requiredAuth: true },
       component: () => import('../components/user/MatchHistory.vue'),
       props: { initialScope: Scope.personal }
     },
     {
       path: '/user/Friends',
       name: 'friends',
+      meta: { requiredAuth: true },
       component: () => import('../components/user/friends/FriendsList.vue')
     },
     {
@@ -61,6 +67,7 @@ const router = createRouter({
     {
       path: '/game/queue',
       name: 'queue',
+      meta: { requiredAuth: true },
       component: () => import('../components/match/WaitingRoom.vue')
     }
   ]
@@ -68,7 +75,9 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  if (to.meta.requiresAuth && !authStore.isLoggedIn) next('/')
+  if (!authStore.isLoaded)
+    await authStore.getuserProfile()
+  if (to.meta.requiredAuth && !authStore.isLoggedIn) return next('/')
   next()
 })
 export default router

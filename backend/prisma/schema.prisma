@@ -12,6 +12,8 @@ enum Status {
   ONLINE
   OFFLINE
   INGAME
+  WAITINGFORPLAYER
+  INQUEUE
 }
 
 model User {

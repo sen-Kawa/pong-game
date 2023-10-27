@@ -15,7 +15,7 @@ describe('FriendsList', () => {
 
   it('fetches the friend list on mount', () => {
 	const fetchListSpy = vi.spyOn(FriendsList.methods as any, 'fetchFriendList');
-    const wrapper = mount(FriendsList);
+    mount(FriendsList);
 	expect(fetchListSpy).toHaveBeenCalled();
   });
 

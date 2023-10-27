@@ -149,9 +149,15 @@ export class MatchService {
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
       .emit('match_end')
-    this.socketService.socket
-      .to(this.socketService.getSocketId(game.players[1].id))
-      .emit('match_end')
+
+    this.usersService.setUserStatus(game.players[0].id, 'ONLINE')
+    if (game.players[1].id !== undefined) {
+      this.socketService.socket
+        .to(this.socketService.getSocketId(game.players[1].id))
+        .emit('match_end')
+      this.usersService.setUserStatus(game.players[1].id, 'ONLINE')
+    }
+
     this.matches.delete(game.gameid)
   }
 
@@ -297,7 +303,7 @@ export class MatchService {
     const players = match.players
 
     const playerTwoId = match.players.length == 2 ? players[1].playerId : undefined
-
+    this.usersService.setUserStatus(players[0].playerId, 'WAITINGFORPLAYER')
     this.matches.set(match.id, {
       players: [
         {
@@ -366,6 +372,8 @@ export class MatchService {
 
       this.socketService.socket.to(connection).emit('start_game', update)
       this.socketService.socket.to(other_player).emit('start_game', update)
+      this.usersService.setUserStatus(match.players[0].id, 'INGAME')
+      this.usersService.setUserStatus(match.players[1].id, 'INGAME')
       match.state = GameState.Running
     }
   }
