@@ -20,8 +20,11 @@ export default {
   },
 	data() {
 		return {
-			avatarPic: `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage/` + this.friend.displayName
+			avatarPic: `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage/` + this.friend.displayName,
 		}
+	},
+	updated() {
+		this.avatarPic = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage/` + this.friend.displayName;
 	},
   methods: {
 		async removeFriend() {
