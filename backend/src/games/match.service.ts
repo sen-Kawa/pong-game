@@ -244,7 +244,7 @@ export class MatchService {
         }
       } else if (state.ball.xPos >= fieldWidth && state.ball.xVec > 0) {
         const angle = Math.random() * MAXBOUNCEANGLE - Math.PI
-        state.ball.xVec = -BALLSPEED * Math.cos(angle)
+        state.ball.xVec = BALLSPEED * Math.cos(angle)
         state.ball.yVec = BALLSPEED * -Math.sin(angle)
         state.score[0] += 1
         if (state.score[0] >= 11) {
