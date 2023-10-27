@@ -100,3 +100,60 @@ export interface ChnListOfflineCache {
   msg: string
   time: string
 }
+
+export interface ChList {
+  channConn: ChnListChannConn[]
+  chlItemActive: boolean
+  chlMsgsActive: boolean
+  chlModActive: boolean
+  chlVisibilityOfFocus: string
+  chlIdOfFocus: number
+  chlNameOfFocus: string
+  chlDescOfFocus: string
+  chlRoleOfFocus: string
+  linkStatusOfFocus: string
+  mutedUntilOfFocus: string
+  chlMsgOrModerate: boolean
+  chlMsgInput: string
+  modGetUserIdArrowRotate: string
+  modGetUserIdBoxDisplayToggle: string
+  modMakeUserAdminArrowRotate: string
+  modMakeUserAdminBoxDisplayToggle: string
+  modModifyChannelArrowRotate: string
+  modModifyChannelBoxDisplayToggle: string
+  modPendingRequestsArrowRotate: string
+  modPendingRequestsBoxDisplayToggle: string
+  modGetUserIdInput: string
+  notifMsg: string
+  modModerMemberId: string
+  modModerSelectAction: string
+  modModerMuteMins: string
+  notifModerMsg: string
+  modModifySelectVisi: string
+  modModifyPwd: string
+  notifModifyMsg: string
+  getPendingsObj: ChnListPendingList[]
+  getPendingsObjRef: number
+  notifDiff: number
+}
+
+export interface ChnListChannConn {
+  chId: number
+  role: string
+  unreadCount: number
+  linkStatus: string
+  mutedUntil: string
+  ch: {
+    name: string
+    desc: string
+    visibility: string
+  }
+}
+
+export interface ChnListPendingList {
+  userId: number
+  chId: number
+  user: {
+    userName: string
+  }
+}
