@@ -93,8 +93,6 @@
         interval = setInterval(drawGame, 1000/ 50)
     })
 
-
-
     onUnmounted(() => {
         clearInterval(interval);
         document.removeEventListener("keydown", (event) => {

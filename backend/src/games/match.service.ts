@@ -128,6 +128,9 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
+
+    let winner = 'Nobody'
+
     if (game.players[1].id !== undefined) {
       await this.addMatchResult(game.gameid, [
         {
@@ -139,22 +142,27 @@ export class MatchService {
           score: game.score[1]
         }
       ])
-      if (game.score[0] > game.score[1])
+
+      if (game.score[0] > game.score[1]) {
         this.usersService.updateWinLosses(game.players[0].id, game.players[1].id)
-      else if (game.score[1] > game.score[0])
+        winner = (await this.usersService.findOne(game.players[0].id)).name
+      } else if (game.score[1] > game.score[0]) {
         this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
+        winner = (await this.usersService.findOne(game.players[1].id)).name
+      }
     }
     else
       this.remove(game.gameid)
+
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
-      .emit('match_end')
+      .emit('match_end', winner)
 
     this.usersService.setUserStatus(game.players[0].id, 'ONLINE')
     if (game.players[1].id !== undefined) {
       this.socketService.socket
         .to(this.socketService.getSocketId(game.players[1].id))
-        .emit('match_end')
+        .emit('match_end', winner)
       this.usersService.setUserStatus(game.players[1].id, 'ONLINE')
     }
 
@@ -243,7 +251,7 @@ export class MatchService {
         }
       } else if (state.ball.xPos >= fieldWidth && state.ball.xVec > 0) {
         const angle = Math.random() * MAXBOUNCEANGLE - Math.PI
-        state.ball.xVec = -BALLSPEED * Math.cos(angle)
+        state.ball.xVec = BALLSPEED * Math.cos(angle)
         state.ball.yVec = BALLSPEED * -Math.sin(angle)
         state.score[0] += 1
         if (state.score[0] >= 11) {
@@ -302,7 +310,7 @@ export class MatchService {
     const players = match.players
 
     const playerTwoId = match.players.length == 2 ? players[1].playerId : undefined
-    this.usersService.setUserStatus(players[0].playerId, 'WAITINGFORPLAYER')
+    this.usersService.setUserStatus(players[0].playerId, 'WAITINGFORPLAYER' as Status)
     this.matches.set(match.id, {
       players: [
         {
@@ -461,7 +469,10 @@ export class MatchService {
 
     return this.prisma.match.findMany({
       include: includes,
-      where: filter
+      where: filter,
+      orderBy: {
+        id: 'desc'
+      }
     })
   }
 
