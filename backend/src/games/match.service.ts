@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Prisma, Status } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
 import { MatchEntity } from './entities/match.entity'
@@ -79,7 +79,6 @@ export class MatchService {
       this.matches.forEach(async (game, key) => {
         const diff = Date.now() - game.last_modified.getTime()
         if (diff > 1000 * 30) {
-          console.log('Match timed out')
           remove.push(key)
           await this.matchEnd(game)
         }
@@ -128,7 +127,7 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
-    console.log(game.gameid)
+    let winner = 'Nobody'
     if (game.players[1].id !== undefined) {
       await this.addMatchResult(game.gameid, [
         {
@@ -140,22 +139,27 @@ export class MatchService {
           score: game.score[1]
         }
       ])
-      if (game.score[0] > game.score[1])
+
+      if (game.score[0] > game.score[1]) {
         this.usersService.updateWinLosses(game.players[0].id, game.players[1].id)
-      else if (game.score[1] > game.score[0])
+        winner = (await this.usersService.findOne(game.players[0].id)).name
+      } else if (game.score[1] > game.score[0]) {
         this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
+        winner = (await this.usersService.findOne(game.players[1].id)).name
+      }
     }
     else
       this.remove(game.gameid)
+
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
-      .emit('match_end')
+      .emit('match_end', winner)
 
     this.usersService.setUserStatus(game.players[0].id, 'ONLINE')
     if (game.players[1].id !== undefined) {
       this.socketService.socket
         .to(this.socketService.getSocketId(game.players[1].id))
-        .emit('match_end')
+        .emit('match_end', winner)
       this.usersService.setUserStatus(game.players[1].id, 'ONLINE')
     }
 
@@ -304,7 +308,7 @@ export class MatchService {
     const players = match.players
 
     const playerTwoId = match.players.length == 2 ? players[1].playerId : undefined
-    this.usersService.setUserStatus(players[0].playerId, 'WAITINGFORPLAYER')
+    this.usersService.setUserStatus(players[0].playerId, 'WAITINGFORPLAYER' as Status)
     this.matches.set(match.id, {
       players: [
         {

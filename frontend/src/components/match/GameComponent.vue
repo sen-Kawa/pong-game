@@ -94,8 +94,6 @@
         interval = setInterval(drawGame, 1000/ 50)
     })
 
-
-
     onUnmounted(() => {
         console.log("Unmounted")
         clearInterval(interval);
