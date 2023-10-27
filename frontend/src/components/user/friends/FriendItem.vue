@@ -3,7 +3,7 @@
 		<td class="displayName details">{{ friend.displayName }}</td>
 		<td class="userName details">{{ friend.userName }}</td>
 		<td class="status details">{{ friend.currentStatus }}</td>
-		<td class="avatar"><img :src="avatarPic" alt="Avatar Picture"></td>
+		<td><img class="avatar" :src="avatarPic" alt="Avatar Picture"></td>
 		<td><button @click="removeFriend">Remove Friend</button></td>
 	</tr>
 </template>
