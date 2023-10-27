@@ -55,7 +55,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
           this.logger.log('Client connected ' + client.id)
         }
       } catch (error) {
-        console.error(error)
+        this.logger.warn(`Error while connecting client: ${error}`)
         client.disconnect()
       }
     }

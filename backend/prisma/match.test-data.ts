@@ -32,7 +32,6 @@ export function createFakeTournament(numberOfPlayer: number): Prisma.MatchCreate
   for (let index = 0; index < numberOfPlayer; index++) {
     players.push(createFakeUser())
   }
-  console.debug({ players })
 
   const matches: Prisma.MatchCreateInput[] = []
   for (let i = 0; i < numberOfPlayer; i++) {

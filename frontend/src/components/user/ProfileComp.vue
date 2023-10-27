@@ -67,7 +67,6 @@ async function getStatistics() {
         position.value = response.data[0].position
         wins.value = response.data[0].wins
         losses.value = response.data[0].losses
-        // console.log(response.data) //.data
     } else {
         window.alert("Can't get statistics");
     }
@@ -77,14 +76,10 @@ async function getAvatar() {
     const response = await jwtInterceptor.get(backendUrl + '/users/userImage', {
         withCredentials: true, responseType: 'blob', timeout: 30000,
     }).catch(() => {
-        ;
-        // console.log("Promise rejection error", error)
-        // catch error when there is no avatar image
     })
 
     if (response && response.status == 200) {
         avatar2.value = URL.createObjectURL(response.data)
-        // console.log(response.data) //.data
     } else {
         window.alert("Can't get avatar");
     }

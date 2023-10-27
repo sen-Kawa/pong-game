@@ -39,11 +39,9 @@ function leaveQueue() {
 onMounted(() => {
 
 socket.on('newGame', async (matchId: number) => {
-  console.log(`joining match ${matchId}`)
   canLeave.value = true
   shouldLeaveQueue.value = false
   await matchStore.getMatch(matchId)
-  console.log(matchStore.currentMatch)
   router.push('/game')
 })
 socket.emit('joinQueue')

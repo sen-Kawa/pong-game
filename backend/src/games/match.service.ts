@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { ConflictException, Injectable, Logger } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
@@ -79,7 +79,7 @@ export class MatchService {
       this.matches.forEach(async (game, key) => {
         const diff = Date.now() - game.last_modified.getTime()
         if (diff > 1000 * 30) {
-          console.log('Match timed out')
+          this.logger.log(`Match ${key} timed out`)
           remove.push(key)
           await this.matchEnd(game)
         }
@@ -93,7 +93,8 @@ export class MatchService {
     }, 1000 / 60)
   }
 
-  matches: Map<number, Game>
+  private matches: Map<number, Game>
+  private logger: Logger = new Logger('MatchService')
 
   isInMatch(userId: number) {
     let matchId = undefined
@@ -108,9 +109,8 @@ export class MatchService {
 
   async join(matchId: number, playerId: number) {
     const match = this.matches.get(matchId)
-    // const match = this.matches[matchId]
     if (match === undefined) {
-      console.log('Match is undefined')
+      this.logger.warn(`Player ${playerId} tried to join non-existing match ${matchId}`)
       return undefined
     }
 
@@ -128,7 +128,6 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
-    console.log(game.gameid)
     if (game.players[1].id !== undefined) {
       await this.addMatchResult(game.gameid, [
         {
@@ -296,7 +295,6 @@ export class MatchService {
   }
 
   async create(data: Prisma.MatchCreateInput) {
-    console.debug({ data })
     const match = await this.prisma.match.create({
       data,
       include: { players: { include: { player: true } } }
@@ -341,7 +339,7 @@ export class MatchService {
   async playerConnected(connection: string, userId: number, gameid: number) {
     const match = this.matches.get(gameid)
     if (!match) {
-      console.log('Match not found')
+      this.logger.log(`User ${userId} tried to connect to non-existing match ${gameid}`)
       return undefined
     }
 
@@ -528,8 +526,7 @@ export class MatchService {
   async addMatchResult(matchId: number, scores: { playerId: number; score: number }[]) {
     if (scores.length != 2) throw new ConflictException('Cannot add match result.')
     try {
-      console.log(scores)
-      console.log('in addMatchResult')
+      this.logger.log(`Match ${matchId} ended with ${scores[0].score}:${scores[1].score}`)
       return this.prisma.match.update({
         include: { players: true },
         where: { id: matchId },
@@ -544,7 +541,7 @@ export class MatchService {
         }
       })
     } catch (error) {
-      console.log(error)
+        this.logger.warn(`Match ${matchId} ended with ${scores[0].score}:${scores[1].score} but could not be saved.`)
     }
   }
 

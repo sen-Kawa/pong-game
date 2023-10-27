@@ -24,10 +24,8 @@ function selectImage(event: Event) {
   file.value = (target.files as FileList)[0]
 }
 async function upload() {
-  console.log(file.value)
   let formData = new FormData()
   formData.append('file', file.value)
-  console.log(formData)
   try {
     await axios.post(baseUrl + 'upload', formData, {
       headers: {
