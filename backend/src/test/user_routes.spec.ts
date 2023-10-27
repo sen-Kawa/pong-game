@@ -500,7 +500,9 @@ describe('Test for diffrent routes', () => {
 
       expect(body).toStrictEqual({
         error: 'Bad Request',
-        message: ['currentStatus must be one of the following values: ONLINE, OFFLINE, INGAME'],
+        message: [
+          'currentStatus must be one of the following values: ONLINE, OFFLINE, INGAME, WAITINGFORPLAYER, INQUEUE'
+        ],
         statusCode: 400
       })
       expect(status).toBe(400)
@@ -516,7 +518,7 @@ describe('Test for diffrent routes', () => {
       expect(body).toStrictEqual({
         error: 'Bad Request',
         message: [
-          'currentStatus must be one of the following values: ONLINE, OFFLINE, INGAME',
+          'currentStatus must be one of the following values: ONLINE, OFFLINE, INGAME, WAITINGFORPLAYER, INQUEUE',
           'currentStatus should not be empty'
         ],
         statusCode: 400

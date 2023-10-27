@@ -18,7 +18,10 @@ const props = defineProps<{
 
 const cliItem: ChatListItem = reactive({})
 cliItem.cliLastMsg = props.outgoingMsg ? props.outgoingMsg : props.incomingMsg
-
+if ( cliItem.cliLastMsg &&
+     cliItem.cliLastMsg.match(/^äiänäväiätäeä$|^ädäeäcäläiänäeä$|^äaäcäcäeäpätä$/)) {
+  cliItem.cliLastMsg = '🗣️'
+}
 if (props.deliveryStatus === 'pending') cliItem.cliDeliveryStat = '◷'
 else if (props.deliveryStatus === 'sent') cliItem.cliDeliveryStat = '✓'
 else if (props.deliveryStatus === 'delivered') cliItem.cliDeliveryStat = '✓✓'

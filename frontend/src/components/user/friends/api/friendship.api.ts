@@ -12,7 +12,6 @@ export async function postAddFriend(friendName: string) {
   const requestBody = JSON.stringify({ friendName: friendName })
   try {
   	const response = await jwtInterceptor.post(`${BASE_URL}/addFriend/`, requestBody, requestOptions)
-	console.log('Request succesful in add friend.');
 	return response.data
   } catch (error) {
 	console.error('Error making the request', error);
@@ -30,7 +29,6 @@ export async function postFindUser(name: string) {
   const requestBody = JSON.stringify({ name: name })
   try {
   	const response = await jwtInterceptor.post(`${BASE_URL}/find/`, requestBody, requestOptions)
-	console.log('Request succesful in find user.');
 	return response
   } catch (error) {
 	console.error('Error making the request', error);
@@ -47,8 +45,7 @@ export async function deleteFriend(displayName: string) {
     data: JSON.stringify({ friendName: displayName })
   }
   try {
-  	const response = await jwtInterceptor.delete(`${BASE_URL}/removeFriend/`, requestOptions)
-	console.log('Request succesful on delete friend.');
+  	await jwtInterceptor.delete(`${BASE_URL}/removeFriend/`, requestOptions)
   } catch (error) {
 	console.error('Error making the request in deleteFriend api', error);
 	throw error

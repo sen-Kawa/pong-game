@@ -6,7 +6,8 @@ import { ChannelsGateway } from './channels.gateway'
 import { SocketService } from '../../socket/socket.service'
 
 describe('ChannelsController', () => {
-  let controller: ChannelsController
+  let channelsController: ChannelsController
+  let channelsService: ChannelsService
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,10 +15,32 @@ describe('ChannelsController', () => {
       providers: [PrismaService, ChannelsService, ChannelsGateway, SocketService]
     }).compile()
 
-    controller = module.get<ChannelsController>(ChannelsController)
+    channelsController = module.get<ChannelsController>(ChannelsController)
+    channelsService = module.get<ChannelsService>(ChannelsService)
   })
 
   it('should be defined', () => {
-    expect(controller).toBeDefined()
+    expect(channelsController).toBeDefined()
+  })
+  it('should be defined', () => {
+    expect(channelsService).toBeDefined()
+  })
+
+  describe('suggestedChannels', () => {
+    it('should return a DB Table ‘SuggestedChannelsResultDto[]’ Object', async () => {
+      const result = [
+        {
+          id: 1,
+          name: 'foo',
+          desc: 'lorem ipsum',
+          visibility: 'public',
+          role: 'user'
+        }
+      ]
+      const resultJson = JSON.stringify(result)
+      jest.spyOn(channelsService, 'suggestedChannels').mockImplementation(async () => result)
+      expect(await channelsController.suggestedChannels({ user: { id: 1 } })).toBe(resultJson)
+    })
+    // more test AKA 'it' for channelsController.suggestedChannels()
   })
 })

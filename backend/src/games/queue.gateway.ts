@@ -9,6 +9,7 @@ import { Server } from 'http'
 import { MatchService } from './match.service'
 import { QueueService } from './queue.service'
 import { SocketService } from 'src/socket/socket.service'
+import { UsersService } from '../users/users.service'
 
 @WebSocketGateway({
   cors: {
@@ -21,7 +22,8 @@ export class QueueGateway {
   constructor(
     private queueService: QueueService,
     private matchService: MatchService,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private usersService: UsersService
   ) {}
 
   @WebSocketServer() private server: Server
@@ -32,9 +34,7 @@ export class QueueGateway {
     const userId = client.data.userId
     this.queueService.addPlayer(userId)
     this.logger.log(`User ${userId} joined the queue`)
-    //this.server.emit('player_joined', userId)
-    this.logger.debug(this.queueService.queue)
-
+    this.usersService.setUserStatus(userId, 'INQUEUE')
     if (this.queueService.queue.length > 1) {
       this.createMatch()
     }
@@ -45,8 +45,7 @@ export class QueueGateway {
     const userId = client.data.userId
     this.queueService.removePlayer(userId)
     this.logger.log(`User ${userId} left the queue`)
-    //this.server.emit('player_left', userId)
-    this.logger.debug(this.queueService.queue)
+    this.usersService.setUserStatus(userId, 'ONLINE')
   }
 
   async createMatch() {
@@ -59,14 +58,14 @@ export class QueueGateway {
           create: [{ playerId: player1 }, { playerId: player2 }]
         }
       })
-      console.log(`created new match ${match.id} for players ${player1} and ${player2}`)
+      this.logger.log(`created new match ${match.id} for players ${player1} and ${player2}`)
       //this.matchService.createQueueGame(match.id, player1, player2)
       const playerOne = this.socketService.getSocketId(player1)
       const playerTwo = this.socketService.getSocketId(player2)
       this.socketService.socket.to(playerOne).emit('newGame', match.id)
       this.socketService.socket.to(playerTwo).emit('newGame', match.id)
     } catch (error) {
-      console.error(error)
+      this.logger.warn(`Error while creating match: ${error}`)
     }
   }
 }

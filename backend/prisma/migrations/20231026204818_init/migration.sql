@@ -13,6 +13,9 @@ CREATE TABLE "User" (
     "refreshToken" TEXT,
     "currentStatus" "Status" NOT NULL DEFAULT 'OFFLINE',
     "avatarId" INTEGER NOT NULL DEFAULT 1,
+    "wins" INTEGER NOT NULL DEFAULT 0,
+    "losses" INTEGER NOT NULL DEFAULT 0,
+    "ratio" DOUBLE PRECISION NOT NULL DEFAULT 0,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );

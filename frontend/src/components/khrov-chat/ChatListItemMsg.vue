@@ -7,6 +7,7 @@ const props = defineProps<{
   outgoing: string | null
   time: string
   status: string
+  theirName: string
 }>()
 
 const msgItem: MessageItem = reactive({})
@@ -19,11 +20,41 @@ if (props.status === 'pending') msgItem.msiStatusOut = '◷'
 else if (props.status === 'sent') msgItem.msiStatusOut = '✓'
 else if (props.status === 'delivered') msgItem.msiStatusOut = '✓✓'
 else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
+
+
 </script>
 <template>
   <div>
     <div :class="msgItem.msiSentOrRcvd">
-      {{ msgItem.msiMsg }}
+      <div>
+        <div v-if="msgItem.msiMsg&&!msgItem.msiMsg.match(/^äiänäväiätäeä$|^ädäeäcäläiänäeä$|^äaäcäcäeäpätä$/)">
+          {{ msgItem.msiMsg }}
+        </div>
+        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äiänäväiätäeä$/)">
+          {{ `🗣️ you invited ${theirName} to a Game`}}
+        </div>
+        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^ädäeäcäläiänäeä$/)">
+          {{ `❌ ${theirName} declined your Game Invite`}}
+        </div>
+        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äaäcäcäeäpätä$/)">
+          {{ `✅ ${theirName} accepted your Invite. Message them to setup Game`}}
+        </div>
+        <div class="Accept-reject-invite" v-if="incoming&&incoming.match(/^äiänäväiätäeä$/)">
+          <div class="Invite-options">
+            {{ `🗣️ ${theirName} invited you to a Game`}}
+          </div>
+          <button class="Confirm-delete-li-yes" @click="$emit('myDecision', 'äaäcäcäeäpätä')">Accept
+          </button>
+          <button class="Confirm-delete-li-no" @click="$emit('myDecision', 'ädäeäcäläiänäeä')">Reject
+          </button>
+        </div>
+        <div class="Invite-options" v-if="incoming&&incoming.match(/^ädäeäcäläiänäeä$/)">
+          {{ `❌ you declined ${theirName}'s Game Invite`}}
+        </div>
+        <div class="Invite-options" v-if="incoming&&incoming.match(/^äaäcäcäeäpätä$/)">
+          {{ `✅ you accepted ${theirName}'s Invite'. Message them to setup Game`}}
+        </div>
+      </div> 
       <span class="Time-status-container" :class="{ AlignTimeRight: msgItem.msiTimeAlign }">
         {{ time }} <span class="Status-mark" v-if="!incoming">{{ msgItem.msiStatusOut }}</span>
       </span>
@@ -83,5 +114,34 @@ else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
 .Status-mark {
   color: #1c39bb;
   font-weight: 600;
+}
+
+.Invite-options {
+  color: blue;
+  font-size: 10px;
+  font-style: italic;
+  width: 200px;
+  min-height: 40px;
+}
+
+.Accept-reject-invite {
+  width: 200px;
+}
+button.Confirm-delete-li-yes, button.Confirm-delete-li-no {
+  display: inline-block;
+  position: relative;
+  border: none;
+  padding: 5px;
+  color: white;
+  width: 47%;
+  margin-left: 2%;
+  font-size: 13px;
+  cursor: pointer;
+}
+button.Confirm-delete-li-yes {
+  background-color: #32de84;
+}
+button.Confirm-delete-li-no {
+  background-color: #C34A2C;
 }
 </style>

@@ -19,7 +19,6 @@ export class ChannelsGateway {
   server: Server
 
   emitToAll(event: string, code: number) {
-    // console.log("hey buddy")
     this.server.emit(event, code)
   }
 }

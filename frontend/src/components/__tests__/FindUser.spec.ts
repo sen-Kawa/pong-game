@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import FindUser from '@/components/user/friends/FindUser.vue'
 import AddFriend from '@/components/user/friends/AddFriend.vue'

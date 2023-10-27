@@ -22,6 +22,12 @@ class UserType {
     example: 'ade'
   })
   readonly userName: string
+
+  @ApiProperty({
+    description: 'ID of the message poster',
+    example: 1
+  })
+  readonly id: number
 }
 export class ChannHistoryResultDto {
   @ApiProperty({
