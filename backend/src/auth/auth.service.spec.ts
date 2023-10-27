@@ -26,7 +26,6 @@ describe('AuthService', () => {
     email: 'test@gmx.de',
     activated2FA: false,
     currentStatus: 'OFFLINE',
-    avatarId: 2,
     refreshToken: '',
     twoFactorAuthenticationSecret: 'ThisIsATwoFASecret',
     wins: 0,

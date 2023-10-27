@@ -2,8 +2,7 @@ import { Injectable, HttpException, HttpStatus, InternalServerErrorException } f
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { Status } from '@prisma/client'
-import * as https from 'https'
-import * as fs from 'fs'
+import axios from 'axios'
 
 @Injectable()
 export class UsersService {
@@ -129,12 +128,12 @@ export class UsersService {
   }
 
   async getUserAvatarUrl(test: number) {
-    return await this.prisma.userAvatar.findUnique({
+    return await this.prisma.profile_pic.findUnique({
       where: {
-        id: test
+        userId: test
       },
       select: {
-        filename: true
+        avatar: true
       }
     })
   }
@@ -155,51 +154,41 @@ export class UsersService {
   }
 
   //TODO fail on download handle / and tests?
-  downloadProfil(url: string, fileName: string): boolean {
-    const dest = './files/' + fileName
-    const file = fs.createWriteStream(dest)
-    https.get(url, function (res) {
-      res.pipe(file)
-      file
-        .on('finish', function () {
-          file.close()
-        })
-        .on('error', function () {
-          fs.unlink(dest, (err) => {
-            if (err) throw err
-            console.log('path/file.txt was deleted')
-          })
-        })
-    })
+  async downloadProfil(url: string, id: number) {
+    try {
+      const response = await axios.get(url, {
+        responseType: 'arraybuffer'
+      })
+      const avatarData =
+        'data:image/jpg;base64,' + Buffer.from(response.data, 'binary').toString('base64')
+      await this.prisma.profile_pic.create({
+        data: {
+          userId: id,
+          avatar: avatarData
+        }
+      })
+    } catch (error) {
+      await this.prisma.profile_pic.create({
+        data: {
+          userId: id
+        }
+      })
+    }
     return true
   }
 
   async createUser(profile: any): Promise<any> {
-    let avatar: any
-    if (this.downloadProfil(profile._json.image.versions.small, profile.username)) {
-      try {
-        avatar = await this.prisma.userAvatar.create({
-          data: {
-            filename: profile.username
-          }
-        })
-      } catch (error) {
-        avatar = { id: 1 }
-      }
-    } else {
-      avatar = { id: 1 }
-    }
     try {
       const user = await this.prisma.user.create({
         data: {
-          displayName: profile.userName,
+          displayName: null,
           name: profile.displayName,
           userName: profile.username,
           email: profile.email,
-          activated2FA: false,
-          avatarId: avatar.id
+          activated2FA: false
         }
       })
+      this.downloadProfil(profile._json.image.versions.small, user.id)
       return user
     } catch (error) {
       throw new InternalServerErrorException('createUser')
@@ -208,36 +197,14 @@ export class UsersService {
 
   async updateAvatar(id: number, fileName: string) {
     try {
-      const avatar = await this.prisma.userAvatar.create({
+      await this.prisma.profile_pic.update({
+        where: { userId: id },
         data: {
-          filename: fileName
-        }
-      })
-      await this.prisma.user.update({
-        where: {
-          id: id
-        },
-        data: {
-          avatarId: avatar.id
+          avatar: fileName
         }
       })
     } catch (error) {
       throw new InternalServerErrorException('updateAvatar')
-    }
-  }
-
-  async updateAvatarFile(id: number, fileName: string) {
-    try {
-      await this.prisma.userAvatar.update({
-        where: {
-          id: id
-        },
-        data: {
-          filename: fileName
-        }
-      })
-    } catch (error) {
-      throw new InternalServerErrorException('updateAvatarFile')
     }
   }
 
@@ -247,9 +214,9 @@ export class UsersService {
         displayName: name
       },
       select: {
-        avatar: {
+        profile_pics: {
           select: {
-            filename: true
+            avatar: true
           }
         }
       }

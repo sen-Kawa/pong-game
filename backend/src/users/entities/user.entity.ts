@@ -31,10 +31,6 @@ export class UserEntity implements User {
 
   @ApiHideProperty()
   @Exclude()
-  avatarId: number
-
-  @ApiHideProperty()
-  @Exclude()
   refreshToken: string
 
   @ApiHideProperty()

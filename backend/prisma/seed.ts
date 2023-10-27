@@ -6,16 +6,16 @@ const prisma = new PrismaClient()
 
 async function main() {
   // create two user articles
-  const avatar1 = await prisma.userAvatar.upsert({
-    where: {
-      id: 1
-    },
-    update: {},
-    create: {
-      private: false,
-      filename: 'default.jpg'
-    }
-  })
+  // const avatar1 = await prisma.userAvatar.upsert({
+  //   where: {
+  //     id: 1
+  //   },
+  //   update: {},
+  //   create: {
+  //     private: false,
+  //     filename: 'default.jpg'
+  //   }
+  // })
   const user1 = await prisma.user.upsert({
     where: {
       userName: 'test'
@@ -93,13 +93,23 @@ async function main() {
     }
   })
 
-  console.log({ avatar1, user1, user2, user3, user4 })
+  console.log({ user1, user2, user3, user4 })
 
   //create alot of matches where players play more matches
   const tournamentMatches = createFakeTournament(5)
   for (const match of tournamentMatches) {
     const m = await prisma.match.create({ data: match })
     console.debug({ m })
+  }
+  for(let i = 1; i < 15; ++i)
+  {
+    console.log(await prisma.profile_pic.upsert({
+      where: { userId: i },
+      update: {},
+      create:{
+        userId: i
+      }
+    }))
   }
 }
 

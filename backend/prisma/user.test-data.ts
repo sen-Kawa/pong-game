@@ -11,6 +11,7 @@ export function createFakeUser(): Prisma.UserCreateInput {
   const email = faker.internet.email({ firstName, lastName })
   const losses = getRandomInt(10)
   const wins = getRandomInt(10)
+  const ratio = (losses + wins) == 0 ? 0 : wins / (losses + wins)
   return {
     displayName: firstName,
     userName: faker.internet.userName({ firstName, lastName }),
@@ -18,6 +19,6 @@ export function createFakeUser(): Prisma.UserCreateInput {
     email: email,
     losses: losses,
     wins: wins,
-    ratio: wins / (losses + wins)
+    ratio: ratio
   }
 }

@@ -1,6 +1,5 @@
 <template>
   <div class="component-title">{{ getUserName }} Preferences</div>
-  <img class="avatar" v-bind:src="avatarUrl" />
   <div class="column-container">
   <div class="column">
 	  <div class="component-subtitle">Change Avatar</div>
@@ -19,8 +18,7 @@ import { useAuthStore } from '@/stores/auth'
 import Twofactor from './TwoFactor.vue'
 import FileUpload from './FileUpload.vue'
 const authStore = useAuthStore()
-authStore.getuserProfile()
-const avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage`
+//authStore.getuserProfile()
 
 const { getUserName } = storeToRefs(authStore)
 
