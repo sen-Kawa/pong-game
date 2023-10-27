@@ -145,7 +145,8 @@ export class MatchService {
       else if (game.score[1] > game.score[0])
         this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
     }
-
+    else
+      this.remove(game.gameid)
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
       .emit('match_end')

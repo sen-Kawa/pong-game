@@ -3,6 +3,7 @@
 		<td class="displayName details">{{ friend.displayName }}</td>
 		<td class="userName details">{{ friend.userName }}</td>
 		<td class="status details">{{ friend.currentStatus }}</td>
+		<td class="status details"><img :src="avatarPic" alt="Avatar Picture"></td>
 		<td><button @click="removeFriend">Remove Friend</button></td>
 	</tr>
 </template>
@@ -17,14 +18,19 @@ export default {
       required: true
     }
   },
+	data() {
+		return {
+			avatarPic: `${import.meta.env.VITE_BACKEND_SERVER_URI}/users/userImage/` + this.friend.displayName
+		}
+	},
   methods: {
-    async removeFriend() {
-	try {
-      await deleteFriend(this.friend.displayName)
-      this.$emit('friendRemoved', this.friend.id)
-	} catch (error) {
-		console.error('Failed to remove friend');
-	}
+		async removeFriend() {
+			try {
+					await deleteFriend(this.friend.displayName)
+					this.$emit('friendRemoved', this.friend.id)
+			} catch (error) {
+				console.error('Failed to remove friend');
+			}
     }
   }
 }
