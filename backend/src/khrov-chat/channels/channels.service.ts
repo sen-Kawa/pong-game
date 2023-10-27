@@ -448,7 +448,8 @@ export class ChannelsService {
         deliveryStatus: true,
         user: {
           select: {
-            userName: true
+            userName: true,
+            id: true
           }
         }
       }
@@ -481,7 +482,36 @@ export class ChannelsService {
       }
     } catch (error) {}
 
-    return history
+    return this.filterBlockedUsers(history, userId)
+  }
+  private filterBlockedUsers = async (
+    history: ChannHistoryResultDto[],
+    userId: number
+  ): Promise<ChannHistoryResultDto[]> => {
+    // get the id of all userid in a block with this.user
+    const blocked = await this.prisma.chat_union.findMany({
+      where: {
+        client1Id: userId,
+        blockStatus: true
+      },
+      select: {
+        client2Id: true
+      }
+    })
+    const blockedIds: number[] = []
+    // put their ids into an array
+    for (const key in blocked) {
+      blockedIds.push(blocked[key].client2Id)
+    }
+    const historyNoBlocked: ChannHistoryResultDto[] = []
+    // iterate through each msg from a userid and if they are not part of blocked, copy them to historyNoBan
+    for (const key in history) {
+      const posterId = history[key].user.id
+      if (!blockedIds.includes(posterId)) {
+        historyNoBlocked.push(history[key])
+      }
+    }
+    return historyNoBlocked
   }
 
   async updateChanns(channPayload: UpdateChannDto[], userId: number) {

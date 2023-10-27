@@ -46,8 +46,7 @@ class Chat_historysType {
 class Profile_picsType {
   @ApiProperty({
     description: 'Base64 encoding of Profile photo of Client2Id',
-    example:
-      'data:image/png;base64,'
+    example: 'data:image/png;base64,'
   })
   readonly avatar: string
 }

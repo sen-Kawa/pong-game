@@ -220,7 +220,7 @@
       <div v-if='datas.length===0&&!cList.loading'>
         <p class="Empty-chat-list">No Chat Conversations to display!</p>
       </div>
-      <div v-if='cList.loading' class="Awaiting-chat-list"></div>
+      <div v-if='datas.length===0&&cList.loading' class="Awaiting-chat-list"></div>
     </div>
 
     <div class="Single-conversation Output-box" :class="{clActive: vtofctc.SingleConversationIsActive}"
@@ -283,10 +283,19 @@
 
         <div id="bodyOfChats" class="bodyOfChat" :key='chatCache[cList.chiUnionUnderFocus]' v-if='chatCache[cList.chiUnionUnderFocus]'>
           <ChatListItemMsg v-for='(item) in chatCache[cList.chiUnionUnderFocus]' v-bind:key="item"
+            :theirName="cList.chiMorphPartnerName ?? ''"
             :incoming="item.incoming"
             :outgoing="item.outgoing" 
             :time="item.time"
             :status="item.deliveryStatus"
+            @my-decision="(decision) => {
+              cactc('Chats-list');
+              cList.chiChatMsg=decision;
+              submitChatMsg();
+              if (decision==='äaäcäcäeäpätä') {
+                $router.push({ path: '/game' });
+              }
+            }"
           />
         </div>
 
@@ -339,8 +348,10 @@
             </span>
             <ul class="Profile-item-ul">
               <li class="Profile-item-li" @click="{
-                  layer.msg('This is a Todo. Depending on the implementation of Match Making');
+                  cList.chiChatMsg='äiänäväiätäeä';
+                  submitChatMsg();
                   styling.ProfileUlHeight='0px';
+                  layer.msg('Invite Sent!');
                 }">
                 Game Invite {{cList.chiMorphPartnerUName}}
               </li>
@@ -569,13 +580,16 @@
 button.Confirm-delete-li-yes, button.Confirm-delete-li-no {
   display: inline-block;
   position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
+  top: 0;
+  transform: translateY(-20%);
+  -ms-transform: translateY(-20%);
   border: none;
-  padding: 10px;
+  padding: 5px;
   color: white;
-  width: 50%;
+  width: 47%;
+  margin-left: 2%;
+  font-size: 13px;
+  cursor: pointer;
 }
 button.Confirm-delete-li-yes {
   background-color: #73C2FB;
@@ -628,9 +642,9 @@ button.Confirm-delete-li-no {
   padding-right: 15px;
   position: relative;
   left: 50%;
-  bottom: 0;
-  transform: translate(-50%, -0);
-  -ms-transform: translate(-50%, -0);
+  bottom: 10%;
+  transform: translate(-50%, -10%);
+  -ms-transform: translate(-50%, -10%);
   box-shadow: 0 0 5px #73C2FB;
   cursor: pointer;
 }
@@ -703,7 +717,7 @@ button.Confirm-delete-li-no {
   -ms-transform: translateY(-50%);
 }
 .Profile-name {
-  margin-left: 30%;
+  margin-left: 40px;
   text-transform: uppercase;
   font-size: 16px;
   top: 30%;

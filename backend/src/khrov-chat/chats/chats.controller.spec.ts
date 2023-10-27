@@ -40,7 +40,7 @@ describe('ChatsController', () => {
         updatedAt: new Date(),
         client2: {
           userName: 'khrov',
-          profile_pics: [{avatar: 'basxxx'}]
+          profile_pics: [{ avatar: 'basxxx' }]
         },
         chat_historys: [
           {
@@ -51,13 +51,9 @@ describe('ChatsController', () => {
           }
         ]
       }
-      jest.spyOn(chatsService, 'getChatHistory').mockImplementation(async () => result);
-      expect(await chatsController.getChatHistory( {unionId: 1} )).toBe(result);
-    });
+      jest.spyOn(chatsService, 'getChatHistory').mockImplementation(async () => result)
+      expect(await chatsController.getChatHistory({ unionId: 1 })).toBe(result)
+    })
     // more test AKA 'it' for chatsController.getChatHistory()
-  });
-
-
-
-
+  })
 })
