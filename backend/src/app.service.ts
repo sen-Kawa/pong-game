@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { SocketService } from './socket/socket.service'
 import { UsersService } from './users/users.service'
 
@@ -9,6 +9,8 @@ export class AppService {
     private userService: UsersService
   ) {}
 
+  private logger: Logger = new Logger('AppService')
+
   //TODO error handling if user not there
   async connectedUser(userId: number, socketId: string) {
     const user = await this.userService.findOne(userId)
@@ -17,7 +19,7 @@ export class AppService {
       this.socketService.addClient(userId, socketId)
       this.userService.setUserStatus(userId, 'ONLINE')
     } catch (error) {
-      console.log(error)
+      this.logger.warn(`Error while adding client: ${error}`)
     }
   }
 
@@ -28,7 +30,7 @@ export class AppService {
       if (this.socketService.removeClient(userId, socketId))
         this.userService.setUserStatus(userId, 'OFFLINE')
     } catch (error) {
-      console.log(error)
+        this.logger.warn(`Error while removing client: ${error}`)
     }
   }
 }

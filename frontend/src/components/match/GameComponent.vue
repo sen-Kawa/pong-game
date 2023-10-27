@@ -90,12 +90,10 @@
     })
 
     socket.on("start_game", () => {
-        console.log("Game started")
         interval = setInterval(drawGame, 1000/ 50)
     })
 
     onUnmounted(() => {
-        console.log("Unmounted")
         clearInterval(interval);
         document.removeEventListener("keydown", (event) => {
             keyUpHandler(event)
@@ -105,9 +103,7 @@
         });
     })
 
-    function moveUp() {
-        console.log("move up:", props.match.id)
-        socket.emit("move_up", [props.match.id]) }
+    function moveUp() { socket.emit("move_up", [props.match.id]) }
 
     function moveDown() { socket.emit("move_down", [props.match.id]) }
 
@@ -165,7 +161,6 @@
     }
 
     socket.on("connect", () => {
-        console.log("connected")
         if (props.match) {
             socket.emit("player_connected", [props.match.id])
         }
@@ -190,7 +185,6 @@
         }
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
-            console.log("cant get canvas");
             clearInterval(interval);
             document.removeEventListener("keydown", (event) => {
                 keyUpHandler(event)
@@ -202,7 +196,6 @@
         }
         const ctx = c.getContext("2d");
         if (ctx === null) {
-            console.log("Cant get canvas");
             clearInterval(interval);
             return;
         }
@@ -219,13 +212,11 @@
         gameInit()
         const c = document.getElementById("game-canvas") as HTMLCanvasElement;
         if (c === null) {
-            console.log("cant get canvas");
             clearInterval(interval);
             return;
         }
         const ctx = c.getContext("2d");
         if (ctx === null) {
-            console.log("Cant get canvas");
             clearInterval(interval);
             return;
         }
