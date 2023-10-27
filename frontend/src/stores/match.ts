@@ -84,7 +84,9 @@ export const useMatchStore = defineStore('match', () => {
       }
       const newMatch = transformMatchDTO(response.data)
       currentLeftPlayer.value = newMatch.players[0].name
-      currentRightPlayer.value = "pending ..."
+      if(!newMatch.players[1]) {
+        currentRightPlayer.value = "pending ..."
+      }
       matches.value.push(newMatch)
       currentMatch.value = newMatch
       player_number.value = 0
@@ -315,6 +317,8 @@ export const useMatchStore = defineStore('match', () => {
     removeCurrentMatch,
     fetchCurrentMatch,
     getLeftPlayer,
-    getRightPlayer
+    getRightPlayer,
+    currentLeftPlayer,
+    currentRightPlayer
   }
 })

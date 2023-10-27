@@ -68,6 +68,8 @@ export class QueueGateway {
       const playerTwo = this.socketService.getSocketId(player2)
       this.socketService.socket.to(playerOne).emit('newGame', match.id)
       this.socketService.socket.to(playerTwo).emit('newGame', match.id)
+      // send player name to update game info
+      this.socketService.socket.to(playerOne).emit('player_one_name', match.players[1].player.name)
     } catch (error) {
       console.error(error)
     }
