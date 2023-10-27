@@ -463,7 +463,10 @@ export class MatchService {
 
     return this.prisma.match.findMany({
       include: includes,
-      where: filter
+      where: filter,
+      orderBy: {
+        id: 'desc'
+      }
     })
   }
 

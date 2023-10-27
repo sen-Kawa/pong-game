@@ -60,9 +60,7 @@
     const end = props.match.end ?? new Date(Date.now())
     const duration = end.getTime() - start.getTime()
     const result = new Date(duration)
-    return result.toLocaleTimeString('de-DE', {
-        timeStyle: 'medium'
-    })
+    return result.toUTCString().split(' ').slice(4, 5)[0]
     })
 
     const timeSinceEnd = computed(() => {
