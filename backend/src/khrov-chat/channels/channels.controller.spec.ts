@@ -38,14 +38,9 @@ describe('ChannelsController', () => {
         }
       ]
       const resultJson = JSON.stringify(result)
-      jest.spyOn(channelsService, 'suggestedChannels').mockImplementation(async () => result );
-      expect(await channelsController.suggestedChannels( { user: { id: 1 } } )).toBe(resultJson);
-    });
+      jest.spyOn(channelsService, 'suggestedChannels').mockImplementation(async () => result)
+      expect(await channelsController.suggestedChannels({ user: { id: 1 } })).toBe(resultJson)
+    })
     // more test AKA 'it' for channelsController.suggestedChannels()
-  });
-
-
-
-
-
+  })
 })

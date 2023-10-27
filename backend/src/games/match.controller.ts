@@ -190,7 +190,6 @@ export class MatchController {
     try {
       await this.matchService.findOne(id)
     } catch (error) {
-      console.error(error)
       throw new NotFoundException('match does not exist')
     }
     let entity = null

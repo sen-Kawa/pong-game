@@ -96,22 +96,43 @@ export class ChatsService {
 
     const filterRegex = /[^a-zA-Z\d?@!üöäßÜÖÄ ,.'^\n]/gi
     if (singleChatObject.outgoing.replace(filterRegex, '').length === 0) return false
-    await this.prisma.chat_history.createMany({
-      data: [
-        {
+    if (singleChatObject.outgoing.match(/^ädäeäcäläiänäeä$|^äaäcäcäeäpätä$/)) {
+      await this.prisma.chat_history.updateMany({
+        where: {
           unionId: singleChatObject.unionId,
-          outgoing: singleChatObject.outgoing.replace(filterRegex, ''),
-          time: singleChatObject.time,
-          deliveryStatus: 'sent'
+          incoming: 'äiänäväiätäeä'
         },
-        {
-          unionId: singleChatObject.unionIdOther,
-          incoming: singleChatObject.outgoing.replace(filterRegex, ''),
-          time: singleChatObject.time,
-          deliveryStatus: 'sent'
+        data: {
+          incoming: singleChatObject.outgoing
         }
-      ]
-    })
+      })
+      await this.prisma.chat_history.updateMany({
+        where: {
+          unionId: singleChatObject.unionIdOther,
+          outgoing: 'äiänäväiätäeä'
+        },
+        data: {
+          outgoing: singleChatObject.outgoing
+        }
+      })
+    } else {
+      await this.prisma.chat_history.createMany({
+        data: [
+          {
+            unionId: singleChatObject.unionId,
+            outgoing: singleChatObject.outgoing.replace(filterRegex, ''),
+            time: singleChatObject.time,
+            deliveryStatus: 'sent'
+          },
+          {
+            unionId: singleChatObject.unionIdOther,
+            incoming: singleChatObject.outgoing.replace(filterRegex, ''),
+            time: singleChatObject.time,
+            deliveryStatus: 'sent'
+          }
+        ]
+      })
+    }
 
     await this.prisma.chat_union.update({
       where: {
@@ -664,7 +685,9 @@ export class ChatsService {
     if (avatarPath) {
       try {
         const fullPath = './files/' + avatarPath + '.jpg'
-        const base64Img = `data:image/gif;base64, ${fs.readFileSync(fullPath, { encoding: 'base64' })}`
+        const base64Img = `data:image/gif;base64, ${fs.readFileSync(fullPath, {
+          encoding: 'base64'
+        })}`
         await this.prisma.profile_pic.upsert({
           where: { userId: userId },
           update: { avatar: base64Img },
@@ -673,7 +696,9 @@ export class ChatsService {
             avatar: base64Img
           }
         })
-      } catch { console.log(`Error reading ./files/${avatarPath}.jpg`) }
+      } catch {
+        console.log(`Error reading ./files/${avatarPath}.jpg`)
+      }
     }
     const totalUsers = await this.prisma.user.count()
     const chatAppUsers = await this.prisma.profile_pic.count()

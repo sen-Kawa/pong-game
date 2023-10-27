@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { reactive, onMounted, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import ChannelListItem from '@/components/khrov-chat/ChannelListItem.vue'
 import ChannelListItemMsg from '@/components/khrov-chat/ChannelListItemMsg.vue'
 import ChannelListItemPendings from '@/components/khrov-chat/ChannelListItemPendings.vue'
-import type { 
-  ChnListOfflineCache, 
-  ChnListChannConn,
-} from '@/components/khrov-chat/interface/khrov-chat'
 import { useChatsStore } from '@/stores/chats'
 import { useChannelListStore } from '@/stores/channelList'
 import { socket } from '@/sockets/sockets'

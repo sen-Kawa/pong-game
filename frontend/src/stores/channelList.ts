@@ -57,7 +57,7 @@ export const useChannelListStore = defineStore('ChannelList', () => {
 
   const calculateChannNotif = (channConn: ChnListChannConn[]): number => {
     let total: number = 0;
-    for (let key in channConn) {
+    for (const key in channConn) {
       const oneChann = channConn[key];
       total += oneChann.unreadCount;
     }
@@ -146,7 +146,7 @@ export const useChannelListStore = defineStore('ChannelList', () => {
     if (!visibility.match(/^public$|^private$|^password$/)) {
       return ''
     }
-    let visImage: string = '/khrov-chat-media/Channel.png'
+    const visImage: string = '/khrov-chat-media/Channel.png'
     if (visibility === 'public') {
       return visImage.substring(0, 18) + 'public' + visImage.substring(18)
     } else if (visibility === 'private') {
