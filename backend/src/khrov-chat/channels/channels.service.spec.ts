@@ -41,18 +41,16 @@ describe('ChannelsService', () => {
           ch: {
             name: 'foo',
             desc: 'lorem ipsum',
-            visibility: 'public',
+            visibility: 'public'
           }
         }
       ]
-      prismaService.user.findUniqueOrThrow = jest.fn().mockImplementation(async () => {});
-      prismaService.channel_link.findMany = jest.fn().mockImplementation(async () => findMany);
-      prismaService.channel_link.findFirst = jest.fn().mockImplementation(async () => {});
-      prismaService.channel_link.findFirstOrThrow = jest.fn().mockImplementation(async () => {});
-      expect(await channelsService.suggestedChannels(1)).toStrictEqual(result);
-    });
+      prismaService.user.findUniqueOrThrow = jest.fn().mockImplementation(async () => {})
+      prismaService.channel_link.findMany = jest.fn().mockImplementation(async () => findMany)
+      prismaService.channel_link.findFirst = jest.fn().mockImplementation(async () => {})
+      prismaService.channel_link.findFirstOrThrow = jest.fn().mockImplementation(async () => {})
+      expect(await channelsService.suggestedChannels(1)).toStrictEqual(result)
+    })
     // more test AKA 'it' for channelsService.suggestedChannels()
-  });
-
-
+  })
 })

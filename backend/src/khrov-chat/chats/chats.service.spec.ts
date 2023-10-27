@@ -45,7 +45,7 @@ describe('ChatsService', () => {
         updatedAt: new Date(),
         client2: {
           userName: 'khrov',
-          profile_pics: [{avatar: 'basxxx'}]
+          profile_pics: [{ avatar: 'basxxx' }]
         },
         chat_historys: [
           {
@@ -56,11 +56,9 @@ describe('ChatsService', () => {
           }
         ]
       }
-      prismaService.chat_union.findUniqueOrThrow = jest.fn().mockImplementation(async () => result);
-      expect(await chatsService.getChatHistory(1)).toBe(result);
-    });
+      prismaService.chat_union.findUniqueOrThrow = jest.fn().mockImplementation(async () => result)
+      expect(await chatsService.getChatHistory(1)).toBe(result)
+    })
     // more test AKA 'it' for chatsService.getChatHistory()
-  });
-
-
+  })
 })
