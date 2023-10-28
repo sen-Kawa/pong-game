@@ -5,7 +5,6 @@ import { Response } from 'express'
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
-
   private logger = new Logger('PrismaClientExceptionFilter')
 
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {

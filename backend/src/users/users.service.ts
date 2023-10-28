@@ -103,13 +103,23 @@ export class UsersService {
         OR: [
           {
             userName: {
-              startsWith: name
+              startsWith: name,
+              mode: 'insensitive'
             }
           },
           {
             displayName: {
-              startsWith: name
+              startsWith: name,
+              mode: 'insensitive'
             }
+          }
+        ],
+        NOT: [
+          {
+            id: id
+          },
+          {
+            displayName: null
           }
         ]
       },

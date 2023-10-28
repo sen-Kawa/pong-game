@@ -30,7 +30,7 @@ export class AppService {
       if (this.socketService.removeClient(userId, socketId))
         this.userService.setUserStatus(userId, 'OFFLINE')
     } catch (error) {
-        this.logger.warn(`Error while removing client: ${error}`)
+      this.logger.warn(`Error while removing client: ${error}`)
     }
   }
 }

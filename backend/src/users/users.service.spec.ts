@@ -395,13 +395,23 @@ describe('Unit test for UsersService', () => {
         OR: [
           {
             userName: {
-              startsWith: 'displayT'
+              startsWith: 'displayT',
+              mode: 'insensitive'
             }
           },
           {
             displayName: {
-              startsWith: 'displayT'
+              startsWith: 'displayT',
+              mode: 'insensitive'
             }
+          }
+        ],
+        NOT: [
+          {
+            id: 1
+          },
+          {
+            displayName: null
           }
         ]
       },
@@ -414,6 +424,7 @@ describe('Unit test for UsersService', () => {
   })
 
   it('findUser should return a list of user even with no friends', async () => {
+    // @ts-ignore
     const spy = jest.spyOn(prisma.user, 'findMany')
     const findUser = [
       {
@@ -448,13 +459,23 @@ describe('Unit test for UsersService', () => {
         OR: [
           {
             userName: {
-              startsWith: 'displayT'
+              startsWith: 'displayT',
+              mode: 'insensitive'
             }
           },
           {
             displayName: {
-              startsWith: 'displayT'
+              startsWith: 'displayT',
+              mode: 'insensitive'
             }
+          }
+        ],
+        NOT: [
+          {
+            id: 1
+          },
+          {
+            displayName: null
           }
         ]
       },
@@ -490,13 +511,23 @@ describe('Unit test for UsersService', () => {
         OR: [
           {
             userName: {
-              startsWith: 'displayT'
+              startsWith: 'displayT',
+              mode: 'insensitive'
             }
           },
           {
             displayName: {
-              startsWith: 'displayT'
+              startsWith: 'displayT',
+              mode: 'insensitive'
             }
+          }
+        ],
+        NOT: [
+          {
+            id: 1
+          },
+          {
+            displayName: null
           }
         ]
       },
