@@ -8,7 +8,6 @@ import { ChatConnectionsResultDto } from './dto/chat-connections.dto'
 import { GetBlockedResultDto } from './dto/get-blocked.dto'
 import { SearchUsersResultDto } from './dto/search-users.dto'
 import { ChatsGateway } from './chats.gateway'
-import * as fs from 'fs'
 
 @Injectable()
 export class ChatsService {
@@ -653,55 +652,49 @@ export class ChatsService {
     return output
   }
 
-  private async chatAvatarHealth() {
-    const allUsers = await this.prisma.user.findMany({
-      where: {},
-      orderBy: { id: 'desc' },
-      take: 100, // last 100 users will be checked // MIGHT CONSIDER REDUCING THIS NUMMBER IN FUTURE
-      select: {
-        id: true
-      }
-    })
-    for (const key in allUsers) {
-      const oneUser = allUsers[key]
-      try {
-        await this.prisma.profile_pic.findFirstOrThrow({
-          where: { userId: oneUser.id }
-        })
-      } catch (error) {
-        await this.prisma.profile_pic.create({ data: { userId: oneUser.id } })
-      }
-    }
-  }
-  async chatHealth(avatarId: number, userId: number) {
-    const avatarPath = await this.prisma.userAvatar
-      .findFirst({
-        where: { id: avatarId },
-        select: { filename: true }
-      })
-      .then((data) => {
-        return data ? data.filename : null
-      })
-    if (avatarPath) {
-      try {
-        const fullPath = './files/' + avatarPath + '.jpg'
-        const base64Img = `data:image/gif;base64, ${fs.readFileSync(fullPath, {
-          encoding: 'base64'
-        })}`
-        await this.prisma.profile_pic.upsert({
-          where: { userId: userId },
-          update: { avatar: base64Img },
-          create: {
-            userId: userId,
-            avatar: base64Img
-          }
-        })
-      } catch {
-        console.log(`Error reading ./files/${avatarPath}.jpg`)
-      }
-    }
-    const totalUsers = await this.prisma.user.count()
-    const chatAppUsers = await this.prisma.profile_pic.count()
-    if (totalUsers > chatAppUsers) this.chatAvatarHealth()
-  }
+  // private async chatAvatarHealth() {
+  //   const allUsers = await this.prisma.user.findMany({
+  //     where: {},
+  //     orderBy: { id: 'desc' },
+  //     take: 100, // last 100 users will be checked // MIGHT CONSIDER REDUCING THIS NUMMBER IN FUTURE
+  //     select: {
+  //       id: true
+  //     }
+  //   })
+  //   for (const key in allUsers) {
+  //     const oneUser = allUsers[key]
+  //     try {
+  //       await this.prisma.profile_pic.findFirstOrThrow({
+  //         where: { userId: oneUser.id }
+  //       })
+  //     } catch (error) {
+  //       await this.prisma.profile_pic.create({ data: { userId: oneUser.id } })
+  //     }
+  //   }
+  // }
+  // async chatHealth(avatarId: number, userId: number) {
+  //   const avatarPath = await this.prisma.userAvatar
+  //     .findFirst({
+  //       where: { id: avatarId },
+  //       select: { filename: true }
+  //     })
+  //     .then((data) => {
+  //       return data != null ? data.filename : null
+  //     })
+  //   if (avatarPath != null) {
+  //     const fullPath = './files/' + avatarPath
+  //     const base64 = `data:image/gif;base64, ${fs.readFileSync(fullPath, { encoding: 'base64' })}`
+  //     await this.prisma.profile_pic.upsert({
+  //       where: { userId: userId },
+  //       update: { avatar: base64 },
+  //       create: {
+  //         userId: userId,
+  //         avatar: base64
+  //       }
+  //     })
+  //   }
+  //   const totalUsers = await this.prisma.user.count()
+  //   const chatAppUsers = await this.prisma.profile_pic.count()
+  //   if (totalUsers > chatAppUsers) this.chatAvatarHealth()
+  // }
 }

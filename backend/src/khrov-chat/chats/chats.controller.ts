@@ -234,10 +234,10 @@ export class ChatsController {
     return response
   }
 
-  @ApiOperation({ summary: 'Health Check and Fix Operations for Chat DB Tables' })
-  @UseGuards(JwtAuthGuard)
-  @Put('/app/plugin/chat/health')
-  async chatHealth(@Req() req) {
-    await this.chatsService.chatHealth(req.user.avatarId, req.user.id)
-  }
+  // @ApiOperation({ summary: 'Health Check and Fix Operations for Chat DB Tables' })
+  // @UseGuards(JwtAuthGuard)
+  // @Put('/app/plugin/chat/health')
+  // async chatHealth(@Req() req) {
+  //   await this.chatsService.chatHealth(req.user.avatarId, req.user.id)
+  // }
 }

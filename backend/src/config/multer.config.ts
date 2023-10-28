@@ -1,6 +1,4 @@
 import { extname } from 'path'
-import { existsSync, mkdirSync } from 'fs'
-import { diskStorage } from 'multer'
 import { HttpException, HttpStatus } from '@nestjs/common'
 
 //TODO file location in env? process.env.UPLOAD_LOCATION
@@ -16,20 +14,6 @@ export const editFileName = (req: any, file: any, callback: any) => {
 }
 
 export const multerOptions = {
-  // Storage properties
-  storage: diskStorage({
-    // Destination storage path details
-    destination: (req: any, file: any, cb: any) => {
-      const uploadPath = multerConfig.dest
-      // Create folder if doesn't exist
-      if (!existsSync(uploadPath)) {
-        mkdirSync(uploadPath)
-      }
-      cb(null, uploadPath)
-    },
-    // File modification details
-    filename: editFileName
-  }),
   // Enable file size limits
   limits: {
     fileSize: maxFileSize

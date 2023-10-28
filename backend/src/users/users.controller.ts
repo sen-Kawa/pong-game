@@ -37,6 +37,7 @@ import { FindUserDto } from './dto/find-user.dto'
 import { FriendDto } from './dto/friend.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { multerOptions } from 'src/config/multer.config'
+import * as fs from 'fs'
 
 @Controller('users')
 @ApiTags('users')
@@ -205,8 +206,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file', multerOptions))
   async uploadedFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
     if (!file) throw new HttpException('missing file', HttpStatus.BAD_REQUEST)
-    if (req.user.avatarId == 1) await this.usersService.updateAvatar(req.user.id, file.filename)
-    else await this.usersService.updateAvatarFile(req.user.avatarId, file.filename)
+    const imagedata = 'data:' + file.mimetype + ';base64,' + req.file.buffer.toString('base64')
+    await this.usersService.updateAvatar(req.user.id, imagedata)
   }
 
   //TODO checks for failure in database request
@@ -224,8 +225,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JwtAuthGuard')
   async seeUploadedFile(@Req() req, @Res() res) {
-    const image = await this.usersService.getUserAvatarUrl(req.user.avatarId)
-    return res.sendFile(image.filename, { root: './files' })
+    const image = await this.usersService.getUserAvatarUrl(req.user.id)
+    const base64Image = image.avatar.split(';base64,').pop()
+    fs.writeFileSync('./files/' + req.user.displayName, base64Image, { encoding: 'base64' })
+    return res.sendFile(req.user.displayName, { root: './files' })
   }
 
   /**
@@ -267,7 +270,9 @@ export class UsersController {
   async seeUploadedFileOthers(@Param('displayName') displayName: string, @Res() res) {
     const image = await this.usersService.getOtherAvatarUrl(displayName)
     if (!image) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
-    return res.sendFile(image.avatar.filename, { root: './files' })
+    const base64Image = image.profile_pics[0].avatar.split(';base64,').pop()
+    fs.writeFileSync('./files/' + displayName, base64Image, { encoding: 'base64' })
+    return res.sendFile(displayName, { root: './files' })
   }
 
   //TODO only for testing here, shouldnt be called from outside ;)

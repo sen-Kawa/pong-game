@@ -7,10 +7,8 @@
 		<td><button @click="removeFriend">Remove Friend</button></td>
 	</tr>
 </template>
-
 <script lang="ts">
 import { deleteFriend } from './api/friendship.api'
-
 export default {
   props: {
     friend: {
@@ -38,7 +36,6 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 td {
 	border: 1px solid black;

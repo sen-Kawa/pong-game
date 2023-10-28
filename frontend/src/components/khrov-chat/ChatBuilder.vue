@@ -17,11 +17,11 @@ onUnmounted(() => {
   document.removeEventListener('click', closeChatWindow, false)
 })
 
-watch(() => authStore.isLoggedIn, (newStatus) => { if (newStatus===true) ApiHealth(); })
+// watch(() => authStore.isLoggedIn, (newStatus) => { if (newStatus===true) ApiHealth(); })
 
-const ApiHealth = async () => {
-  await chatsStore.fetchForKhrov('/chats/app/plugin/chat/health', 'PUT', {});
-}
+// const ApiHealth = async () => {
+//   await chatsStore.fetchForKhrov('/chats/app/plugin/chat/health', 'PUT', {});
+// }
 
 const closeChatWindow = (e: Event) => {
   const chatWindow = document.getElementById('ChatWindow-container')

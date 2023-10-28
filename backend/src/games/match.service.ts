@@ -128,7 +128,6 @@ export class MatchService {
   }
 
   private async matchEnd(game: Game) {
-
     let winner = 'Nobody'
 
     if (game.players[1].id !== undefined) {
@@ -150,9 +149,7 @@ export class MatchService {
         this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
         winner = (await this.usersService.findOne(game.players[1].id)).name
       }
-    }
-    else
-      this.remove(game.gameid)
+    } else this.remove(game.gameid)
 
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
@@ -558,7 +555,9 @@ export class MatchService {
         }
       })
     } catch (error) {
-        this.logger.warn(`Match ${matchId} ended with ${scores[0].score}:${scores[1].score} but could not be saved.`)
+      this.logger.warn(
+        `Match ${matchId} ended with ${scores[0].score}:${scores[1].score} but could not be saved.`
+      )
     }
   }
 

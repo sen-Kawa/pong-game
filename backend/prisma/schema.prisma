@@ -31,8 +31,6 @@ model User {
   blocked                       User[]            @relation("UserBlocked")
   blockedBy                     User[]            @relation("UserBlocked")
   matches                       PlayersOnMatch[]
-  avatar                        UserAvatar        @relation(fields: [avatarId], references: [id])
-  avatarId                      Int               @default(1)
   profile_pics                  Profile_pic[]
   chat_union1                   Chat_union[]      @relation("Client1")
   chat_union2                   Chat_union[]      @relation("Client2")
@@ -59,13 +57,6 @@ model Match {
   players PlayersOnMatch[]
   start   DateTime?
   end     DateTime?
-}
-
-model UserAvatar {
-  id       Int     @id @default(autoincrement())
-  userId   User[]
-  private  Boolean @default(true)
-  filename String  @unique
 }
 
 // *************************************************************************

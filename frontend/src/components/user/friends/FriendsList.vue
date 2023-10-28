@@ -3,7 +3,7 @@
     <h1 class="component-title">Friends</h1>
     <table v-if="friends.length">
 		<tr>
-			<th class="component-subtitle">Name</th>
+      <th class="component-subtitle">Name</th>
 			<th class="component-subtitle">User Name</th>
 			<th class="component-subtitle">Status</th>
 			<th class="component-subtitle">Avatar</th>
