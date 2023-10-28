@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import type { MessageItem } from '@/components/khrov-chat/interface/khrov-chat'
+import jwtInterceptor from '@/interceptor/jwtInterceptor';
+import { useMatchStore } from '@/stores/match';
 
 const props = defineProps<{
   incoming: string | null
@@ -11,6 +13,8 @@ const props = defineProps<{
 }>()
 
 const msgItem: MessageItem = reactive({})
+
+const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI
 
 msgItem.msiTimeAlign = props.outgoing == null ? false : true
 msgItem.msiSentOrRcvd = props.outgoing == null ? 'Received' : 'Sent'
@@ -27,10 +31,10 @@ else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
   <div>
     <div :class="msgItem.msiSentOrRcvd">
       <div>
-        <div v-if="msgItem.msiMsg&&!msgItem.msiMsg.match(/^äiänäväiätäeä$|^ädäeäcäläiänäeä$|^äaäcäcäeäpätä$/)">
+        <div v-if="msgItem.msiMsg&&!msgItem.msiMsg.match(/^äiänäväiätäeä[0-9]*$|^ädäeäcäläiänäeä$|^äaäcäcäeäpätä$/)">
           {{ msgItem.msiMsg }}
         </div>
-        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äiänäväiätäeä$/)">
+        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äiänäväiätäeä[0-9]*$/)">
           {{ `🗣️ you invited ${theirName} to a Game`}}
         </div>
         <div class="Invite-options" v-if="outgoing&&outgoing.match(/^ädäeäcäläiänäeä$/)">
@@ -39,13 +43,24 @@ else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
         <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äaäcäcäeäpätä$/)">
           {{ `✅ ${theirName} accepted your Invite. Message them to setup Game`}}
         </div>
-        <div class="Accept-reject-invite" v-if="incoming&&incoming.match(/^äiänäväiätäeä$/)">
+        <div class="Accept-reject-invite" v-if="incoming&&incoming.match(/^äiänäväiätäeä[0-9]*$/)">
           <div class="Invite-options">
             {{ `🗣️ ${theirName} invited you to a Game`}}
           </div>
-          <button class="Confirm-delete-li-yes" @click="$emit('myDecision', 'äaäcäcäeäpätä')">Accept
+          <button class="Confirm-delete-li-yes" @click="async () => {
+            const matchId = parseInt(incoming?.replace('äiänäväiätäeä', '') as string)
+            const matchStore = useMatchStore()
+            await matchStore.joinMatch(matchId)
+            await $router.push({ path: '/game' });
+            $router.go(0);
+            $emit('myDecision', 'äaäcäcäeäpätä')
+          }">Accept
           </button>
-          <button class="Confirm-delete-li-no" @click="$emit('myDecision', 'ädäeäcäläiänäeä')">Reject
+          <button class="Confirm-delete-li-no" @click="async () => {
+            const matchId = parseInt(incoming?.replace('äiänäväiätäeä', '') as string)
+            await jwtInterceptor.post(baseUrl + '/match/decline', { matchId: matchId }, {withCredentials: true})
+            $emit('myDecision', 'ädäeäcäläiänäeä')
+          }">Reject
           </button>
         </div>
         <div class="Invite-options" v-if="incoming&&incoming.match(/^ädäeäcäläiänäeä$/)">
@@ -54,7 +69,7 @@ else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
         <div class="Invite-options" v-if="incoming&&incoming.match(/^äaäcäcäeäpätä$/)">
           {{ `✅ you accepted ${theirName}'s Invite'. Message them to setup Game`}}
         </div>
-      </div> 
+      </div>
       <span class="Time-status-container" :class="{ AlignTimeRight: msgItem.msiTimeAlign }">
         {{ time }} <span class="Status-mark" v-if="!incoming">{{ msgItem.msiStatusOut }}</span>
       </span>

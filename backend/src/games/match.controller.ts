@@ -37,7 +37,9 @@ import { MatchService } from './match.service'
 @ApiTags('match')
 @UseGuards(JwtAuthGuard)
 export class MatchController {
-  constructor(private readonly matchService: MatchService) {}
+  constructor(
+    private readonly matchService: MatchService
+    ) {}
 
   /**
    * Creates a match entity.
@@ -89,6 +91,22 @@ export class MatchController {
     })
 
     return match
+  }
+
+  @Post('invite')
+  async invitePlayer(@Req() request) {
+    const match = await this.matchService.create({
+      players: {
+        create: { playerId: request.user.id }
+      }
+    })
+
+    return match.id
+  }
+
+  @Post('decline')
+  async declineMatch(@Body() body) {
+    return this.matchService.decline(body.matchId)
   }
 
   /**

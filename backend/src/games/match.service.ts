@@ -127,10 +127,16 @@ export class MatchService {
     return db_match
   }
 
+  async decline(matchId: number) {
+    const match = this.matches.get(matchId)
+    if (match) {
+        this.matchEnd(match)
+    }
+  }
+
   private async matchEnd(game: Game) {
 
     let winner = 'Nobody'
-
     if (game.players[1].id !== undefined) {
       await this.addMatchResult(game.gameid, [
         {
@@ -300,6 +306,10 @@ export class MatchService {
       this.socketService.socket.to(playerOne).emit('game_update', update)
       this.socketService.socket.to(playerTwo).emit('game_update', update)
     })
+  }
+
+  invitePlayer(userId: number, gameid: number) {
+    this.socketService.socket.to(this.socketService.getSocketId(userId)).emit('invite', gameid)
   }
 
   async create(data: Prisma.MatchCreateInput) {
