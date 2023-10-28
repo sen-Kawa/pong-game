@@ -465,7 +465,7 @@ describe('Test for diffrent routes', () => {
       })
       expect(status).toBe(400)
     })
-    
+
     it('[PATCH] /users/changeStatus changes the User Status', async () => {
       const mockUser = { id: 1 }
       prisma.user.update.mockResolvedValue(mockUser as any)
