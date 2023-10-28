@@ -6,6 +6,10 @@
   import { layer } from '@layui/layer-vue';
   import { useChatsStore } from '@/stores/chats'
   import { socket } from '@/sockets/sockets'
+  import jwtInterceptor from '@/interceptor/jwtInterceptor';
+import { response } from 'msw';
+
+  const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI;
 
   const chatsStore = useChatsStore();
 
@@ -19,8 +23,8 @@
     loading: false,
   });
 
-  const chatCache: any = reactive({});  
-  const offlineCache: ChatListTmp[] = []; 
+  const chatCache: any = reactive({});
+  const offlineCache: ChatListTmp[] = [];
   let datas: Chat_unionTb[] = [];
 
   const deleteConversation = async (unionId: number) => {
@@ -94,7 +98,7 @@
 
   watch(() => cList.notifDiff, async (curr, expired) => {
     if (curr > expired) {
-      let there_be_sounds = new Audio(chatsStore.getKhrovCelestial);  
+      let there_be_sounds = new Audio(chatsStore.getKhrovCelestial);
       there_be_sounds.play();
       chatsStore.manageAllNotifCounter(curr, 0);
     }
@@ -112,7 +116,7 @@
           cList.chiChatConnsApiOk+=1;
           cList.notifDiff = calculateChatNotif(datas);
         }
-         
+
       } catch (error) {
          cList.chiChatConnsApiOk = cList.chiChatConnsApiOk ? 1 : 0;
       }
@@ -130,7 +134,7 @@
         if (!response.ok) throw response;
         const jsonObj = await response.json();
         if (JSON.stringify(chatCache[cList.chiUnionUnderFocus]) != JSON.stringify(jsonObj.chat_historys)) {
-          chatCache[cList.chiUnionUnderFocus] = jsonObj.chat_historys;            
+          chatCache[cList.chiUnionUnderFocus] = jsonObj.chat_historys;
         }
       } catch {/* Do nothing */}
     }
@@ -139,7 +143,7 @@
   onMounted(() => {
     getConversationPreviews();
     socket.on('new-chat-event', (id: number) => {
-    // Tricky Bug: chatCache{key: {},...} key will be empty 
+    // Tricky Bug: chatCache{key: {},...} key will be empty
     // when no conversation has been clicked from preview yet
     let found: boolean = false;
     for (let key in datas) {
@@ -171,12 +175,12 @@
   }
 
   const styling = reactive({
-    TopOfChatUlHeight: '0px',       
-    DeleteConvLiDisplay: 'block',   
-    ConfirmDeleteLiDisplay: 'none', 
-    DisplayBlockingQuestion: 'block',     
-    DisplayBlockingConfirm: 'none',     
-    ProfileUlHeight: '0px',         
+    TopOfChatUlHeight: '0px',
+    DeleteConvLiDisplay: 'block',
+    ConfirmDeleteLiDisplay: 'none',
+    DisplayBlockingQuestion: 'block',
+    DisplayBlockingConfirm: 'none',
+    ProfileUlHeight: '0px',
   });
 
 </script>
@@ -193,17 +197,17 @@
           :partnerDp="item.client2.profile_pics[0].avatar"
           :blockStatus="item.blockStatus"
           :allowedToUnblock="item.allowedToUnblock"
-          :unreadCount="item.unreadCount" 
+          :unreadCount="item.unreadCount"
           :time="item.updatedAt"
           :outgoingMsg="item.chat_historys[0].outgoing"
           :incomingMsg="item.chat_historys[0].incoming"
           :deliveryStatus="item.chat_historys[0].deliveryStatus"
           @click="{
-            cList.chiChatMsg = ''; 
+            cList.chiChatMsg = '';
             cList.chiUnionUnderFocus = item.unionId;
             cList.chiUnionIdOther = item.unionIdOther;
             cList.chiMorphPartnerUserId = item.client2Id;
-            cList.chiMorphPartnerDp = item.client2.profile_pics[0].avatar;  
+            cList.chiMorphPartnerDp = item.client2.profile_pics[0].avatar;
             cList.chiMorphPartnerUName = item.client2.userName;
             cList.chiMorphPartnerName = item.client2.name;
             cList.chiMorphPartnerEmail = item.client2.email;
@@ -228,8 +232,8 @@
       <div v-if='cList.chiUnionUnderFocus'>
         <div class="Top-of-chat">
           <div class="Back-button-and-dp">
-            <span class="Union-back-btn" @click="{ 
-              cactc('Chats-list'); 
+            <span class="Union-back-btn" @click="{
+              cactc('Chats-list');
               styling.TopOfChatUlHeight='0px';
               }">&#11164;
             </span>
@@ -252,7 +256,7 @@
 
                 styling.TopOfChatUlHeight='0px';
 
-                cactc('Their-profile'); 
+                cactc('Their-profile');
               }
               ">{{cList.chiMorphPartnerUName}}'s Profile
             </li>
@@ -285,7 +289,7 @@
           <ChatListItemMsg v-for='(item) in chatCache[cList.chiUnionUnderFocus]' v-bind:key="item"
             :theirName="cList.chiMorphPartnerName ?? ''"
             :incoming="item.incoming"
-            :outgoing="item.outgoing" 
+            :outgoing="item.outgoing"
             :time="item.time"
             :status="item.deliveryStatus"
             @my-decision="(decision) => {
@@ -327,7 +331,7 @@
       <div v-if='cList.chiUnionUnderFocus'>
         <div class="Their-profile-output">
           <div>
-            <span class="Profile-back-btn" @click="{ 
+            <span class="Profile-back-btn" @click="{
 
                 styling.ProfileUlHeight='0px';
 
@@ -347,11 +351,22 @@
               }">:::
             </span>
             <ul class="Profile-item-ul">
-              <li class="Profile-item-li" @click="{
-                  cList.chiChatMsg='äiänäväiätäeä';
-                  submitChatMsg();
-                  styling.ProfileUlHeight='0px';
-                  layer.msg('Invite Sent!');
+              <li class="Profile-item-li" @click="async () => {
+                  try {
+                    const response = await jwtInterceptor.post(baseUrl + '/match/invite', {playerId: cList.chiMorphPartnerUserId}, { withCredentials: true })
+                    if (response.status !== 201) throw response;
+
+                    const matchId: number = response.data;
+                    cList.chiChatMsg='äiänäväiätäeä' + matchId;
+                    await submitChatMsg();
+                    styling.ProfileUlHeight='0px';
+                    layer.msg('Invite Sent!');
+                    await $router.push({ path: '/game' });
+                    $router.go(0);
+                  } catch (e) {
+                    console.error(e)
+                    layer.msg('Invite Failed!');
+                  }
                 }">
                 Game Invite {{cList.chiMorphPartnerUName}}
               </li>
@@ -360,13 +375,13 @@
           <img class="Profile-view-dp" :src="cList.chiMorphPartnerDp" alt="Avatar">
           <span class="Their-profile-details">
             <img class="Profile-icon Email" alt="Email Icon" src="/khrov-chat-media/email.png"/><span>{{cList.chiMorphPartnerEmail}}</span>
-          </span>  
+          </span>
           <span class="Their-profile-details">
             <img class="Profile-icon Signature" alt="Signature Icon" src="/khrov-chat-media/signature.png"/><span>{{cList.chiMorphPartnerName}}</span>
-          </span> 
-          <span class="Their-profile-details"> 
+          </span>
+          <span class="Their-profile-details">
             <img class="Profile-icon LastSeen" alt="Joined Icon" src="/khrov-chat-media/lastSeen.png"/><span>{{cList.chiMorphPartnerLastSeen}}</span>
-          </span> 
+          </span>
           <span class="Their-profile-details Block" @click="{
               styling.DisplayBlockingQuestion='none';
               styling.DisplayBlockingConfirm='block';
@@ -459,8 +474,8 @@
   overflow-y: scroll;
   border-radius: 10px;
 
-  -ms-overflow-style: none;  
-  scrollbar-width: none;  
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .bodyOfChat::-webkit-scrollbar {
@@ -536,13 +551,13 @@
   position: absolute;
   top: 40px;
   right: 5px;
-  z-index: 2; 
+  z-index: 2;
   border-radius: 5px;
   height: v-bind('styling.TopOfChatUlHeight');
   overflow: hidden;
   list-style: none;
   margin: 0;
-  padding: 0 2px; 
+  padding: 0 2px;
   -webkit-transition: height 0.5s;
   transition: height 0.5s;
 
@@ -558,7 +573,7 @@
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
   box-shadow: 0 0 5px #1C39BB;
-  white-space: nowrap; 
+  white-space: nowrap;
   text-transform: capitalize;
   cursor: pointer;
 }
@@ -741,13 +756,13 @@ button.Confirm-delete-li-no {
   top: 50px;
   transform: translateY(-10px);
   -ms-transform: translateY(-10px);
-  z-index: 2; 
+  z-index: 2;
   border-radius: 5px;
   height: v-bind('styling.ProfileUlHeight');
   overflow: hidden;
   list-style: none;
   margin: 0;
-  padding: 0 2px; 
+  padding: 0 2px;
   -webkit-transition: height 0.5s;
   transition: height 0.5s;
 }
@@ -762,7 +777,7 @@ button.Confirm-delete-li-no {
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
   box-shadow: 0 0 5px #1C39BB;
-  white-space: nowrap; 
+  white-space: nowrap;
   text-transform: capitalize;
   cursor: pointer;
 }
@@ -809,7 +824,7 @@ button.Confirm-delete-li-no {
 }
 .Their-profile-details.Block {
   display: v-bind('styling.DisplayBlockingQuestion');
-  cursor: pointer;   
+  cursor: pointer;
 }
 .Their-profile-details.Block-confirm {
   display: v-bind('styling.DisplayBlockingConfirm');

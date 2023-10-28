@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common'
+import { ConflictException, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { Prisma, Status } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
@@ -40,6 +40,7 @@ interface Game {
     xVec: number
     yVec: number
   }
+  invited_player?: number
   score: [number, number]
   state: GameState
   gameid: number
@@ -114,6 +115,14 @@ export class MatchService {
       return undefined
     }
 
+    if (
+      match.players[0].id != playerId &&
+      match.invited_player !== undefined &&
+      match.invited_player !== playerId
+    ) {
+      throw new HttpException('not allowed to join match', HttpStatus.UNAUTHORIZED)
+    }
+
     if (match.players[0].id != playerId && match.players[1].id === undefined) {
       match.players[1].id = playerId
       await this.addPlayer(matchId, playerId)
@@ -127,9 +136,32 @@ export class MatchService {
     return db_match
   }
 
+  async invite(playerId: number, invitingUser: number) {
+    const match = await this.create({
+      players: {
+        create: { playerId: invitingUser }
+      }
+    })
+
+    const tmp = this.matches.get(match.id)
+    tmp.invited_player = playerId
+
+    return match.id
+  }
+
+  async decline(matchId: number, playerId: number) {
+    const match = this.matches.get(matchId)
+    if (match) {
+      if (match.invited_player === playerId && match.state === GameState.Created) {
+        this.matchEnd(match)
+      } else {
+        throw new HttpException('not allowed to decline match', HttpStatus.UNAUTHORIZED)
+      }
+    }
+  }
+
   private async matchEnd(game: Game) {
     let winner = 'Nobody'
-
     if (game.players[1].id !== undefined) {
       await this.addMatchResult(game.gameid, [
         {
@@ -299,6 +331,10 @@ export class MatchService {
     })
   }
 
+  invitePlayer(userId: number, gameid: number) {
+    this.socketService.socket.to(this.socketService.getSocketId(userId)).emit('invite', gameid)
+  }
+
   async create(data: Prisma.MatchCreateInput) {
     const match = await this.prisma.match.create({
       data,
@@ -381,10 +417,8 @@ export class MatchService {
       match.state = GameState.Running
 
       // send the other player name to player 0 to update player name data
-      const playerOne = await this.prisma.user.findFirst(
-        { where: { id: match.players[1].id}})
-      this.socketService.socket.to(other_player).emit('player_one_name', playerOne.name )
-
+      const playerOne = await this.prisma.user.findFirst({ where: { id: match.players[1].id } })
+      this.socketService.socket.to(other_player).emit('player_one_name', playerOne.name)
     }
   }
 

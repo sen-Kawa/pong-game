@@ -91,6 +91,25 @@ export class MatchController {
     return match
   }
 
+  @Post('invite')
+  async invitePlayer(@Req() request, @Body() body) {
+    if (
+      this.matchService.isInMatch(request.user.id) ||
+      this.matchService.isInMatch(body.playerId)
+    ) {
+      throw new HttpException('player already in match', HttpStatus.NOT_MODIFIED)
+    }
+
+    const matchId = await this.matchService.invite(body.playerId, request.user.id)
+
+    return matchId
+  }
+
+  @Post('decline')
+  async declineMatch(@Body() body, @Req() request) {
+    return this.matchService.decline(body.matchId, request.user.id)
+  }
+
   /**
    * Finds all matches.
    * The level of detail in the representation and the set of matches can be controlled with query parameters.
