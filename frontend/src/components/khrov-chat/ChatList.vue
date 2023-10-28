@@ -7,6 +7,7 @@
   import { useChatsStore } from '@/stores/chats'
   import { socket } from '@/sockets/sockets'
   import jwtInterceptor from '@/interceptor/jwtInterceptor';
+import { response } from 'msw';
 
   const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI;
 
@@ -353,7 +354,11 @@
               <li class="Profile-item-li" @click="async () => {
                   try {
                     const response = await jwtInterceptor.post(baseUrl + '/match/invite', {playerId: cList.chiMorphPartnerUserId}, { withCredentials: true })
-                    if (response.status !== 201) throw response;
+                    if (response.status === 304) {
+                        layer.msg("Player is already in a match!")
+                        return
+                    } else if (response.status !== 201) throw response;
+                    
                     const matchId: number = response.data;
                     cList.chiChatMsg='äiänäväiätäeä' + matchId;
                     await submitChatMsg();
