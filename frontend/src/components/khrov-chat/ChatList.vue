@@ -356,7 +356,7 @@
                     if (response.status !== 201) throw response;
                     const matchId: number = response.data;
                     cList.chiChatMsg='äiänäväiätäeä' + matchId;
-                    submitChatMsg();
+                    await submitChatMsg();
                     styling.ProfileUlHeight='0px';
                     layer.msg('Invite Sent!');
                     await $router.push({ path: '/game' });
