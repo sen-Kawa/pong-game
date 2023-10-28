@@ -379,6 +379,12 @@ export class MatchService {
       this.usersService.setUserStatus(match.players[0].id, 'INGAME')
       this.usersService.setUserStatus(match.players[1].id, 'INGAME')
       match.state = GameState.Running
+
+      // send the other player name to player 0 to update player name data
+      const playerOne = await this.prisma.user.findFirst(
+        { where: { id: match.players[1].id}})
+      this.socketService.socket.to(other_player).emit('player_one_name', playerOne.name )
+
     }
   }
 
