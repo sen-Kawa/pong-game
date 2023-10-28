@@ -49,24 +49,24 @@ else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
           </div>
           <button class="Confirm-delete-li-yes" @click="async () => {
             const matchId = parseInt(incoming?.replace('äiänäväiätäeä', '') as string)
+            $emit('myDecision', 'äaäcäcäeäpätä' + matchId)
             const matchStore = useMatchStore()
             await matchStore.joinMatch(matchId)
             await $router.push({ path: '/game' });
             $router.go(0);
-            $emit('myDecision', 'äaäcäcäeäpätä' + matchId)
           }">Accept
           </button>
           <button class="Confirm-delete-li-no" @click="async () => {
             const matchId = parseInt(incoming?.replace('äiänäväiätäeä', '') as string)
-            await jwtInterceptor.post(baseUrl + '/match/decline', { matchId: matchId }, {withCredentials: true})
             $emit('myDecision', 'ädäeäcäläiänäeä' + matchId)
+            await jwtInterceptor.post(baseUrl + '/match/decline', { matchId: matchId }, {withCredentials: true})
           }">Reject
           </button>
         </div>
         <div class="Invite-options" v-if="incoming&&incoming.match(/^ädäeäcäläiänäeä[0-9]*$/)">
           {{ `❌ you declined ${theirName}'s Game Invite`}}
         </div>
-        <div class="Invite-options" v-if="incoming&&incoming.match(/^äaäcäcäeäpätä[0-9]$/)">
+        <div class="Invite-options" v-if="incoming&&incoming.match(/^äaäcäcäeäpätä[0-9]*$/)">
           {{ `✅ you accepted ${theirName}'s Invite'. Message them to setup Game`}}
         </div>
       </div>
