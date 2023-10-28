@@ -31,16 +31,16 @@ else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
   <div>
     <div :class="msgItem.msiSentOrRcvd">
       <div>
-        <div v-if="msgItem.msiMsg&&!msgItem.msiMsg.match(/^äiänäväiätäeä[0-9]*$|^ädäeäcäläiänäeä$|^äaäcäcäeäpätä$/)">
+        <div v-if="msgItem.msiMsg&&!msgItem.msiMsg.match(/^äiänäväiätäeä[0-9]*$|^ädäeäcäläiänäeä[0-9]*$|^äaäcäcäeäpätä[0-9]*$/)">
           {{ msgItem.msiMsg }}
         </div>
         <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äiänäväiätäeä[0-9]*$/)">
           {{ `🗣️ you invited ${theirName} to a Game`}}
         </div>
-        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^ädäeäcäläiänäeä$/)">
+        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^ädäeäcäläiänäeä[0-9]*$/)">
           {{ `❌ ${theirName} declined your Game Invite`}}
         </div>
-        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äaäcäcäeäpätä$/)">
+        <div class="Invite-options" v-if="outgoing&&outgoing.match(/^äaäcäcäeäpätä[0-9]*$/)">
           {{ `✅ ${theirName} accepted your Invite. Message them to setup Game`}}
         </div>
         <div class="Accept-reject-invite" v-if="incoming&&incoming.match(/^äiänäväiätäeä[0-9]*$/)">
@@ -53,20 +53,20 @@ else if (props.status === 'seen') msgItem.msiStatusOut = '👁'
             await matchStore.joinMatch(matchId)
             await $router.push({ path: '/game' });
             $router.go(0);
-            $emit('myDecision', 'äaäcäcäeäpätä')
+            $emit('myDecision', 'äaäcäcäeäpätä' + matchId)
           }">Accept
           </button>
           <button class="Confirm-delete-li-no" @click="async () => {
             const matchId = parseInt(incoming?.replace('äiänäväiätäeä', '') as string)
             await jwtInterceptor.post(baseUrl + '/match/decline', { matchId: matchId }, {withCredentials: true})
-            $emit('myDecision', 'ädäeäcäläiänäeä')
+            $emit('myDecision', 'ädäeäcäläiänäeä' + matchId)
           }">Reject
           </button>
         </div>
-        <div class="Invite-options" v-if="incoming&&incoming.match(/^ädäeäcäläiänäeä$/)">
+        <div class="Invite-options" v-if="incoming&&incoming.match(/^ädäeäcäläiänäeä[0-9]*$/)">
           {{ `❌ you declined ${theirName}'s Game Invite`}}
         </div>
-        <div class="Invite-options" v-if="incoming&&incoming.match(/^äaäcäcäeäpätä$/)">
+        <div class="Invite-options" v-if="incoming&&incoming.match(/^äaäcäcäeäpätä[0-9]$/)">
           {{ `✅ you accepted ${theirName}'s Invite'. Message them to setup Game`}}
         </div>
       </div>
