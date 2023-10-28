@@ -1,9 +1,9 @@
 <template>
-  <div>first time log in</div>
-  <div>set display name</div>
+  <div class="component-title">First time log in</div>
+  <div class="component-subtitle">Set display name</div>
   <Form @submit="onSubmit" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
     <div class="form-group">
-      <label>Choose a Display name:</label>
+      <label class="details">Choose a Display name: </label>
       <Field
         name="displayName"
         type="text"
