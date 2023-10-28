@@ -29,7 +29,6 @@ import { RefreshAuthGuard } from 'src/auth/guards/refresh.guard'
 import { UserEntity } from 'src/users/entities/user.entity'
 import { AuthService } from './auth.service'
 
-//TODO token and cookie to much same code
 export interface JwtPayload {
   userId: number
   iat: number
@@ -232,12 +231,6 @@ export class AuthController {
       expires: new Date(new Date().getTime() + 86409000)
     })
     await this.authService.updateRefreshToken(req.user.id, jwtRefreshToken)
-    // return {
-    //   userId: req.user.id,
-    //   twoFaEnabled: req.user.activated2FA
-    // }
-    //TODO cors and redirect o.O
-    //res.redirect(this.config.get<string>('FRONTEND_URL') + '/user/Preference')
   }
 
   /**

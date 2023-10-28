@@ -81,6 +81,4 @@ describe('Match Store', () => {
     store.removeCurrentMatch()
     expect(store.currentMatch).toBeFalsy()
   })
-
-  // TODO: test error handling
 })

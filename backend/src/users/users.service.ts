@@ -48,7 +48,6 @@ export class UsersService {
     }
   }
 
-  //TODO error handling?
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
     await this.prisma.user.update({
       where: { id: userId },
@@ -163,7 +162,6 @@ export class UsersService {
     }
   }
 
-  //TODO fail on download handle / and tests?
   async downloadProfil(url: string, id: number) {
     try {
       const response = await axios.get(url, {

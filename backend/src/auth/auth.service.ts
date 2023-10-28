@@ -133,7 +133,6 @@ export class AuthService {
     }
   }
 
-  //TODO test
   async verifyJwt(jwt: string) {
     try {
       const validToken = await this.jwtService.verifyAsync(jwt, { secret: process.env.JWTSECRET })

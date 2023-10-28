@@ -26,5 +26,4 @@ export interface PlayerOnMatch {
   score: number
   name: string
   email: string
-  // avatar: number // FIXME
 }

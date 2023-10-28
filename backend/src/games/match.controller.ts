@@ -45,7 +45,7 @@ export class MatchController {
    * @returns the created match entity
    */
   @Post()
-  @ApiCreatedResponse({ type: MatchEntity }) // TODO: include players in response example
+  @ApiCreatedResponse({ type: MatchEntity })
   @ApiNotFoundResponse({ description: 'gets send if one of the specified users does not exist' })
   async create(@Body() createMatchDto: CreateMatchDto) {
     try {
@@ -60,7 +60,7 @@ export class MatchController {
       return match
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError && error.code === 'P2003')
-        throw new NotFoundException('User not found') // TODO: maybe be more verbose: which user was not found?
+        throw new NotFoundException('User not found')
       throw error
     }
   }
@@ -135,8 +135,6 @@ export class MatchController {
     })
   }
 
-  // TODO: add route for getting a players matches by name
-
   /**
    * Searches for all matches where the specified user participated.
    * @param playerId user id of the player to search for.
@@ -175,17 +173,6 @@ export class MatchController {
   }
 
   /**
-   * Starts the match.
-   * Updates the start time of the match with the current time.
-   * @param id id of the match to start.
-   */
-  @Patch(':id/start')
-  async startMatch(@Param('id', ParseIntPipe) id: number) {
-    // TODO: check if players where added
-    await this.matchService.start(id)
-  }
-
-  /**
    * Updates the match.
    * Useful for adding new players or reporting the result.
    * @param id
@@ -203,7 +190,7 @@ export class MatchController {
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateGameDto: UpdateMatchDto) {
     // console.debug(`update match with id ${id} with`, { updateGameDto })
     if (updateGameDto.playerId === undefined && updateGameDto.scores === undefined)
-      throw new HttpException('not modified', HttpStatus.NO_CONTENT) // TODO: NOT MODIFIED is 304
+      throw new HttpException('not modified', HttpStatus.NO_CONTENT)
 
     try {
       await this.matchService.findOne(id)

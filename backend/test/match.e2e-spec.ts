@@ -55,7 +55,6 @@ describe('MatchController (e2e)', () => {
 
   describe('/GET match', () => {
     it('should return all matches', () => {
-      // TODO: check the content of the response?
       return request(app.getHttpServer()).get('/match').expect(200)
     })
 

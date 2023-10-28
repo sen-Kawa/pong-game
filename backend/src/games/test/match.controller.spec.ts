@@ -87,20 +87,11 @@ describe('MatchController', () => {
     })
   })
 
-  // describe('findOne', () => {
-  //   it('should return the match in detailed representation', async () => {
-  //     const match = await controller.findOne(1, { includeScores: true, includePlayers: true })
-
-  //     expect(match).toEqual(maximalMatch)
-  //   })
-  // })
-
   describe('update', () => {
     it('should add a second player to an existing match', async () => {
       await controller.update(1, { playerId: 2 })
 
       expect(service.addPlayer).toBeCalled()
-      // expect(match).toEqual(matchWithTwoPlayers) // TODO: arrange test for that
     })
 
     it('should add the match result and mark the game as completed', async () => {
@@ -114,7 +105,6 @@ describe('MatchController', () => {
       })
 
       expect(service.addMatchResult).toBeCalled()
-      // expect(match).toEqual(matchWithScore) // TODO: arrange test for that
     })
 
     it('should add a second player and report the match results', async () => {

@@ -45,7 +45,6 @@ const change2fa = () => {
       })
   } else {
     url.value = ''
-    //TODO error handling on deactivate
     authStore.deactivate2FA()
   }
 }

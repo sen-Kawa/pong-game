@@ -16,7 +16,7 @@ jwtInterceptor.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
     if (!error || !error.response) return Promise.reject(error)
-    
+
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       try {
@@ -31,7 +31,6 @@ jwtInterceptor.interceptors.response.use(
         return Promise.reject(error)
       }
     }
-    //TODO handle error on interceptors
     else {
       return Promise.reject(error)
     }

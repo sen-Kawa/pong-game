@@ -195,7 +195,6 @@ export const useAuthStore = defineStore('auth', () => {
       loginStatus.value = true
       router.push('/leader')
     } catch (error: any) {
-      //TODO improve error handling
       //return error.response.data.message;
     }
   }

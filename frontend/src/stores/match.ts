@@ -75,7 +75,6 @@ export const useMatchStore = defineStore('match', () => {
           withCredentials: true
         }
       )
-      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
 
       error.value = ''
       loading.value = false
@@ -155,7 +154,6 @@ export const useMatchStore = defineStore('match', () => {
         withCredentials: true,
         params: searchParams
       })
-      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
 
       error.value = ''
       loading.value = false
@@ -193,7 +191,6 @@ export const useMatchStore = defineStore('match', () => {
         withCredentials: true,
         params: searchParams
       })
-      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
       error.value = ''
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
@@ -275,7 +272,6 @@ export const useMatchStore = defineStore('match', () => {
       const response = await jwtInterceptor.get(requestPath, {
         withCredentials: true
       })
-      // await new Promise((resolve) => setTimeout(resolve, 1000)) // TODO: remove debug delay
       error.value = ''
       loading.value = false
       if (response.status >= 200 && response.status < 300) {
