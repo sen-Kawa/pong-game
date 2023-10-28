@@ -39,8 +39,8 @@ interface Game {
     yPos: number
     xVec: number
     yVec: number
-  },
-  invited_player?: number,
+  }
+  invited_player?: number
   score: [number, number]
   state: GameState
   gameid: number
@@ -115,8 +115,12 @@ export class MatchService {
       return undefined
     }
 
-    if (match.players[0].id != playerId && match.invited_player !== undefined && match.invited_player !== playerId) {
-        throw new HttpException('not allowed to join match', HttpStatus.UNAUTHORIZED)
+    if (
+      match.players[0].id != playerId &&
+      match.invited_player !== undefined &&
+      match.invited_player !== playerId
+    ) {
+      throw new HttpException('not allowed to join match', HttpStatus.UNAUTHORIZED)
     }
 
     if (match.players[0].id != playerId && match.players[1].id === undefined) {
@@ -133,11 +137,10 @@ export class MatchService {
   }
 
   async invite(playerId: number, invitingUser: number) {
-
     const match = await this.create({
-        players: {
-          create: { playerId: invitingUser }
-        }
+      players: {
+        create: { playerId: invitingUser }
+      }
     })
 
     const tmp = this.matches.get(match.id)
@@ -149,16 +152,15 @@ export class MatchService {
   async decline(matchId: number, playerId: number) {
     const match = this.matches.get(matchId)
     if (match) {
-        if (match.invited_player === playerId && match.state === GameState.Created) {
-            this.matchEnd(match)
-        } else {
-            throw new HttpException('not allowed to decline match', HttpStatus.UNAUTHORIZED)
-        }
+      if (match.invited_player === playerId && match.state === GameState.Created) {
+        this.matchEnd(match)
+      } else {
+        throw new HttpException('not allowed to decline match', HttpStatus.UNAUTHORIZED)
+      }
     }
   }
 
   private async matchEnd(game: Game) {
-
     let winner = 'Nobody'
     if (game.players[1].id !== undefined) {
       await this.addMatchResult(game.gameid, [
@@ -179,9 +181,7 @@ export class MatchService {
         this.usersService.updateWinLosses(game.players[1].id, game.players[0].id)
         winner = (await this.usersService.findOne(game.players[1].id)).name
       }
-    }
-    else
-      this.remove(game.gameid)
+    } else this.remove(game.gameid)
 
     this.socketService.socket
       .to(this.socketService.getSocketId(game.players[0].id))
@@ -417,10 +417,8 @@ export class MatchService {
       match.state = GameState.Running
 
       // send the other player name to player 0 to update player name data
-      const playerOne = await this.prisma.user.findFirst(
-        { where: { id: match.players[1].id}})
-      this.socketService.socket.to(other_player).emit('player_one_name', playerOne.name )
-
+      const playerOne = await this.prisma.user.findFirst({ where: { id: match.players[1].id } })
+      this.socketService.socket.to(other_player).emit('player_one_name', playerOne.name)
     }
   }
 
@@ -591,7 +589,9 @@ export class MatchService {
         }
       })
     } catch (error) {
-        this.logger.warn(`Match ${matchId} ended with ${scores[0].score}:${scores[1].score} but could not be saved.`)
+      this.logger.warn(
+        `Match ${matchId} ended with ${scores[0].score}:${scores[1].score} but could not be saved.`
+      )
     }
   }
 

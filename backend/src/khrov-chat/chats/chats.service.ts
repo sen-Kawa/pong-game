@@ -98,10 +98,10 @@ export class ChatsService {
     if (singleChatObject.outgoing.replace(filterRegex, '').length === 0) return false
 
     if (singleChatObject.outgoing.match(/^ädäeäcäläiänäeä[0-9]*$|^äaäcäcäeäpätä[0-9]*$/)) {
-      const str = singleChatObject.outgoing.replace("äaäcäcäeäpätä", '')
-      const str2 = str.replace("ädäeäcäläiänäeä", '')
+      const str = singleChatObject.outgoing.replace('äaäcäcäeäpätä', '')
+      const str2 = str.replace('ädäeäcäläiänäeä', '')
       const matchId = parseInt(str2)
-        console.log(matchId)
+      console.log(matchId)
       await this.prisma.chat_history.updateMany({
         where: {
           unionId: singleChatObject.unionId,
@@ -114,7 +114,7 @@ export class ChatsService {
       await this.prisma.chat_history.updateMany({
         where: {
           unionId: singleChatObject.unionIdOther,
-          outgoing: 'äiänäväiätäeä'+ matchId
+          outgoing: 'äiänäväiätäeä' + matchId
         },
         data: {
           outgoing: singleChatObject.outgoing

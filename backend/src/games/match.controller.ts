@@ -37,9 +37,7 @@ import { MatchService } from './match.service'
 @ApiTags('match')
 @UseGuards(JwtAuthGuard)
 export class MatchController {
-  constructor(
-    private readonly matchService: MatchService
-    ) {}
+  constructor(private readonly matchService: MatchService) {}
 
   /**
    * Creates a match entity.
@@ -95,7 +93,10 @@ export class MatchController {
 
   @Post('invite')
   async invitePlayer(@Req() request, @Body() body) {
-    if (this.matchService.isInMatch(request.user.id) || this.matchService.isInMatch(body.playerId)) {
+    if (
+      this.matchService.isInMatch(request.user.id) ||
+      this.matchService.isInMatch(body.playerId)
+    ) {
       throw new HttpException('player already in match', HttpStatus.NOT_MODIFIED)
     }
 
