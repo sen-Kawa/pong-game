@@ -94,7 +94,11 @@ export class MatchController {
   }
 
   @Post('invite')
-  async invitePlayer(@Req() request) {
+  async invitePlayer(@Req() request, @Body() body) {
+    if (this.matchService.isInMatch(request.user.id) || this.matchService.isInMatch(body.playerId)) {
+      throw new HttpException('player already in match', HttpStatus.NOT_MODIFIED)
+    }
+
     const match = await this.matchService.create({
       players: {
         create: { playerId: request.user.id }

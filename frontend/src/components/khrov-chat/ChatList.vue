@@ -351,13 +351,19 @@
             </span>
             <ul class="Profile-item-ul">
               <li class="Profile-item-li" @click="async () => {
-                  const matchId: number = (await jwtInterceptor.post(baseUrl + '/match/invite', {}, { withCredentials: true })).data;
-                  cList.chiChatMsg='äiänäväiätäeä' + matchId;
-                  submitChatMsg();
-                  styling.ProfileUlHeight='0px';
-                  layer.msg('Invite Sent!');
-                  await $router.push({ path: '/game' });
-                  $router.go(0);
+                  try {
+                    const response = await jwtInterceptor.post(baseUrl + '/match/invite', {playerId: cList.chiMorphPartnerUserId}, { withCredentials: true })
+                    if (response.status !== 201) throw response;
+                    const matchId: number = response.data;
+                    cList.chiChatMsg='äiänäväiätäeä' + matchId;
+                    submitChatMsg();
+                    styling.ProfileUlHeight='0px';
+                    layer.msg('Invite Sent!');
+                    await $router.push({ path: '/game' });
+                    $router.go(0);
+                  } catch {
+                    layer.msg('Invite Failed!');
+                  }
                 }">
                 Game Invite {{cList.chiMorphPartnerUName}}
               </li>
