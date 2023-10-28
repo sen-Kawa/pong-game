@@ -45,7 +45,6 @@ export const useChatsStore = defineStore('chats', () => {
     else if (response && response.status===401) {
       const refreshResponse = await useFetch(server + '/auth/refresh', 'GET', {});
       if (refreshResponse.ok) {
-        console.log('unauthorized')
         return fetchForKhrov(path, meth, body)
       }
       else {
@@ -72,12 +71,12 @@ export const useChatsStore = defineStore('chats', () => {
     }
   }
 
-  return { 
-    getIconNotifCnt, 
-    getChatNotifCnt, 
+  return {
+    getIconNotifCnt,
+    getChatNotifCnt,
     getChannNotifCnt,
     getKhrovCelestial,
     manageAllNotifCounter,
-    fetchForKhrov, 
+    fetchForKhrov,
   }
 })

@@ -122,7 +122,6 @@ export const useMatchStore = defineStore('match', () => {
         throw new Error(response.statusText)
       }
       const newMatch = transformMatchDTO(response.data as MatchDTO)
-      console.log("NewMatch", newMatch)
       currentLeftPlayer.value = newMatch.players[0].name
       if (newMatch.players[1])
         currentRightPlayer.value = newMatch.players[1].name

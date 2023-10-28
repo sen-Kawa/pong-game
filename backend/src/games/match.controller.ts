@@ -181,7 +181,6 @@ export class MatchController {
    */
   @Patch(':id/start')
   async startMatch(@Param('id', ParseIntPipe) id: number) {
-    console.debug(`start match with id ${id}`)
     // TODO: check if players where added
     await this.matchService.start(id)
   }

@@ -163,7 +163,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
   async function setDisplayName2(displayName: string, returnRoute: string) {
     const body = { displayName: displayName }
-    console.log('disp2', body)
     try {
       const response = await jwtInterceptor.patch(baseUrlUser + 'changeDisplay', body, {
         headers: {
@@ -185,7 +184,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   async function login(username: string) {
-    console.log(username)
     const body = { userid: username }
     try {
       await axios.post(baseUrlauth + 'login', body, {
@@ -198,7 +196,6 @@ export const useAuthStore = defineStore('auth', () => {
       router.push('/leader')
     } catch (error: any) {
       //TODO improve error handling
-      console.log(error)
       //return error.response.data.message;
     }
   }
