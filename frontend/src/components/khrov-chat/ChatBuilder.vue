@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import ChatIcon from '@/components/khrov-chat/ChatIcon.vue'
 import ChatWindow from '@/components/khrov-chat/ChatWindow.vue'
@@ -50,7 +50,7 @@ const openChatWindow = () => {
                                               openChatWindow();
                                               chatsStore.manageAllNotifCounter(0, 0, 'icon');
                                             }
-                                            startChat=1;  
+                                            startChat=1;
                                           }"
     >
       <ChatIcon />
