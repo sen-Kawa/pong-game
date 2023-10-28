@@ -13,7 +13,8 @@ import {
   Param,
   HttpException,
   HttpStatus,
-  HttpCode
+  HttpCode,
+  StreamableFile
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { DisplayNameDto } from './dto/displayName.dto'
@@ -37,7 +38,6 @@ import { FindUserDto } from './dto/find-user.dto'
 import { FriendDto } from './dto/friend.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { multerOptions } from 'src/config/multer.config'
-import * as fs from 'fs'
 
 @Controller('users')
 @ApiTags('users')
@@ -224,11 +224,12 @@ export class UsersController {
   @Get('userImage')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JwtAuthGuard')
-  async seeUploadedFile(@Req() req, @Res() res) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async seeUploadedFile(@Req() req, @Res({ passthrough: true }) res) {
     const image = await this.usersService.getUserAvatarUrl(req.user.id)
     const base64Image = image.avatar.split(';base64,').pop()
-    fs.writeFileSync('./files/' + req.user.displayName, base64Image, { encoding: 'base64' })
-    return res.sendFile(req.user.displayName, { root: './files' })
+    const buffer = Buffer.from(base64Image, 'base64')
+    return new StreamableFile(buffer)
   }
 
   /**
@@ -267,12 +268,16 @@ export class UsersController {
   @Get('userImage/:displayName')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JwtAuthGuard')
-  async seeUploadedFileOthers(@Param('displayName') displayName: string, @Res() res) {
+  async seeUploadedFileOthers(
+    @Param('displayName') displayName: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Res({ passthrough: true }) res
+  ) {
     const image = await this.usersService.getOtherAvatarUrl(displayName)
     if (!image) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     const base64Image = image.profile_pics[0].avatar.split(';base64,').pop()
-    fs.writeFileSync('./files/' + displayName, base64Image, { encoding: 'base64' })
-    return res.sendFile(displayName, { root: './files' })
+    const buffer = Buffer.from(base64Image, 'base64')
+    return new StreamableFile(buffer)
   }
 
   //TODO only for testing here, shouldnt be called from outside ;)
