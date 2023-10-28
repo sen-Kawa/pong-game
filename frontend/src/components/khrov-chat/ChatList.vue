@@ -354,11 +354,7 @@ import { response } from 'msw';
               <li class="Profile-item-li" @click="async () => {
                   try {
                     const response = await jwtInterceptor.post(baseUrl + '/match/invite', {playerId: cList.chiMorphPartnerUserId}, { withCredentials: true })
-                    console.log(response.status)
-                    if (response.status === 304) {
-                        layer.msg("Player is already in a match!")
-                        return
-                    } else if (response.status !== 201) throw response;
+                    if (response.status !== 201) throw response;
 
                     const matchId: number = response.data;
                     cList.chiChatMsg='äiänäväiätäeä' + matchId;
