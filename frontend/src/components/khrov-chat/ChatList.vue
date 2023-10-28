@@ -367,7 +367,8 @@ import { response } from 'msw';
                     layer.msg('Invite Sent!');
                     await $router.push({ path: '/game' });
                     $router.go(0);
-                  } catch {
+                  } catch (e) {
+                    console.error(e)
                     layer.msg('Invite Failed!');
                   }
                 }">
