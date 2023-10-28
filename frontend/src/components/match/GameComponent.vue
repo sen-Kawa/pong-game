@@ -22,7 +22,6 @@
     import { ref, onUnmounted, onMounted } from 'vue';
     import { type GameUpdate } from 'common-types';
     // import { paddleHeight, paddleWidth, ballRadius, fieldHeight, fieldWidth } from 'common-types'
-    import { useAuthStore } from '../../stores/auth.js';
     import { useMatchStore } from '../../stores/match.js';
 
     const paddleWidth = 15
@@ -90,7 +89,7 @@
     socket.on("start_game", () => {
         interval = setInterval(drawGame, 1000/ 50)
     })
-    
+
      // when player joins the game the player name is updated
     socket.on("player_one_name", (playerOneName: string) => {
         rightPlayerName.value = playerOneName
