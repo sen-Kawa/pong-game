@@ -99,18 +99,14 @@ export class MatchController {
       throw new HttpException('player already in match', HttpStatus.NOT_MODIFIED)
     }
 
-    const match = await this.matchService.create({
-      players: {
-        create: { playerId: request.user.id }
-      }
-    })
+    const matchId = await this.matchService.invite(body.playerId, request.user.id)
 
-    return match.id
+    return matchId
   }
 
   @Post('decline')
-  async declineMatch(@Body() body) {
-    return this.matchService.decline(body.matchId)
+  async declineMatch(@Body() body, @Req() request) {
+    return this.matchService.decline(body.matchId, request.user.id)
   }
 
   /**

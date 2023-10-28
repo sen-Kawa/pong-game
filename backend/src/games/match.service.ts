@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common'
+import { ConflictException, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { Prisma, Status } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { GameStatus } from './dto/query-match.dto'
@@ -39,7 +39,8 @@ interface Game {
     yPos: number
     xVec: number
     yVec: number
-  }
+  },
+  invited_player?: number,
   score: [number, number]
   state: GameState
   gameid: number
@@ -114,6 +115,10 @@ export class MatchService {
       return undefined
     }
 
+    if (match.players[0].id != playerId && match.invited_player !== undefined && match.invited_player !== playerId) {
+        throw new HttpException('not allowed to join match', HttpStatus.UNAUTHORIZED)
+    }
+
     if (match.players[0].id != playerId && match.players[1].id === undefined) {
       match.players[1].id = playerId
       await this.addPlayer(matchId, playerId)
@@ -127,10 +132,28 @@ export class MatchService {
     return db_match
   }
 
-  async decline(matchId: number) {
+  async invite(playerId: number, invitingUser: number) {
+
+    const match = await this.create({
+        players: {
+          create: { playerId: invitingUser }
+        }
+    })
+
+    const tmp = this.matches.get(match.id)
+    tmp.invited_player = playerId
+
+    return match.id
+  }
+
+  async decline(matchId: number, playerId: number) {
     const match = this.matches.get(matchId)
     if (match) {
-        this.matchEnd(match)
+        if (match.invited_player === playerId && match.state === GameState.Created) {
+            this.matchEnd(match)
+        } else {
+            throw new HttpException('not allowed to decline match', HttpStatus.UNAUTHORIZED)
+        }
     }
   }
 
