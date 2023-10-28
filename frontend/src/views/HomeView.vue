@@ -47,8 +47,6 @@ async function onSubmit(values: any, { setErrors }: any) {
   setErrors({ apiError: stuff })
 }
 
-//TODO fake login for chat testing
-
 const back_url = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/42login/`
 const { isLoggedIn } = storeToRefs(authStore)
 const { getUserName } = storeToRefs(authStore)

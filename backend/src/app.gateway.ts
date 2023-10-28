@@ -37,8 +37,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-    //TODO error handling
-    //TODO run via refresh if auth token invalid
     if (!client.handshake.headers.cookie) client.disconnect()
     else {
       try {
@@ -62,7 +60,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   }
 
   async handleDisconnect(client: Socket) {
-    //TODO error handling
     if (client.data.userId) {
       this.appService.disconnectedUser(client.data.userId, client.id)
       this.logger.log('Client disconnected ' + client.data.userId)

@@ -21,7 +21,6 @@ onBeforeRouteLeave(() => {
     return true
   }
   const answer = window.confirm('Do yo really want to leave the queue?')
-  console.debug(answer)
   if (!answer) return false
   sendLeaveQueueEvent()
 })

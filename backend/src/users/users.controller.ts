@@ -210,7 +210,6 @@ export class UsersController {
     await this.usersService.updateAvatar(req.user.id, imagedata)
   }
 
-  //TODO checks for failure in database request
   /**
    * Returns the User Profil Picture as stream
    * @param req USerID
@@ -279,15 +278,4 @@ export class UsersController {
     const buffer = Buffer.from(base64Image, 'base64')
     return new StreamableFile(buffer)
   }
-
-  //TODO only for testing here, shouldnt be called from outside ;)
-  /**
-   * test route for updating users on win/losses
-   */
-  // @UseGuards(JwtAuthGuard)
-  // @Post('/updateWinLosses')
-  // async updateWinLosses(@Body() test: any) {
-  //   console.log(test)
-  //   this.usersService.updateWinLosses(test.winner, test.loser)
-  // }
 }

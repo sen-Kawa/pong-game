@@ -7,7 +7,6 @@
   import { useChatsStore } from '@/stores/chats'
   import { socket } from '@/sockets/sockets'
   import jwtInterceptor from '@/interceptor/jwtInterceptor';
-import { response } from 'msw';
 
   const baseUrl = import.meta.env.VITE_BACKEND_SERVER_URI;
 

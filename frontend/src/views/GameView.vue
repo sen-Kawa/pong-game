@@ -42,6 +42,7 @@ socket.on('match_end', async (name: string) => {
   setTimeout(() => {
     showEndscreen.value = false
     winner.value = ''
+    router.go(0)
   }, 5000)
   matchStore.removeCurrentMatch()
 })

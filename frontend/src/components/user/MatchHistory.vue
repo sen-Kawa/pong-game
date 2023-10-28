@@ -28,7 +28,6 @@ onMounted(() => {
   matchStore.getMatchHistory(scope.value)
 })
 
-//TODO fix joinGame function as props for matchlist?
 </script>
 
 <template>

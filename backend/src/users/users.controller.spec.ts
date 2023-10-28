@@ -10,7 +10,6 @@ import { Readable } from 'stream'
 import { UpdateStatusDto } from './dto/updateStatus.dto'
 import { Status } from '@prisma/client'
 import { DisplayNameDto } from './dto/displayName.dto'
-//TODO check return values? right type not value
 describe('UsersController Unit Tests', () => {
   let userController: UsersController
 

@@ -58,7 +58,6 @@ export async function getFriendList() {
   }
   try {
   	const response = await jwtInterceptor.get(`${BASE_URL}/friends/`, requestOptions)
-	console.log('Request succesful in friends list.');
 	return response.data
   } catch (error) {
 	  console.error('Error fetching friends list: ', error);

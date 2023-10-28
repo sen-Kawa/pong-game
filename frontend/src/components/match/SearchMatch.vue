@@ -59,7 +59,6 @@ defineProps({
 
 const matchStore = useMatchStore()
 
-// TODO: call when checkboxes changed
 function applyFilters() {
   matchStore.matches = []
   matchStore.getMatches()

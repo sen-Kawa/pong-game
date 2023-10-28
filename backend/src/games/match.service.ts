@@ -462,7 +462,6 @@ export class MatchService {
     gameStatus?: GameStatus
     players?: number[]
   }): Promise<MatchEntity | unknown> {
-    // TODO: add sorting and limit
     const { includeScores, includePlayers, gameStatus, players } = options
 
     const playersOnMatchFilter =
@@ -532,7 +531,6 @@ export class MatchService {
     })
   }
 
-  // TODO: check if the player is already on the match
   async addPlayer(matchId: number, additionalPlayer: number) {
     // check if maxPlayersOnMatch already reached
     const currentPlayerCount = await this.prisma.playersOnMatch.count({

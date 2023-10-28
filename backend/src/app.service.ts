@@ -11,7 +11,6 @@ export class AppService {
 
   private logger: Logger = new Logger('AppService')
 
-  //TODO error handling if user not there
   async connectedUser(userId: number, socketId: string) {
     const user = await this.userService.findOne(userId)
     if (!user) return

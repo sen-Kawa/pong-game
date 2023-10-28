@@ -1,9 +1,7 @@
 import { extname } from 'path'
 import { HttpException, HttpStatus } from '@nestjs/common'
 
-//TODO file location in env? process.env.UPLOAD_LOCATION
 const fileLocation = './files'
-//TODO file size in env? process.env.MAX_FILE_SIZE
 const maxFileSize = 1024 * 1024
 export const multerConfig = {
   dest: fileLocation
