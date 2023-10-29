@@ -1,16 +1,15 @@
 <template>
 	<h1 class="component-title">Technical Specifications</h1>
-	<h2 class="component-subtitle">Version 1.0.0</h2>
+	<h2 class="component-subtitle">Version</h2>
+	<p class="details">1.0.0</p>
 	<h2 class="component-subtitle">Frontend</h2>
-	<p>Vue.js</p>
+	<p class="details">Vue.js</p>
 	<h2 class="component-subtitle">Backend</h2>
-	<p>NestJS</p>
-	<h2 class="component-subtitle">Developers</h2>
-	<p>Chris, daniel, markus, ulli, karla, pedro, freddo</p>
-	<h2 class="component-subtitle">Repository</h2>
-	<p>https://github.com/transcendence</p>
+	<p class="details">NestJS</p>
+	<h2 class="component-subtitle">Database</h2>
+	<p class="details">PostgreSQL</p>
 	<h2 class="component-subtitle">License</h2>
-	<p>GPL</p>
+	<p class="details">GPL</p>
 	<router-link to="/">Go Back</router-link>
 </template>
 
