@@ -1,9 +1,9 @@
 <template>
   <div class="validation-form">
-    <p>Validate yourself with your Auth App code</p>
+    <p class="component-title">Validate yourself with your Auth App code</p>
     <Form id="twoFactor" @submit="onSubmit" :validation-schema="schema" v-slot="{ errors }">
       <div class="form-group">
-        <label>Code:</label>
+        <label class="details">Code:</label>
         <Field
           id="inputField"
           name="codeValue"
