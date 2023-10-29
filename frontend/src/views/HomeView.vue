@@ -6,7 +6,7 @@
     <div>
       <a class="component-title login" v-bind:href="back_url"> Login with your 42 account </a>
     </div>
-    <p>Fake login for testing</p>
+    <!-- <p>Fake login for testing</p>
     <Form @submit="onSubmit" :validation-schema="schema" v-slot="{ errors, isSubmitting }">
       <div class="form-group">
         <label>User Id</label>
@@ -25,7 +25,7 @@
         </button>
       </div>
       <div v-if="errors.apiError">{{ errors.apiError }}</div>
-    </Form>
+    </Form> -->
   </div>
   <div v-else class="component-title">Welcome {{ getUserName }}</div>
 </template>
