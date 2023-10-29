@@ -98,7 +98,7 @@ export const useMatchStore = defineStore('match', () => {
   }
 
   async function joinMatch(id: number) {
-    console.log('joinMatch called:', id)
+   // console.log('joinMatch called:', id)
     const requestPath = baseUrlMatch + '/join'
     // console.log("Join cM 1: ", currentMatch.value)
 
