@@ -32,20 +32,20 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { Field, Form } from 'vee-validate'
-import * as Yup from 'yup'
+// import { Field, Form } from 'vee-validate'
+// import * as Yup from 'yup'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
-const schema = Yup.object().shape({
-  username: Yup.string().required('Username is required')
-})
+// const schema = Yup.object().shape({
+//   username: Yup.string().required('Username is required')
+// })
 
-async function onSubmit(values: any, { setErrors }: any) {
-  const { username } = values
-  const stuff = await authStore.login(username)
-  setErrors({ apiError: stuff })
-}
+// async function onSubmit(values: any, { setErrors }: any) {
+//   const { username } = values
+//   const stuff = await authStore.login(username)
+//   setErrors({ apiError: stuff })
+// }
 
 const back_url = `${import.meta.env.VITE_BACKEND_SERVER_URI}/auth/42login/`
 const { isLoggedIn } = storeToRefs(authStore)
