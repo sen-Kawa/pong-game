@@ -1,5 +1,5 @@
 <template>
-    <h2 class="component-subtitle">No. {{ match.id }}: {{matchStore.currentLeftPlayer}} ./. {{rightPlayerName}}</h2>
+    <h2 class="component-subtitle">No. {{ match.id }}: {{matchStore.currentLeftPlayer}} ./. {{matchStore.currentRightPlayer}}</h2>
     <br>
 	<div class="game">
 		<div class="map-menu">
@@ -44,7 +44,6 @@
     const playerInfo = ref('Control your player with [w] for up and [s] for down.')
     const elementColor:string = 'white'
 
-    const rightPlayerName = ref('pending ...')
     const matchStore = useMatchStore()
 
     let interval: any
@@ -92,7 +91,7 @@
 
      // when player joins the game the player name is updated
     socket.on("player_one_name", (playerOneName: string) => {
-        rightPlayerName.value = playerOneName
+        matchStore.currentRightPlayer = playerOneName
     })
 
     onUnmounted(() => {
@@ -172,9 +171,6 @@
         // change the key and info if player is on the right side (maybe put it to a setup function later)
         game_state.value.game.players[0].pos = 450 / 2
         game_state.value.game.players[1].pos = 450 / 2
-        if(props.player_number == 1) {
-            rightPlayerName.value = matchStore.getRightPlayer
-        }
         socket.emit("player_connected", [props.match.id])
     }
 
