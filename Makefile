@@ -3,18 +3,14 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hrings <hrings@student.42.fr>              +#+  +:+       +#+         #
+#    By: fhenrich <fhenrich@student.42wolfsburg.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/05 18:50:57 by hrings            #+#    #+#              #
-#    Updated: 2023/06/09 09:46:11 by hrings           ###   ########.fr        #
+#    Updated: 2023/10/30 09:18:59 by fhenrich         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-all: install build up
-
-install:
-	npm install --prefix backend
-	npm install --prefix frontend
+all: build up
 
 build:
 	@docker compose -f docker-compose.yml build
@@ -42,4 +38,4 @@ clean:
 fclean: clean
 	@docker system prune -f
 
-.PHONY: all re down clean fclean install production re-prod
+.PHONY: all re down clean fclean production re-prod

@@ -1,6 +1,7 @@
 FROM node:20
 
-RUN mkdir -p /app
+COPY ./frontend /app
+COPY ./common /common
 WORKDIR /app
 
 #COPY ./frontend/package*.json .
@@ -10,4 +11,4 @@ WORKDIR /app
 
 EXPOSE 3030
 
-CMD npm run dev
+CMD npm install && npm run dev
